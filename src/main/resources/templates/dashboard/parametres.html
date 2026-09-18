@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::content})}">
+<head><title>Personnaliser - HellMetz</title></head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header"><div class="hm-card-title">⚙️ Mes widgets</div></div>
+        <p style="color:var(--hm-text-muted);">Coche pour afficher, glisse pour réordonner.</p>
+
+        <form th:action="@{/dashboard/parametres}" method="post">
+            <ul id="liste-widgets" class="list-group mb-3">
+                <li class="list-group-item d-flex align-items-center gap-2"
+                    th:each="w : ${affichage}">
+                    <span class="poignee" style="cursor:grab;">⠿</span>
+                    <input type="checkbox" name="widgets" th:value="${w.name()}"
+                           th:checked="${visibles.contains(w)}">
+                    <span th:text="${w.libelle}">Widget</span>
+                </li>
+            </ul>
+            <button type="submit" class="hm-btn-primary"><span>💾</span><span>Enregistrer</span></button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        new Sortable(document.getElementById('liste-widgets'),
+            { handle: '.poignee', animation: 150 });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>3.2.5</version>
+      <relativePath/>
+    </parent>
+    <groupId>com.hellmetz</groupId>
+    <artifactId>hellmetz</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>HellMetz Festival - Backoffice</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+        <!-- Application Web + Tomcat embarqué -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Spring Data JPA + Hibernate (ORM) -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- Spring Security (remplace AuthenticationFilter) -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- Thymeleaf (remplace les JSP) -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- Thymeleaf + Spring Security (affichage conditionnel) -->
+        <dependency>
+          <groupId>org.thymeleaf.extras</groupId>
+          <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+        </dependency>
+        <!-- Connecteur PostgreSQL (votre BDD) -->
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <!-- Validation des formulaires -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.mindrot</groupId>
+          <artifactId>jbcrypt</artifactId>
+          <version>0.4</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flywaydb</groupId>
+          <artifactId>flyway-core</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <finalName>web-hellmetz</finalName>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+</project>

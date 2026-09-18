@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title>Paramètres - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header">
+            <div>
+                <div class="hm-tag">Administration</div>
+                <div class="hm-card-title">⚙️ Paramètres de l'application</div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <form action="/parametres" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">⚙️ Général</div>
+                    <div class="row">
+                        <div th:each="p : ${parametres}" th:if="${#strings.startsWith(p.codeParametre, 'app.')}"
+                             class="col-md-6 mb-3">
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                        </div>
+                        <div th:each="p : ${parametres}" th:if="${p.codeParametre == 'festival.edition'}"
+                             class="col-md-6 mb-3">
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#e74c3c; font-weight:700; margin-bottom:16px;">📅 Dates</div>
+                    <div class="row">
+                        <div th:each="p : ${parametres}"
+                             th:if="${#strings.startsWith(p.codeParametre, 'festival.date')}"
+                             class="col-md-6 mb-3">
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                            <input type="date" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
+                    <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">🔑 Programmation</div>
+                    <small style="color:var(--hm-text-muted);">Délais pris en compte lors de la génération du planning des scènes.</small>
+                    <div class="row mt-2">
+                        <div th:each="p : ${parametres}"
+                             th:if="${#strings.startsWith(p.codeParametre, 'programmation.')}"
+                             class="col-md-6 mb-3">
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="number" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                                <span style="color:var(--hm-text-muted);">min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">✉️ Coordonnées</div>
+                    <div class="row">
+                        <div th:each="p : ${parametres}"
+                             th:if="${#strings.startsWith(p.codeParametre, 'contact.')}"
+                             class="col-md-6 mb-3">
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#9b59b6; font-weight:700; margin-bottom:16px;">🖥️ Affichage & système</div>
+                    <div class="row">
+                        <div th:each="p : ${parametres}"
+                             th:if="${#strings.startsWith(p.codeParametre, 'affichage.')}"
+                             class="col-md-6 mb-3">
+
+                            <input type="hidden" name="ids" th:value="${p.idParametre}">
+                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+
+                            <th:block th:if="${p.codeParametre == 'affichage.theme'}">
+                                <select class="form-select" name="valeurs">
+                                    <option value="Sombre" th:selected="${p.valeurParametre == 'Sombre'}">Sombre</option>
+                                    <option value="Claire" th:selected="${p.valeurParametre == 'Claire'}">Claire</option>
+                                </select>
+                            </th:block>
+
+                            <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
+                                <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                            </th:block>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="submit" class="hm-btn-primary" style="border:none;">
+                        <span>💾</span><span>Enregistrer</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

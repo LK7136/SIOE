@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${pageTitle != null ? pageTitle : 'HellMetz - Backoffice'}">HellMetz - Backoffice</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700&display=swap" rel="stylesheet">
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-festava-live.css}" rel="stylesheet">
+
+    <link th:href="@{/css/backoffice.css}" rel="stylesheet">
+
+    <meta th:if="${rafraichissement != null and rafraichissement > 0}"
+          http-equiv="refresh" th:content="${rafraichissement}">
+    <meta name="_csrf"        th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack-all.js"></script>
+</head>
+<body th:class="${theme == 'Claire'} ? 'theme-clair' : 'theme-sombre'">
+
+<div class="backoffice-wrapper">
+
+    <aside id="sidebar" class="backoffice-sidebar hm-sidebar">
+        <script>
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
+        <div th:replace="~{menu :: menu}"></div>
+    </aside>
+
+    <main class="backoffice-main main-content">
+        <header class="backoffice-header"
+                style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+            <div>
+                <h1 th:text="${pageTitle != null ? pageTitle : 'Backoffice HellMetz'}">Backoffice HellMetz</h1>
+                <p class="subtitle">Interface d'administration du festival (groupes, concerts, logistique…)</p>
+            </div>
+
+            <div th:if="${#authentication != null}"
+                 style="display:flex; align-items:center; gap:.75rem; white-space:nowrap;">
+                <span><i class="bi bi-person-circle"></i> Bonjour,
+                    <strong th:text="${#authentication.name}">admin</strong>
+                </span>
+                <form th:action="@{/logout}" method="post" style="margin:0;">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-left"></i> Se déconnecter
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <section>
+            <div th:replace="${content}"></div>
+        </section>
+    </main>
+
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/click-scroll.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleSidebarBtn');
+
+        // Écoute le clic pour ouvrir/fermer et enregistrer le choix
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebar-collapsed', isCollapsed);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

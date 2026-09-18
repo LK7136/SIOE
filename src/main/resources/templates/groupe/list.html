@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title>Groupes - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header">
+            <div>
+                <div class="hm-tag">Gestion</div>
+                <div class="hm-card-title">Groupes du HellMetz Festival</div>
+            </div>
+
+            <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
+               th:href="@{/groupes/ajouter}" class="hm-btn-primary">
+                <span>＋</span>
+                <span>Nouveau groupe</span>
+            </a>
+        </div>
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
+            <form th:action="@{/groupes/liste}" method="get"
+                  style="display:flex; align-items:center; gap:.5rem; margin:0;">
+                <!-- on revient en page 1 quand on change la taille -->
+                <input type="hidden" name="page" value="0">
+                <label for="taille" style="font-size:.9rem;">Afficher</label>
+                <select id="taille" name="taille" class="form-select" style="width:auto;"
+                        onchange="this.form.submit()">
+                    <option value="10"   th:selected="${taille == '10'}">10</option>
+                    <option value="20"   th:selected="${taille == '20'}">20</option>
+                    <option value="50"   th:selected="${taille == '50'}">50</option>
+                    <option value="100"  th:selected="${taille == '100'}">100</option>
+                    <option value="tout" th:selected="${taille == 'tout'}">Tout</option>
+                </select>
+                <span style="font-size:.9rem;">par page</span>
+            </form>
+        </div>
+        <div th:if="${#lists.isEmpty(groupes)}" style="padding: 40px; text-align: center;">
+            <p>Aucun groupe enregistré pour le moment.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(groupes)}" class="table-responsive">
+            <table class="hm-table">
+                <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Style</th>
+                    <th>Année Création</th>
+                    <th>Pays</th>
+                    <th>Site web</th>
+                    <th sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="g : ${groupes}">
+                    <td>
+                        <img th:if="${not #strings.isEmpty(g.urlLogo)}"
+                             th:src="@{/groupes/uploads/{photo}(photo=${g.urlLogo})}"
+                             th:alt="${'Photo de ' + g.nomGroupe}"
+                             style="width: 50px; height: 50px; border-radius: 4px;">
+
+                        <img th:unless="${not #strings.isEmpty(g.urlLogo)}"
+                             th:src="@{/images/groupes/defaultGroupeAvatar.png}"
+                             alt="Photo par défaut"
+                             style="width: 50px; height: 50px; border-radius: 4px;">
+                    </td>
+
+                    <td><strong th:text="${g.nomGroupe}"></strong></td>
+                    <td><strong th:text="${g.description}"></strong></td>
+                    <td>
+                        <span th:each="style : ${g.stylesDuGroupe}" class="hm-pill"
+                              th:text="${style.libelle}">
+                        </span>
+                    </td>
+                    <td><span class="hm-pill" th:text="${g.anneeCreation}"></span></td>
+                    <td th:text="${g.paysOrigine}"></td>
+                    <td>
+                        <a th:if="${not #strings.isEmpty(g.siteWeb)}"
+                           class="hm-link-site"
+                           th:href="${g.siteWeb}"
+                           target="_blank" rel="noopener noreferrer">
+                            ouvrir
+                        </a>
+                    </td>
+                    <td sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">
+                        <a class="hm-link-site"
+                           th:href="@{/groupes/ajouter(id=${g.id})}">
+                            ✏️ éditer
+                        </a>
+                        &nbsp;|&nbsp;
+                        <a class="hm-link-site"
+                           th:href="@{/groupes/delete/{id}(id=${g.id})}"
+                           onclick="return confirm('Supprimer ce groupe ?');">
+                            🗑️ supprimer
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <nav th:if="${taille != 'tout' and page.totalPages > 1}"
+                 style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+
+    <span style="font-size:.85rem; color:var(--hm-text-muted);"
+          th:text="${page.totalElements} + ' groupes au total'">0 groupes</span>
+
+                <ul class="pagination mb-0">
+                    <!-- Précédent -->
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/groupes/liste(page=${page.number - 1}, taille=${taille})}">‹</a>
+                    </li>
+
+                    <!-- Numéros de page (affichage 1-based) -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/groupes/liste(page=${i}, taille=${taille})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Suivant -->
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/groupes/liste(page=${page.number + 1}, taille=${taille})}">›</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

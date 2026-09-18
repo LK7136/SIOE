@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title>Artistes - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header">
+            <div>
+                <div class="hm-tag">Programmation</div>
+                <div class="hm-card-title">Artistes du HellMetz Festival</div>
+            </div>
+
+            <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
+               th:href="@{/artistes/ajouter}" class="hm-btn-primary">
+                <span>＋</span>
+                <span>Nouvel artiste</span>
+            </a>
+        </div>
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
+            <form th:action="@{/artistes/liste}" method="get"
+                  style="display:flex; align-items:center; gap:.5rem; margin:0;">
+                <!-- on revient en page 1 quand on change la taille -->
+                <input type="hidden" name="page" value="0">
+                <label for="taille" style="font-size:.9rem;">Afficher</label>
+                <select id="taille" name="taille" class="form-select" style="width:auto;"
+                        onchange="this.form.submit()">
+                    <option value="10"   th:selected="${taille == '10'}">10</option>
+                    <option value="20"   th:selected="${taille == '20'}">20</option>
+                    <option value="50"   th:selected="${taille == '50'}">50</option>
+                    <option value="100"  th:selected="${taille == '100'}">100</option>
+                    <option value="tout" th:selected="${taille == 'tout'}">Tout</option>
+                </select>
+                <span style="font-size:.9rem;">par page</span>
+            </form>
+        </div>
+
+        <div th:if="${#lists.isEmpty(artistes)}" style="padding: 40px; text-align: center;">
+            <p>Aucun artiste enregistré pour le moment.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(artistes)}" class="table-responsive">
+            <table class="hm-table">
+                <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Artiste / Groupe</th>
+                    <th>Style</th>
+                    <th>Nationalité</th>
+                    <th sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="a : ${artistes}">
+                    <td>
+                        <img th:if="${not #strings.isEmpty(a.urlPhoto)}"
+                             th:src="@{/artistes/uploads/{photo}(photo=${a.urlPhoto})}"
+                             th:alt="${'Photo de ' + a.nom}"
+                             style="width: 50px; height: 50px; border-radius: 4px;">
+
+                        <img th:unless="${not #strings.isEmpty(a.urlPhoto)}"
+                             th:src="@{/images/artistes/defaultAvatar.png}"
+                             alt="Photo par défaut"
+                             style="width: 50px; height: 50px; border-radius: 4px;">
+                    </td>
+
+                    <td>
+                        <strong th:text="${a.nomScene}"></strong><br>
+                        <small style="color: #666;">
+                            <span th:text="${a.prenom}"></span>
+                            <span th:text="${a.nom}"></span>
+                        </small>
+                    </td>
+
+                    <td>
+                        <span class="hm-pill" th:text="${a.style != null ? a.style.libelle : ''}"></span>
+                    </td>
+
+                    <td th:text="${a.nationalite}"></td>
+
+                    <td sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">
+                        <a class="hm-link-site"
+                           th:href="@{/artistes/ajouter(id=${a.id})}">
+                            ✏️ éditer
+                        </a>
+                        &nbsp;|&nbsp;
+                        <a class="hm-link-site"
+                           th:href="@{/artistes/delete/{id}(id=${a.id})}"
+                           th:onclick="'return confirm(\'Supprimer l\'artiste ' + ${a.id} + ' ?\')'"
+                           style="color: #e74c3c;">
+                            🗑️ supprimer
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <nav th:if="${taille != 'tout' and page.totalPages > 1}"
+                 style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+
+    <span style="font-size:.85rem; color:var(--hm-text-muted);"
+          th:text="${page.totalElements} + ' artistes au total'">0 artistes</span>
+
+                <ul class="pagination mb-0">
+                    <!-- Précédent -->
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/artistes/liste(page=${page.number - 1}, taille=${taille})}">‹</a>
+                    </li>
+
+                    <!-- Numéros de page (affichage 1-based) -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/artistes/liste(page=${i}, taille=${taille})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Suivant -->
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/artistes/liste(page=${page.number + 1}, taille=${taille})}">›</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

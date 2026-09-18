@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<div th:fragment="menu" style="display: flex; flex-direction: column; width: 100%;">
+
+  <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px;">
+    <div class="backoffice-logo sidebar-text" style="margin: 0;">HellMetz</div>
+    <button type="button" id="toggleSidebarBtn" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.2rem; padding: 5px;">
+      ☰
+    </button>
+  </div>
+
+  <div class="backoffice-subtitle sidebar-text" style="padding: 0 20px 15px 20px;">Backoffice organisateur</div>
+
+  <nav class="backoffice-nav">
+    <a th:href="@{/dashboard}"
+       th:class="${activeMenu eq 'dashboard' ? 'active' : ''}">
+      <span class="menu-icon">🏠</span><span class="menu-text">Tableau de bord</span>
+    </a>
+
+    <a th:href="@{/scenes/liste}"
+       th:class="${activeMenu eq 'scenes' ? 'active' : ''}">
+      <span class="menu-icon">🪩</span><span class="menu-text">Scenes</span>
+    </a>
+
+    <a th:href="@{/artistes/liste}"
+       th:class="${activeMenu eq 'artiste' ? 'active' : ''}">
+      <span class="menu-icon">🧑‍🎤</span><span class="menu-text">Artistes</span>
+    </a>
+
+    <a th:href="@{/groupes/liste}"
+       th:class="${activeMenu eq 'groupes' ? 'active' : ''}">
+      <span class="menu-icon">🎸</span><span class="menu-text">Groupes</span>
+    </a>
+
+    <a th:href="@{/concerts/liste}"
+       th:class="${activeMenu eq 'concerts' ? 'active' : ''}">
+      <span class="menu-icon">🎵</span><span class="menu-text">Concerts</span>
+    </a>
+
+    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+       th:href="@{/festival/utilisateurs/liste}"
+       th:class="${activeMenu eq 'utilisateurs' ? 'active' : ''}">
+      <span class="menu-icon">👥</span><span class="menu-text">Utilisateurs</span>
+    <a/>
+
+    <a class="disabled"><span class="menu-icon">📦</span><span class="menu-text">Logistique & Matériel</span></a>
+    <a class="disabled"><span class="menu-icon">🧑‍🤝‍🧑</span><span class="menu-text">RH & Bénévoles</span></a>
+    <a class="disabled"><span class="menu-icon">📍</span><span class="menu-text">Points d'intérêt</span></a>
+
+    <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
+       th:href="@{/parametres/liste}" th:class="${activeMenu eq 'parametres' ? 'active' : ''}">
+      <span class="menu-icon">⚙️</span><span class="menu-text">Paramètres</span>
+    </a>
+
+  </nav>
+</div>
+</html>

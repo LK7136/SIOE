@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="hellmetz1:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/hellmetz1_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="hellmetz1/web/Web" />
+    </root>
+  </artifact>
+</component>
