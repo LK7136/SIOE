@@ -1,5 +1,5 @@
 package com.hellmetz.festival.controller;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.hellmetz.festival.model.Permission;
 import com.hellmetz.festival.model.Role;
 import com.hellmetz.festival.model.Utilisateur;
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @Controller
 public class UtilisateurController {
@@ -145,17 +146,19 @@ public class UtilisateurController {
     @PostMapping("/festival/utilisateurs/edit")
     public String save(@ModelAttribute Utilisateur utilisateur,
                        @RequestParam Long idRole,
-                       @RequestParam(required = false) Boolean actif) {
+                       @RequestParam(required = false) Boolean actif,
+                       RedirectAttributes redirectAttributes) {
         Role role = roleService.findById(idRole);
         if (utilisateur.getId() != null) {
-            Utilisateur existing = utilisateurDetailService.findById(utilisateur.getId());
-            existing.setRoles(java.util.List.of(role));
-            existing.setActif(actif != null && actif);
-            utilisateurDetailService.save(existing);
+            utilisateur.setRoles(java.util.List.of(role));
+            utilisateur.setActif(actif != null && actif);
+            utilisateurDetailService.modifierUtilisateur(utilisateur);
+            redirectAttributes.addFlashAttribute("message", "Utilisateur modifié avec succès.");
         } else {
             // Création
             utilisateur.setRoles(java.util.List.of(role));
             utilisateurDetailService.creerUtilisateur(utilisateur);
+            redirectAttributes.addFlashAttribute("message", "Utilisateur créé avec succès.");
         }
         return "redirect:/festival/utilisateurs/liste";
     }
