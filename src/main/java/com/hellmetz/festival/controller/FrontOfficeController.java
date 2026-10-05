@@ -2,6 +2,8 @@ package com.hellmetz.festival.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import java.security.Principal;
 
 /**
  * Controleur du site public (front office).
@@ -9,6 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class FrontOfficeController {
+
+    // vrai si un utilisateur est connecte sert au lien du menu
+    @ModelAttribute("connecte")
+    public boolean connecte(Principal principal) {
+        return principal != null;
+    }
 
     @GetMapping("/")
     public String accueil() {
