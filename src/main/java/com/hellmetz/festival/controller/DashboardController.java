@@ -4,6 +4,8 @@ import com.hellmetz.festival.dashboard.*;
 import com.hellmetz.festival.model.DashboardProperties;
 import com.hellmetz.festival.service.DashboardPreferenceService;
 import com.hellmetz.festival.service.DashboardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @Controller
 public class DashboardController {
+
+    private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 
     private final DashboardService dashboardService;
     private final DashboardPreferenceService preferenceService;
@@ -31,6 +35,7 @@ public class DashboardController {
     @GetMapping({"/", "/dashboard"})
     public String dashboard(Model model, Principal principal) {
         String user = principal.getName();
+        log.debug("Affichage du tableau de bord pour l'utilisateur {}", user);
         Map<String, WidgetGeometry> layout = preferenceService.layout(user);
 
         List<WidgetAffichage> widgets = preferenceService.widgetsVisibles(user).stream()
@@ -54,11 +59,13 @@ public class DashboardController {
     @ResponseBody
     public void enregistrerDisposition(@RequestBody String layoutJson, Principal principal) {
         preferenceService.enregistrerLayout(principal.getName(), layoutJson);
+        log.info("Disposition du tableau de bord modifiée par l'utilisateur {}", principal.getName());
     }
 
 
     @GetMapping("/dashboard/parametres")
     public String parametres(Model model, Principal principal) {
+        log.debug("Ouverture de la personnalisation du tableau de bord pour l'utilisateur {}", principal.getName());
         List<WidgetDashboard> visibles = preferenceService.widgetsVisibles(principal.getName());
         List<WidgetDashboard> reste = preferenceService.parDefaut().stream()
                 .filter(w -> !visibles.contains(w)).toList();
@@ -75,7 +82,11 @@ public class DashboardController {
     @PostMapping("/dashboard/parametres")
     public String enregistrer(@RequestParam(name = "widgets", required = false) List<String> widgets,
                               Principal principal) {
+        if (widgets == null) {
+            log.warn("Aucun widget reçu de l'utilisateur {} : le tableau de bord sera vide", principal.getName());
+        }
         preferenceService.enregistrer(principal.getName(), widgets == null ? List.of() : widgets);
+        log.info("Widgets du tableau de bord modifiés par l'utilisateur {}", principal.getName());
         return "redirect:/dashboard";
     }
 }
