@@ -1,9 +1,11 @@
 package com.hellmetz.festival.service;
 
 import com.hellmetz.festival.model.Role;
+import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.List;
 
@@ -36,7 +38,5 @@ public class RoleService {
     }
 
     public Role save(Role role) { return roleRepository.save(role);}
-
-
 
 }
