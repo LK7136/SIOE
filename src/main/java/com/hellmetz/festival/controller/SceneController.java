@@ -20,9 +20,16 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/scenes")
 public class SceneController {
+
+    private static final Logger log = LoggerFactory.getLogger(SceneController.class);
+
     @Autowired
     private SceneService sceneService;
 
@@ -41,10 +48,12 @@ public class SceneController {
     public String edit(@RequestParam(required = false) Long id, Model model)  {
 
         if (id != null) {
+            log.debug("Ouverture du formulaire de modification de la scène {}", id);
             Scene concert = sceneService.findById(id);
             model.addAttribute("scene", concert);
             model.addAttribute("pageTitle", "Modifier la scene - HellMetz");
         } else {
+            log.debug("Ouverture du formulaire de création d'une scène");
             model.addAttribute("scene", new Scene());
             model.addAttribute("pageTitle", "Nouvel scene - HellMetz");
         }
@@ -56,8 +65,11 @@ public class SceneController {
 
     @PostMapping("/edit")
     public String save(@ModelAttribute Scene scene,
-                       @RequestParam("planTechnique") MultipartFile file) {
+                       @RequestParam("planTechnique") MultipartFile file,
+                       Model model,
+                       Principal principal) {
         if (file != null && !file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
             try {
                 // 1. Créer le dossier s'il n'existe pas
                 Path uploadPath = Paths.get(UPLOAD_DIR);
@@ -66,7 +78,6 @@ public class SceneController {
                 }
 
                 // 2. Nettoyer et sécuriser le nom du fichier
-                String fileName = file.getOriginalFilename();
                 Path targetLocation = uploadPath.resolve(fileName);
 
                 // 3. Copier le fichier physiquement dans le dossier
@@ -76,14 +87,26 @@ public class SceneController {
                 scene.setUrlPlanTechnique(fileName);
 
             } catch (IOException e) {
-                e.printStackTrace();
-                // Optionnel : ajouter une erreur personnalisée si l'écriture échoue
-                return "/scenes/edit";
+                log.error("Échec de l'upload du fichier {} pour la scène {}", fileName, scene.getId(), e);
+                model.addAttribute("erreur", "Échec de l'upload du plan technique. La scène n'a pas été enregistrée.");
+                model.addAttribute("scene", scene);
+                model.addAttribute("scenes", sceneService.findAll());
+                model.addAttribute("pageTitle", scene.getId() != null
+                        ? "Modifier la scene - HellMetz" : "Nouvel scene - HellMetz");
+                return "scene/edit";
             }
         }
 
+        boolean creation = (scene.getId() == null);
+
         // 5. Sauvegarder la scène en BDD via le service
         sceneService.save(scene);
+
+        if (creation) {
+            log.info("Scène {} créée par l'utilisateur {}", scene.getId(), principal.getName());
+        } else {
+            log.info("Scène {} modifiée par l'utilisateur {}", scene.getId(), principal.getName());
+        }
 
         return "redirect:/scenes/liste";
     }
@@ -96,9 +119,11 @@ public class SceneController {
         Resource resource = new UrlResource(cheminFichier.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
+            log.warn("Fichier demandé introuvable ou illisible : {}", nomFichier);
             return ResponseEntity.notFound().build();
         }
 
+        log.debug("Consultation du fichier {}", nomFichier);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + nomFichier + "\"")
@@ -107,9 +132,11 @@ public class SceneController {
 
 
 
+
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, Principal principal) {
         sceneService.deleteById(id);
+        log.info("Scène {} supprimée par l'utilisateur {}", id, principal.getName());
         return "redirect:/scenes/liste";
     }
 

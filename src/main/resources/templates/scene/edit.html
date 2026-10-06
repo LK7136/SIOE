@@ -23,6 +23,7 @@
     </div>
 
     <div class="p-4">
+      <div th:if="${erreur}" th:text="${erreur}" class="alert alert-danger"></div>
       <form th:action="@{/scenes/edit}" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="id" th:value="${scene.id}">
