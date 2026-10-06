@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Création d'un compte - HellMetz</title>
+    <meta name="_csrf"        th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/backoffice.css}"    rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <style>
+        .section-card .card-header {
+            background-color: #1a1a2e;
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .form-label {
+            color: #212529 !important;
+            font-weight: 700 !important;
+        }
+        .perm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .perm-grid::-webkit-scrollbar { width: 6px; }
+        .perm-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+        .perm-grid::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 3px; }
+        .perm-item {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            background: white;
+        }
+        .perm-item:hover  { border-color: #0d6efd; background: #f0f5ff; }
+        .perm-item.checked { border-color: #0d6efd; background: #e8f0fe; }
+        .perm-item.checked .perm-badge { background-color: #0d6efd !important; }
+        .perm-badge { font-size: 0.7rem; font-family: monospace; }
+        /* Option spéciale "Créer un rôle" dans le select */
+        option.opt-new { color: #0d6efd; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid py-4 px-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/festival/utilisateurs/liste}">Utilisateurs</a></li>
+                    <li class="breadcrumb-item active">Nouveau compte</li>
+                </ol>
+            </nav>
+            <h2 class="mb-0">Création d'un compte utilisateur</h2>
+        </div>
+        <a th:href="@{/utilisateurs}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+
+    <!-- Alerte d'erreur -->
+    <div th:if="${not #strings.isEmpty(erreur)}"
+         class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${erreur}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+
+    <form method="post" th:action="@{/register}">
+        <div class="row g-4">
+
+            <!-- ── SECTION 1 : Informations personnelles ── -->
+            <div class="col-xl-6">
+                <div class="card shadow-sm section-card h-100">
+                    <div class="card-header py-3">
+                        <i class="bi bi-person-fill me-2"></i>Informations personnelles
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">Nom</label>
+                                <input type="text" class="form-control" name="nom" placeholder="Votre nom" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" class="form-control" name="prenom" placeholder="Votre prénom" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Adresse email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" name="email"
+                                           placeholder="votre-email@email.fr" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECTION 2 : Identifiants de connexion ── -->
+            <div class="col-xl-6">
+                <div class="card shadow-sm section-card h-100">
+                    <div class="card-header py-3">
+                        <i class="bi bi-key-fill me-2"></i>Identifiants de connexion
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Identifiant</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-at"></i></span>
+                                    <input type="text" class="form-control" name="identifiant"
+                                           placeholder="identifiant" required>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Mot de passe</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control" name="motDePasse"
+                                           id="motDePasse" placeholder="••••••••" required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            id="btnTogglePass" title="Afficher / masquer">
+                                        <i class="bi bi-eye" id="iconTogglePass"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECTION 3 : Rôle et permissions ── -->
+            <div class="col-12">
+                <div class="card shadow-sm section-card">
+                    <div class="card-header py-3">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Rôle &amp; Permissions
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4 align-items-start">
+
+                            <!-- Choix du rôle -->
+                            <div class="col-lg-4">
+                                <label class="form-label">Rôle de l'utilisateur</label>
+                                <select class="form-select" name="idRole" id="selectRole" required>
+                                    <option value="">-- Choisir un rôle --</option>
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.idRole}"
+                                            th:text="${r.libelle}">
+                                    </option>
+                                    <!-- Option spéciale : ouvre la modale de création -->
+                                    <option value="__new__" class="opt-new">
+                                        ➕ Créer un nouveau rôle...
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Zone des permissions -->
+                            <div class="col-lg-8">
+                                <div class="d-flex align-items-center mb-2 gap-2">
+                                    <label class="form-label mb-0">Permissions accordées</label>
+                                    <span class="badge bg-primary rounded-pill" id="badgeCount">0</span>
+                                </div>
+
+                                <div class="perm-grid border rounded p-2">
+                                    <div class="perm-item"
+                                         th:each="p : ${permissions}"
+                                         th:id="'item_' + ${p.idPermission}">
+                                        <div class="form-check mb-0">
+                                            <input class="form-check-input chkPermission"
+                                                   type="checkbox"
+                                                   name="idsPermissions"
+                                                   th:value="${p.idPermission}"
+                                                   th:id="'perm_' + ${p.idPermission}">
+                                            <label class="form-check-label w-100 user-select-none"
+                                                   th:for="'perm_' + ${p.idPermission}">
+                                                <span class="badge bg-secondary perm-badge me-1"
+                                                      th:id="'badge_' + ${p.idPermission}"
+                                                      th:text="${p.codePermission}"></span>
+                                                <small class="text-muted" th:text="${p.libelle}"></small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="mt-1 mb-0 text-muted" style="font-size: 0.8rem;">
+                                    Cliquez sur les cases pour personnaliser les accès.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a th:href="@{/festival/utilisateurs/liste}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-person-plus-fill me-1"></i>Créer le compte
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MODALE — Créer un nouveau rôle
+     Nécessite côté Spring Boot : POST /roles → { idRole, libelle }
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalCreerRole" tabindex="-1"
+     aria-labelledby="modalCreerRoleLabel" aria-hidden="true"
+     data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header py-3" style="background-color: #1a1a2e; color: white;">
+                <h5 class="modal-title fw-semibold" id="modalCreerRoleLabel">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Créer un nouveau rôle
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                        id="btnFermerModal" aria-label="Fermer"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="alertModalRole" class="alert d-none mb-3" role="alert"></div>
+
+                <div class="mb-1">
+                    <label for="inputLibelleRole" class="form-label">
+                        Libellé du rôle <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="inputLibelleRole"
+                           placeholder="Ex : Organisateur, Bénévole…" maxlength="100">
+                    <div class="form-text">
+                        Ce libellé apparaîtra dans tous les menus de l'application.
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" id="btnAnnulerModal">
+                    <i class="bi bi-x-circle me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-primary" id="btnValiderRole">
+                    <i class="bi bi-check2-circle me-1"></i>Créer le rôle
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var permissionsParRole = /*[[${permissionsParRole}]]*/ {};
+
+    /* Lecture du token CSRF pour les requêtes fetch() */
+    var csrfToken  = document.querySelector('meta[name="_csrf"]')
+        ? document.querySelector('meta[name="_csrf"]').content : '';
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]')
+        ? document.querySelector('meta[name="_csrf_header"]').content : 'X-CSRF-TOKEN';
+
+    /* Mémorise la dernière sélection valide (pour restaurer si annulation modale) */
+    var lastValidRole = '';
+
+    /* ── Mise à jour visuelle des permissions ── */
+    function updateUI() {
+        var count = 0;
+        document.querySelectorAll(".chkPermission").forEach(function(cb) {
+            var item  = document.getElementById("item_"  + cb.value);
+            var badge = document.getElementById("badge_" + cb.value);
+            if (cb.checked) {
+                count++;
+                item.classList.add("checked");
+                badge.classList.replace("bg-secondary", "bg-primary");
+            } else {
+                item.classList.remove("checked");
+                badge.classList.replace("bg-primary", "bg-secondary");
+            }
+        });
+        document.getElementById("badgeCount").textContent = count;
+    }
+
+    /* ── Changement de rôle dans le select ── */
+    document.getElementById("selectRole").addEventListener("change", function () {
+        var idRole = this.value;
+
+        /* Option spéciale : ouvrir la modale de création */
+        if (idRole === '__new__') {
+            this.value = lastValidRole;              /* Restaure la valeur précédente */
+            document.getElementById('inputLibelleRole').value = '';
+            document.getElementById('alertModalRole').className = 'alert d-none';
+            new bootstrap.Modal(document.getElementById('modalCreerRole')).show();
+            return;
+        }
+
+        lastValidRole = idRole;
+
+        /* Réinitialise et pré-coche selon le rôle */
+        document.querySelectorAll(".chkPermission").forEach(function(cb) {
+            cb.checked = false;
+        });
+
+        if (idRole && permissionsParRole[idRole]) {
+            var permisAutorisees = permissionsParRole[idRole];
+            document.querySelectorAll(".chkPermission").forEach(function(cb) {
+                cb.checked = permisAutorisees.includes(parseInt(cb.value));
+            });
+        }
+
+        updateUI();
+    });
+
+    /* ── Clic manuel sur une permission ── */
+    document.querySelectorAll(".chkPermission").forEach(function(cb) {
+        cb.addEventListener("change", updateUI);
+    });
+
+    /* ── Toggle afficher / masquer mot de passe ── */
+    document.getElementById("btnTogglePass").addEventListener("click", function() {
+        var input = document.getElementById("motDePasse");
+        var icon  = document.getElementById("iconTogglePass");
+        if (input.type === "password") {
+            input.type    = "text";
+            icon.className = "bi bi-eye-slash";
+        } else {
+            input.type    = "password";
+            icon.className = "bi bi-eye";
+        }
+    });
+
+    /* ════════════════════════════════════════
+       LOGIQUE MODALE — Créer un rôle via AJAX
+    ════════════════════════════════════════ */
+
+    function showModalAlert(type, message) {
+        var el = document.getElementById('alertModalRole');
+        var icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+        el.className = 'alert alert-' + type;
+        el.innerHTML = '<i class="bi bi-' + icon + '-fill me-2"></i>' + message;
+    }
+
+    /* Fermer la modale sans créer de rôle */
+    ['btnFermerModal', 'btnAnnulerModal'].forEach(function(id) {
+        document.getElementById(id).addEventListener('click', function() {
+            bootstrap.Modal.getInstance(document.getElementById('modalCreerRole')).hide();
+        });
+    });
+
+    /* Soumettre la création du rôle */
+    document.getElementById('btnValiderRole').addEventListener('click', function() {
+        var libelle = document.getElementById('inputLibelleRole').value.trim();
+        if (!libelle) {
+            showModalAlert('danger', 'Le libellé du rôle est obligatoire.');
+            return;
+        }
+
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Création…';
+
+        var headers = { 'Content-Type': 'application/json' };
+        if (csrfToken) headers[csrfHeader] = csrfToken;
+
+        /* Endpoint attendu → POST /roles, corps : { libelle: "..." }
+           Réponse attendue  → { idRole: 42, libelle: "Organisateur" }       */
+        fetch(/*[[@{/roles}]]*/ '/roles', {
+            method : 'POST',
+            headers: headers,
+            body   : JSON.stringify({ libelle: libelle })
+        })
+            .then(function(resp) {
+                if (!resp.ok) return resp.text().then(function(t) {
+                    throw new Error(t || 'Erreur serveur ' + resp.status);
+                });
+                return resp.json();
+            })
+            .then(function(role) {
+                /* Insérer la nouvelle option juste avant "➕ Créer un nouveau rôle..." */
+                var select  = document.getElementById('selectRole');
+                var newOpt  = select.querySelector('option[value="__new__"]');
+                var opt     = document.createElement('option');
+                opt.value       = role.idRole;
+                opt.textContent = role.libelle;
+                select.insertBefore(opt, newOpt);
+
+                /* Sélectionner automatiquement le rôle créé */
+                select.value = role.idRole;
+                lastValidRole = String(role.idRole);
+
+                showModalAlert('success', 'Rôle « ' + role.libelle + ' » créé avec succès !');
+                setTimeout(function() {
+                    bootstrap.Modal.getInstance(document.getElementById('modalCreerRole')).hide();
+                }, 900);
+            })
+            .catch(function(err) {
+                showModalAlert('danger', 'Impossible de créer le rôle : ' + err.message);
+            })
+            .finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Créer le rôle';
+            });
+    });
+
+    /* ── Init ── */
+    updateUI();
+    /*]]>*/
+</script>
+
+</body>
+</html>

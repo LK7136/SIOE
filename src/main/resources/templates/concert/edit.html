@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+  <title>Concerts - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+  <div class="hm-card">
+    <div class="hm-card-header">
+      <div>
+        <div class="hm-tag">Édition</div>
+        <div class="hm-card-title">
+          <span th:if="${concert.id != null}" th:text="'Modifier le concert #' + ${concert.id}"></span>
+          <span th:unless="${concert.id != null}">Nouveau concert</span>
+        </div>
+      </div>
+      <a th:href="@{/concerts/liste}" class="hm-btn-primary" style="background-color:#6c757d; color:white;">
+        <span>←</span><span>Retour à la liste</span>
+      </a>
+    </div>
+
+    <div class="p-4">
+
+      <form th:action="@{/concerts/edit}" method="post">
+
+        <input type="hidden" name="id" th:value="${concert.id}">
+
+        <div id="panel-infos">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="scene" class="form-label fw-bold">Nom de la scène</label>
+              <select id="scene" name="scene" class="form-control">
+                <option value="">-- Sélectionner une scène --</option>
+                <option th:each="scene : ${scenes}"
+                        th:value="${scene.id}"
+                        th:text="${scene.nom}"
+                        th:selected="${concert.scene != null && concert.scene.id == scene.id}">
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="edition" class="form-label fw-bold">Édition <span class="text-danger">*</span></label>
+              <select id="edition" name="edition" class="form-control">
+                <option value="">-- Sélectionner une édition --</option>
+                <option th:each="edition : ${editions}"
+                        th:value="${edition.id}"
+                        th:text="${edition.nomEdition}"
+                        th:selected="${edition.actif}">
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="dateHeureDebut" class="form-label fw-bold">Date et heure de début</label>
+              <input type="datetime-local" id="dateHeureDebut" name="dateHeureDebut"
+                     class="form-control" th:value="${concert.dateHeureDebut}">
+            </div>
+            <div class="col-md-6">
+              <label for="dateHeureFin" class="form-label fw-bold">Date et heure de fin</label>
+              <input type="datetime-local" id="dateHeureFin" name="dateHeureFin"
+                     class="form-control" th:value="${concert.dateHeureFin}">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="heureBalanceDebut" class="form-label fw-bold">Balance début</label>
+              <input type="datetime-local" id="heureBalanceDebut" name="heureBalanceDebut"
+                     class="form-control" th:value="${concert.heureBalanceDebut}">
+            </div>
+            <div class="col-md-6">
+              <label for="heureBalanceFin" class="form-label fw-bold">Balance fin</label>
+              <input type="datetime-local" id="heureBalanceFin" name="heureBalanceFin"
+                     class="form-control" th:value="${concert.heureBalanceFin}">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="decibelsMax" class="form-label fw-bold">Décibels max</label>
+              <input type="number" id="decibelsMax" name="decibelsMax" class="form-control"
+                     th:value="${concert.id != null ? concert.decibelsMax : 95}" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 mb-0" style="border-bottom: 2px solid #dee2e6; display:flex; align-items:center; width:100%;">
+          <button type="button" id="tab-groupes"
+                  style="padding:10px 22px; border:none; border-radius:6px 6px 0 0;
+               font-weight:600; background:#1a1a2e; color:white;
+               border-bottom:2px solid transparent; margin-bottom:-2px;">
+            Groupes sans concert
+          </button>
+        </div>
+
+        <div id="panel-groupes" class="table-responsive mt-0">
+
+          <div class="mb-3" style="max-width: 350px; margin-top: 15px;">
+            <div class="input-group">
+              <span class="input-group-text" style="background: #1a1a2e; color: white; border: 1px solid #454d55;">🔍</span>
+              <input type="text" id="rechercheGroupe" class="form-control"
+                     placeholder="Rechercher un groupe..."
+                     style="border: 1px solid #ced4da;" onkeyup="filtrerLesGroupes()">
+            </div>
+          </div>
+
+          <table class="hm-table" style="margin-top: 15px;">
+            <thead>
+            <tr>
+              <th style="width: 40px;">✔</th>
+              <th>Photo</th>
+              <th>Nom du groupe</th>
+              <th>Description</th>
+              <th>Style</th>
+              <th>Année Création</th>
+              <th>Pays</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${concert.groupe != null}">
+              <td>
+                <input type="checkbox" name="groupeId" th:value="${concert.groupe.id}" class="groupe-checkbox"
+                       checked style="width:18px; height:18px; cursor:pointer;"
+                       onclick="checkOnlyOne(this)">
+              </td>
+              <td>
+                <img th:src="${not #strings.isEmpty(concert.groupe.urlLogo)} ? @{/groupes/uploads/{photo}(photo=${concert.groupe.urlLogo})} : @{/images/groupes/defaultGroupeAvatar.png}"
+                     style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover;">
+              </td>
+              <td><strong th:text="${concert.groupe.nomGroupe}"></strong> <span class="badge bg-primary text-xs ms-1">Actuel</span></td>
+              <td th:text="${concert.groupe.description}"></td>
+              <td>
+                <span th:each="style : ${concert.groupe.stylesDuGroupe}" class="hm-pill" th:text="${style.libelle}"></span>
+              </td>
+              <td><span class="hm-pill" th:text="${concert.groupe.anneeCreation}"></span></td>
+              <td th:text="${concert.groupe.paysOrigine}"></td>
+            </tr>
+
+            <tr th:each="g : ${groupesSansConcert}" th:if="${concert.groupe == null || g.id != concert.groupe.id}">
+              <td>
+                <input type="checkbox" name="groupeId" th:value="${g.id}" class="groupe-checkbox"
+                       style="width:18px; height:18px; cursor:pointer;"
+                       onclick="checkOnlyOne(this)">
+              </td>
+              <td>
+                <img th:src="${not #strings.isEmpty(g.urlLogo)} ? @{/groupes/uploads/{photo}(photo=${g.urlLogo})} : @{/images/groupes/defaultGroupeAvatar.png}"
+                     style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover;">
+              </td>
+              <td><strong th:text="${g.nomGroupe}"></strong></td>
+              <td th:text="${g.description}"></td>
+              <td>
+                <span th:each="style : ${g.stylesDuGroupe}" class="hm-pill" th:text="${style.libelle}"></span>
+              </td>
+              <td><span class="hm-pill" th:text="${g.anneeCreation}"></span></td>
+              <td th:text="${g.paysOrigine}"></td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(groupesSansConcert) && concert.groupe == null}">
+              <td colspan="7" style="text-align:center; color:#999; padding:20px;">
+                Aucun groupe disponible.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <nav th:if="${groupesTaille != 'tout' and pageGroupes.totalPages > 1}"
+               style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+            <span style="font-size:.85rem; color:var(--hm-text-muted);"
+                  th:text="${pageGroupes.totalElements} + ' groupes disponibles au total'"></span>
+            <ul class="pagination mb-0">
+              <li class="page-item" th:classappend="${pageGroupes.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/concerts/ajouter(id=${concert.id},groupesPage=${pageGroupes.number - 1},groupesTaille=${groupesTaille})}">‹</a>
+              </li>
+              <li class="page-item"
+                  th:each="i : ${#numbers.sequence(0, pageGroupes.totalPages - 1)}"
+                  th:classappend="${i == pageGroupes.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/concerts/ajouter(id=${concert.id},groupesPage=${i},groupesTaille=${groupesTaille})}"
+                   th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${pageGroupes.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/concerts/ajouter(id=${concert.id},groupesPage=${pageGroupes.number + 1},groupesTaille=${groupesTaille})}">›</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <div class="text-end mt-4 pt-3 border-top">
+          <button type="submit" class="hm-btn-primary" style="border:none;">
+            <span>💾</span><span>Enregistrer les modifications</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <script>
+      function checkOnlyOne(checkbox) {
+        const checkboxes = document.querySelectorAll('.groupe-checkbox');
+        checkboxes.forEach((item) => {
+          if (item !== checkbox) item.checked = false;
+        });
+      }
+
+//script pour chercher un groupe avec son nom
+      function filtrerLesGroupes() {
+        const saisie = document.getElementById('rechercheGroupe').value.toLowerCase();
+        const lignes = document.querySelectorAll('#panel-groupes .hm-table tbody tr');
+        lignes.forEach(ligne => {
+          const celluleNom = ligne.querySelector('td:nth-child(3) strong');
+          if (celluleNom) {
+            const nomGroupe = celluleNom.textContent.toLowerCase();
+            if (nomGroupe.includes(saisie)) {
+              ligne.style.display = "";
+            } else {
+              ligne.style.display = "none";
+            }
+          }
+        });
+      }
+    </script>
+
+  </div>
+</div>
+</body>
+</html>

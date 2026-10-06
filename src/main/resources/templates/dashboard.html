@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head><title>Tableau de bord - HellMetz</title></head>
+<body>
+<div th:fragment="content">
+
+  <div style="display:flex; justify-content:flex-end; gap:.5rem; margin-bottom:1rem;">
+    <button id="btn-editer" type="button" class="hm-btn-primary"
+            style="background-color:#6c757d;"><span>✥</span><span>Éditer la disposition</span></button>
+    <button id="btn-enregistrer" type="button" class="hm-btn-primary" style="display:none;">
+      <span>💾</span><span>Enregistrer</span></button>
+    <a th:href="@{/dashboard/parametres}" class="hm-btn-primary"
+       style="background-color:#6c757d;"><span>⚙️</span><span>Widgets</span></a>
+  </div>
+
+  <div class="grid-stack">
+    <div class="grid-stack-item" th:each="wa : ${widgets}"
+         th:attr="gs-id=${wa.widget.name()},
+                  gs-x=${wa.x}, gs-y=${wa.y}, gs-w=${wa.w}, gs-h=${wa.h}">
+      <div class="grid-stack-item-content">
+        <div th:replace="~{dashboard/widgets :: __${wa.widget.fragment}__}"></div>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const grid = GridStack.init({ column: 12, cellHeight: 90, margin: 8, staticGrid: true });
+
+      const tokenCsrf  = document.querySelector('meta[name="_csrf"]').content;
+      const headerCsrf = document.querySelector('meta[name="_csrf_header"]').content;
+      const btnEditer      = document.getElementById('btn-editer');
+      const btnEnregistrer = document.getElementById('btn-enregistrer');
+
+      btnEditer.addEventListener('click', function () {
+        grid.setStatic(false);
+        btnEditer.style.display = 'none';
+        btnEnregistrer.style.display = '';
+      });
+
+      btnEnregistrer.addEventListener('click', function () {
+        const disposition = grid.save(false);
+        fetch(/*[[@{/dashboard/disposition}]]*/ '/dashboard/disposition', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', [headerCsrf]: tokenCsrf },
+          body: JSON.stringify(disposition)
+        }).then(() => location.reload());
+      });
+
+    });
+  </script>
+</div>
+</body>
+</html>

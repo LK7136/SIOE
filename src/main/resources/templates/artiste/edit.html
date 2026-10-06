@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+  <title>Artistes - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+  <div class="hm-card">
+    <div class="hm-card-header">
+      <div>
+        <div class="hm-tag">Édition</div>
+        <div class="hm-card-title">
+          <span th:if="${artiste.id != null}" th:text="'Modifier artiste #' + ${artiste.nom}"></span>
+          <span th:unless="${artiste.id != null}">Nouvel artiste</span>
+        </div>
+      </div>
+      <a th:href="@{/artistes/liste}" class="hm-btn-primary" style="background-color:#6c757d; color:white;">
+        <span>←</span><span>Retour à la liste</span>
+      </a>
+    </div>
+
+    <div class="p-4">
+      <form th:action="@{/artistes/edit}" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" name="id" th:value="${artiste.id}">
+        <input type="hidden" name="supprimerPhoto" id="supprimer_photo" value="false">
+
+        <div class="row mb-3">
+          <div class="col-auto" style="text-align:center">
+            <label for="urlPhotoArtiste" style="cursor:pointer; display:inline-block;">
+              <img id="preview"
+                   th:src="${not #strings.isEmpty(artiste.urlPhoto)} ? @{/artistes/uploads/{p}(p=${artiste.urlPhoto})} : @{/images/artistes/defaultAvatar.png}"
+                   style="width:180px; height:180px; border-radius:5%; object-fit:cover;">
+            </label>
+            <input type="file" id="urlPhotoArtiste" name="urlPhotoArtiste" accept="image/*" style="display:none;">
+            <div id="containerBtnSupprimer" style="margin-top:6px;"
+                 th:style="${not #strings.isEmpty(artiste.urlPhoto)} ? 'margin-top:6px; display:block;' : 'margin-top:6px; display:none;'">
+              <button type="button" id="btnSupprimerPhoto" class="hm-btn-primary"
+                      style="background-color:#6c757d; color:white;">
+                🗑️ Supprimer la photo
+              </button>
+            </div>
+          </div>
+
+          <div class="col mb-3" style="display:flex; flex-direction:column; justify-content:space-between; height:180px;">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="nom" class="form-label fw-bold">Nom<span class="text-danger">*</span></label>
+                <input type="text" id="nom" name="nom" class="form-control"
+                       th:value="${artiste.nom}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="prenom" class="form-label fw-bold">Prénom<span class="text-danger">*</span></label>
+                <input type="text" id="prenom" name="prenom" class="form-control"
+                       th:value="${artiste.prenom}" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label for="nomScene" class="form-label fw-bold">Nom de scène</label>
+                <input type="text" id="nomScene" name="nomScene" class="form-control"
+                       th:value="${artiste.nomScene}">
+              </div>
+              <div class="col-md-6">
+                <label for="nationalite" class="form-label fw-bold">Nationalité</label>
+                <input type="text" id="nationalite" name="nationalite" class="form-control"
+                       th:value="${artiste.nationalite}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="biographie" class="form-label fw-bold">Biographie</label>
+            <textarea id="biographie" name="biographie" class="form-control"
+                      style="height:200px" th:text="${artiste.biographie}"></textarea>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="idStyle" class="form-label fw-bold">Style</label>
+            <select id="idStyle" name="style.id" class="form-control">
+              <option value="">-- Sélectionner un style --</option>
+              <option th:each="style : ${styles}"
+                      th:value="${style.id}"
+                      th:text="${style.libelle}"
+                      th:selected="${artiste.style != null && artiste.style.id == style.id}">
+              </option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="exigencesCatering" class="form-label fw-bold">Exigences</label>
+            <textarea id="exigencesCatering" name="exigencesCatering"
+                      class="form-control" th:text="${artiste.exigencesCatering}"></textarea>
+          </div>
+        </div>
+
+        <div class="text-end mt-4 pt-3 border-top">
+          <button type="submit" class="hm-btn-primary" style="border:none;">
+            <span>💾</span><span>Enregistrer</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    const defaultAvatarUrl = /*[[@{/images/artistes/defaultAvatar.png}]]*/ '';
+
+    const containerBtn = document.getElementById('containerBtnSupprimer');
+    const inputPhoto = document.getElementById('urlPhotoArtiste');
+
+    inputPhoto.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('preview').src = URL.createObjectURL(file);
+        document.getElementById('supprimer_photo').value = "false";
+
+        // 🌟 CORRECTION : On force le bouton à apparaître dès qu'un fichier est choisi !
+        if (containerBtn) {
+          containerBtn.style.display = "block";
+        }
+      }
+    });
+
+
+    const btnSuppr = document.getElementById('btnSupprimerPhoto');
+    if (btnSuppr) {
+      btnSuppr.addEventListener('click', function() {
+        document.getElementById('preview').src = defaultAvatarUrl;
+        inputPhoto.value = ""; // Vide le fichier sélectionné
+        document.getElementById('supprimer_photo').value = "true";
+
+        // On masque le container à nouveau
+        if (containerBtn) {
+          containerBtn.style.display = "none";
+        }
+      });
+    }
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 1. INCLUSION DES RÈGLES ET CONVERSIONS SPRING BOOT -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <!-- 2. PROPRIÉTÉS ET MOTIF DE LOG (PATTERN) -->
+  <!-- Définit le format d'affichage (date, niveau, thread, logger, %X{user} pour le MDC, et message). L'utilisation de %clr(...) gère la coloration en console. -->
+  <property name="CONSOLE_LOG_PATTERN"
+            value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%5p) [%thread] %clr(%logger{36}){cyan} [user:%X{user}] - %msg%n"/>
+  <property name="FILE_LOG_PATTERN"
+            value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%thread] %logger{36} [user:%X{user}] - %msg%n"/>
+
+  <!-- Permet de conditionner les blocs XML selon le profil actif (dev ou prod). -->
+  <springProfile name="dev">
+    <!-- Définit où et comment écrire les logs. -->
+    <!-- ConsoleAppende permet d'écrire sur la sortie standard -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+  </springProfile>
+
+  <!-- 4. APPENDERS FICHIERS (PROD) -->
+  <springProfile name="prod">
+    <!-- Appender principal roulant -->
+    <!-- RollingFileAppender sert à écrire dans un fichier et gère le découpage via <rollingPolicy>. L'extension .gz active automatiquement la compression lors de la rotation. -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>logs/sioe.log</file>
+      <encoder>
+        <pattern>${FILE_LOG_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+      <!-- Policy de rotation : quotidienne + taille max avec compression (.gz) -->
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>logs/sioe-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+        <maxFileSize>10MB</maxFileSize>
+        <maxHistory>30</maxHistory> <!-- Rétention 30 jours -->
+        <totalSizeCap>3GB</totalSizeCap>
+      </rollingPolicy>
+    </appender>
+
+    <!-- Appender dédié à l'audit métier -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>logs/sioe-audit.log</file>
+      <encoder>
+        <pattern>${FILE_LOG_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>logs/sioe-audit-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+        <maxFileSize>10MB</maxFileSize>
+        <maxHistory>30</maxHistory>
+      </rollingPolicy>
+    </appender>
+  </springProfile>
+
+  <!-- 5. CONFIGURATION PAR PROFIL DES NIVEAUX DE LOGS -->
+  <springProfile name="dev">
+    <!--cible un package précis pour lui assigner un niveau (DEBUG, INFO, WARN).-->
+    <logger name="com.hellmetz.festival" level="DEBUG"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="prod">
+    <logger name="com.hellmetz.festival" level="INFO"/>
+    <logger name="org.springframework.web" level="WARN"/>
+    <!-- Logger dédié à l'audit (additivity="false" évite qu'il ne s'écrive aussi dans sioe.log) -->
+    <logger name="com.hellmetz.festival.audit" level="INFO" additivity="false">
+      <appender-ref ref="AUDIT_FILE"/>
+    </logger>
+    <!-- <root> définit le niveau par défaut pour tout le reste de l'application et y attache les appenders à utiliser. -->
+    <root level="INFO">
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+</configuration>

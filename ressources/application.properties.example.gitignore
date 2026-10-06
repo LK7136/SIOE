@@ -1,0 +1,11 @@
+# ==========================================
+# CONFIGURATION DES LOGS ET PROFILS
+# ==========================================
+# Profil actif : 'dev' (console + SQL) ou 'prod' (fichiers dans logs/)
+# Indique à Spring Boot quel profil utiliser par défaut (dev ou prod).
+spring.profiles.active=dev
+
+# Niveaux de logs applicatifs (surcharge optionnelle de logback-spring.xml)
+# logging.level.com.hellmetz.festival=INFO
+# logging.level.org.springframework.web=WARN
+# logging.level.org.hibernate.SQL=DEBUG

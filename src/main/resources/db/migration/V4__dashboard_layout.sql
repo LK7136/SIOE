@@ -1,0 +1,1 @@
+ALTER TABLE dashboard_preference ADD COLUMN layout TEXT;

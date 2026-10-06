@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+  <title>Groupes - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+  <div class="hm-card">
+    <div class="hm-card-header">
+      <div>
+        <div class="hm-tag">Édition</div>
+        <div class="hm-card-title">
+          <span th:if="${groupe.id != null}" th:text="'Modifier le groupe : ' + ${groupe.nomGroupe}"></span>
+          <span th:unless="${groupe.id != null}">Nouveau groupe</span>
+        </div>
+      </div>
+      <a th:href="@{/groupes/liste}" class="hm-btn-primary" style="background-color:#6c757d; color:white;">
+        <span>←</span><span>Retour à la liste</span>
+      </a>
+    </div>
+
+    <div class="p-4">
+
+      <form th:action="@{/groupes/edit}" method="post" enctype="multipart/form-data">
+
+        <input th:if="${groupe.id != null}" type="hidden" name="id" th:value="${groupe.id}">
+        <input type="hidden" name="supprimerPhoto" id="supprimer_photo" value="false">
+        <input type="hidden" name="urlLogo"        th:value="${groupe.urlLogo}">
+
+        <div class="row mb-3">
+          <div class="col-auto" style="text-align:center">
+            <label for="urlLogoGroupe" style="cursor:pointer; display:inline-block;">
+              <img id="preview"
+                   th:src="${not #strings.isEmpty(groupe.urlLogo)} ? @{/groupes/uploads/{p}(p=${groupe.urlLogo})} : @{/images/groupes/defaultGroupeAvatar.png}"
+                   style="width:180px; height:180px; border-radius:5%; object-fit:cover;">
+            </label>
+            <input type="file" id="urlLogoGroupe" name="urlLogoGroupe" accept="image/*" style="display:none;">
+            <div th:if="${not #strings.isEmpty(groupe.urlLogo)}" style="margin-top:6px;">
+              <button type="button" id="btnSupprimerPhoto" class="hm-btn-primary"
+                      style="background-color:#6c757d; color:white;">
+                🗑️ Supprimer la photo
+              </button>
+            </div>
+          </div>
+
+          <div class="col mb-3" style="display:flex; flex-direction:column; justify-content:space-between; height:180px;">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="nomGroupe" class="form-label fw-bold">Nom du groupe <span class="text-danger">*</span></label>
+                <input type="text" id="nomGroupe" name="nomGroupe" class="form-control"
+                       th:value="${groupe.nomGroupe}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="anneeCreation" class="form-label fw-bold">Année de création</label>
+                <input type="number" id="anneeCreation" name="anneeCreation" class="form-control"
+                       th:value="${groupe.anneeCreation}">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label for="paysOrigine" class="form-label fw-bold">Pays d'origine</label>
+                <input type="text" id="paysOrigine" name="paysOrigine" class="form-control"
+                       th:value="${groupe.paysOrigine}">
+              </div>
+              <div class="col-md-6">
+                <label for="villeOrigine" class="form-label fw-bold">Ville d'origine</label>
+                <input type="text" id="villeOrigine" name="villeOrigine" class="form-control"
+                       th:value="${groupe.villeOrigine}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="description" class="form-label fw-bold">Description</label>
+            <textarea id="description" name="description" class="form-control"
+                      rows="4" th:text="${groupe.description}"></textarea>
+          </div>
+        </div>
+
+
+        <div class="row mb-3">
+
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Styles du groupe :</label>
+            <div style="position: relative; width: 100%;">
+
+              <div class="form-control" id="dropdownTrigger"
+                   style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; color: #212529; min-height: 38px;">
+                <span id="dropdownLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%;">Choisir le(s) style(s)</span>
+                <span style="font-size: 0.7rem; color: #6c757d;">▼</span>
+              </div>
+
+              <div id="dropdownMenu"
+                   style="display: none; position: absolute; top: 100%; left: 0; right: 0;
+                          background: #1a1a2e; border: 1px solid #454d55; border-radius: 4px;
+                          max-height: 200px; overflow-y: auto; z-index: 1000; padding: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.5);">
+
+                <div class="form-check mb-2" th:each="style : ${tousLesStyles}">
+                  <input class="form-check-input style-checkbox"
+                         type="checkbox"
+                         name="stylesId"
+                         th:value="${style.id}"
+                         th:data-nom="${style.libelle}"
+                         th:id="${'style_' + style.id}"
+                         th:checked="${groupe != null and groupe.stylesDuGroupe != null and #lists.contains(groupe.stylesDuGroupe, style)}">
+
+                  <label class="form-check-label text-white"
+                         th:for="${'style_' + style.id}"
+                         th:text="${style.libelle}"
+                         style="cursor: pointer;">
+                    Nom du Style
+                  </label>
+                </div>
+
+              </div> </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="siteWeb" class="form-label fw-bold">Site Web</label>
+            <input type="url" id="siteWeb" name="siteWeb" class="form-control"
+                   th:value="${groupe.siteWeb}">
+          </div>
+
+          <div class="col-md-4">
+            <label for="urlYoutube" class="form-label fw-bold">Chaîne YouTube</label>
+            <input type="url" id="urlYoutube" name="urlYoutube" class="form-control"
+                   th:value="${groupe.urlYoutube}">
+          </div>
+
+        </div>
+
+        <div class="form-check form-switch mb-4 mt-3">
+          <input class="form-check-input" type="checkbox" id="actif" name="actif"
+                 value="true" th:checked="${groupe.actif}">
+          <label class="form-check-label fw-bold text-success" for="actif">
+            Groupe actif (programmé au festival)
+          </label>
+        </div>
+
+        <div class="text-end mt-4 pt-3 border-top">
+          <button type="submit" class="hm-btn-primary" style="border:none;">
+            <span>💾</span><span>Enregistrer les modifications</span>
+          </button>
+        </div>
+
+      </form>
+
+      <div class="mt-4 mb-0" style="border-bottom: 2px solid #dee2e6; display:flex; gap:4px;">
+        <button type="button" id="tab-artistes" onclick="switchTab('artistes')"
+                style="padding:10px 22px; border:none; border-radius:6px 6px 0 0;
+                         font-weight:600; cursor:pointer; background:#f0f0f0; color:#1a1a2e;
+                         border-bottom:2px solid #f0f0f0; margin-bottom:-2px;">
+          🎤 Artistes
+        </button>
+        <button type="button" id="tab-concerts" onclick="switchTab('concerts')"
+                style="padding:10px 22px; border:none; border-radius:6px 6px 0 0;
+                         font-weight:600; cursor:pointer; background:#1a1a2e; color:white;
+                         border-bottom:2px solid transparent; margin-bottom:-2px;">
+          🎵 Concerts
+        </button>
+      </div>
+
+      <div id="panel-artistes" class="table-responsive mt-0">
+        <table class="hm-table">
+          <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Artiste</th>
+            <th>Style</th>
+            <th>Nationalité</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="a : ${artistes}">
+            <td>
+              <img th:if="${not #strings.isEmpty(a.urlPhoto)}"
+                   th:src="@{/artistes/uploads/{p}(p=${a.urlPhoto})}"
+                   th:alt="${'Photo de ' + a.nom}"
+                   style="width:50px; height:50px; border-radius:4px; object-fit:cover;">
+              <img th:unless="${not #strings.isEmpty(a.urlPhoto)}"
+                   th:src="@{/images/artistes/defaultAvatar.png}"
+                   alt="Photo par défaut"
+                   style="width:50px; height:50px; border-radius:4px;">
+            </td>
+            <td>
+              <strong th:text="${a.nomScene}"></strong><br>
+              <small style="color:#666;">
+                <span th:text="${a.prenom}"></span>
+                <span th:text="${a.nom}"></span>
+              </small>
+            </td>
+            <td>
+              <span class="hm-pill" th:text="${a.style != null ? a.style.libelle : ''}"></span>
+            </td>
+            <td th:text="${a.nationalite}"></td>
+            <td>
+              <a class="hm-link-site"
+                 th:href="@{/artistes/ajouter(id=${a.id}, idGroupeParam=${groupe.id})}">
+                ✏️ éditer
+              </a>
+              &nbsp;|&nbsp;
+              <a class="hm-link-site"
+                 th:href="@{/artistes/delete/{id}(id=${a.id})}"
+                 th:onclick="'return confirm(\'Supprimer l\'artiste ' + ${a.id} + ' ?\')'"
+                 style="color:#e74c3c;">
+                🗑️ supprimer
+              </a>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(artistes)}">
+            <td colspan="5" style="text-align:center; color:#999; padding:20px;">
+              Aucun artiste dans ce groupe
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="panel-concerts" class="table-responsive mt-0" style="display:none;">
+
+        <form th:action="@{/groupes/ajouter}" method="get"
+              style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0; margin:0;">
+          <input th:if="${groupe.id != null}" type="hidden" name="id" th:value="${groupe.id}">
+          <input type="hidden" name="concertPage"   th:value="${pageConcerts.number}">
+          <input type="hidden" name="concertTaille" th:value="${concertTaille}">
+          <input type="hidden" name="concertPage" value="0">
+          <input type="hidden" name="tab"         value="concerts">
+          <label style="font-size:.9rem;">Afficher</label>
+          <select name="concertTaille" class="form-select" style="width:auto;"
+                  onchange="this.form.submit()">
+            <option value="5"    th:selected="${concertTaille == '5'}">5</option>
+            <option value="10"   th:selected="${concertTaille == '10'}">10</option>
+            <option value="20"   th:selected="${concertTaille == '20'}">20</option>
+            <option value="50"   th:selected="${concertTaille == '50'}">50</option>
+            <option value="tout" th:selected="${concertTaille == 'tout'}">Tout</option>
+          </select>
+          <span style="font-size:.9rem;">par page</span>
+        </form>
+
+        <form th:if="${groupe.id != null}" th:action="@{/groupes/{id}/concerts(id=${groupe.id})}" method="post">
+
+          <table class="hm-table">
+            <thead>
+            <tr>
+              <th style="width:40px;">✔</th>
+              <th>Date début</th>
+              <th>Date fin</th>
+              <th>Scène</th>
+              <th>Édition</th>
+              <th>Statut</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${concertsDispo}">
+              <td>
+                <input type="hidden" name="visibleConcertIds" th:value="${c.id}">
+                <input type="checkbox"
+                       name="concertIds"
+                       th:value="${c.id}"
+                       th:checked="${c.groupe != null && c.groupe.id == groupe.id}"
+                       style="width:18px; height:18px; cursor:pointer;">
+              </td>
+              <td th:text="${c.dateHeureDebut != null ? #temporals.format(c.dateHeureDebut, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+              <td th:text="${c.dateHeureFin   != null ? #temporals.format(c.dateHeureFin,   'dd/MM/yyyy HH:mm') : '-'}"></td>
+              <td th:text="${c.scene   != null ? c.scene.nom          : '-'}"></td>
+              <td th:text="${c.edition != null ? c.edition.nomEdition : '-'}"></td>
+              <td>
+                <span th:if="${#strings.equalsIgnoreCase(c.statut, 'Annulé')}"
+                      style="background:#e74c3c; color:white; padding:3px 10px;
+                             border-radius:12px; font-size:0.8em; font-weight:600;">
+                  ❌ Annulé
+                </span>
+                <span th:unless="${#strings.equalsIgnoreCase(c.statut, 'Annulé')}"
+                      class="hm-pill" th:text="${c.statut}">
+                </span>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(concertsDispo)}">
+              <td colspan="6" style="text-align:center; color:#999; padding:20px;">
+                Aucun concert disponible
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <nav th:if="${concertTaille != 'tout' and pageConcerts.totalPages > 1}"
+               style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+            <span style="font-size:.85rem; color:var(--hm-text-muted);"
+                  th:text="${pageConcerts.totalElements} + ' concerts au total'"></span>
+            <ul class="pagination mb-0">
+              <li class="page-item" th:classappend="${pageConcerts.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},concertPage=${pageConcerts.number - 1},concertTaille=${concertTaille},tab='concerts')}">‹</a>
+              </li>
+              <li class="page-item"
+                  th:each="i : ${#numbers.sequence(0, pageConcerts.totalPages - 1)}"
+                  th:classappend="${i == pageConcerts.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},concertPage=${i},concertTaille=${concertTaille},tab='concerts')}"
+                   th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${pageConcerts.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},concertPage=${pageConcerts.number + 1},concertTaille=${concertTaille},tab='concerts')}">›</a>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="text-end mt-3">
+            <button type="submit" class="hm-btn-primary" style="border:none;">
+              💾 Enregistrer les concerts
+            </button>
+          </div>
+
+        </form>
+
+        <div th:unless="${groupe.id != null}" class="text-end mt-3">
+          <span style="color:#999; font-style:italic;">
+            Sauvegardez d'abord le groupe pour assigner des concerts
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    const defaultGroupeAvatarUrl = /*[[@{/images/groupes/defaultGroupeAvatar.png}]]*/ '';
+
+    document.getElementById('urlLogoGroupe').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('preview').src = URL.createObjectURL(file);
+        document.getElementById('supprimer_photo').value = "false";
+      }
+    });
+
+    const btnSuppr = document.getElementById('btnSupprimerPhoto');
+    if (btnSuppr) {
+      btnSuppr.addEventListener('click', function() {
+        document.getElementById('preview').src = defaultGroupeAvatarUrl;
+        document.getElementById('urlLogoGroupe').value = "";
+        document.getElementById('supprimer_photo').value = "true";
+        this.style.display = "none";
+      });
+    }
+
+    function switchTab(tab) {
+      document.getElementById('panel-artistes').style.display = tab === 'artistes' ? '' : 'none';
+      document.getElementById('panel-concerts').style.display = tab === 'concerts' ? '' : 'none';
+
+      const activeStyle   = 'background:#f0f0f0; color:#1a1a2e; border-bottom:2px solid #f0f0f0; margin-bottom:-2px;';
+      const inactiveStyle = 'background:#1a1a2e; color:white;   border-bottom:2px solid transparent; margin-bottom:-2px;';
+
+      document.getElementById('tab-artistes').style.cssText =
+              'padding:10px 22px; border:none; border-radius:6px 6px 0 0; font-weight:600; cursor:pointer; ' +
+              (tab === 'artistes' ? activeStyle : inactiveStyle);
+
+      document.getElementById('tab-concerts').style.cssText =
+              'padding:10px 22px; border:none; border-radius:6px 6px 0 0; font-weight:600; cursor:pointer; ' +
+              (tab === 'concerts' ? activeStyle : inactiveStyle);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'concerts') {
+      switchTab('concerts');
+    }
+
+    // --- LOGIQUE JS POUR LE MENU DÉROULANT DES STYLES ---
+    const trigger = document.getElementById('dropdownTrigger');
+    const menu = document.getElementById('dropdownMenu');
+    const label = document.getElementById('dropdownLabel');
+    const checkboxes = document.querySelectorAll('.style-checkbox');
+
+    // Ouvrir / Fermer au clic
+    trigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isVisible = menu.style.display === 'block';
+      menu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Fermer le menu si clic à l'extérieur
+    document.addEventListener('click', function(e) {
+      if (!menu.contains(e.target) && e.target !== trigger) {
+        menu.style.display = 'none';
+      }
+    });
+
+    // Mettre à jour l'affichage du libellé
+    function updateDropdownLabel() {
+      const selectionnes = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          selectionnes.push(cb.getAttribute('data-nom'));
+        }
+      });
+
+      if (selectionnes.length > 0) {
+        label.textContent = selectionnes.join(', ');
+      } else {
+        label.textContent = 'Choisir le(s) style(s)';
+      }
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateDropdownLabel);
+    });
+
+    // Initialisation au chargement de la page
+    updateDropdownLabel();
+  </script>
+
+</div>
+</body>
+</html>

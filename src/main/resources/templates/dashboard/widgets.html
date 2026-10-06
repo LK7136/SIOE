@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ============ OCCUPATION_SCENES ============ -->
+<div th:fragment="occupationScenes" class="hm-card mb-4">
+    <div class="hm-card-header"><div class="hm-card-title">🪩 Occupation des scènes</div></div>
+    <div th:each="occ : ${vue.occupations}" style="margin:.6rem 0;">
+        <div style="display:flex; justify-content:space-between; font-size:.85rem;">
+            <span th:text="${occ.nomScene}">Scène</span>
+            <span th:text="${occ.pourcentage} + ' %'">0 %</span>
+        </div>
+        <div style="background:rgba(255,255,255,.08); border-radius:6px; height:14px; overflow:hidden;">
+            <div th:style="'width:' + ${occ.pourcentage} + '%;'"
+                 style="height:100%; background:var(--hm-accent-light);"></div>
+        </div>
+    </div>
+    <p th:if="${#lists.isEmpty(vue.occupations)}" style="color:var(--hm-text-muted);">
+        Aucun concert programmé aujourd'hui.</p>
+</div>
+
+<!-- ============ CONCERTS_EN_COURS ============ -->
+<div th:fragment="concertsEnCours" class="hm-card mb-4">
+    <div class="hm-card-title">🎵 En cours</div>
+    <ul th:if="${not #lists.isEmpty(vue.concertsEnCours)}">
+        <li th:each="c : ${vue.concertsEnCours}"
+            th:text="${c.scene.nom} + ' — fin à ' + ${#temporals.format(c.dateHeureFin, 'HH:mm')}"></li>
+    </ul>
+    <p th:if="${#lists.isEmpty(vue.concertsEnCours)}" style="color:var(--hm-text-muted);">
+        Rien en cours.</p>
+</div>
+
+<!-- ============ CONCERTS_A_VENIR ============ -->
+<div th:fragment="concertsAVenir" class="hm-card mb-4">
+    <div class="hm-card-title">⏭️ Dans l'heure</div>
+    <ul th:if="${not #lists.isEmpty(vue.concertsAVenir)}">
+        <li th:each="c : ${vue.concertsAVenir}"
+            th:text="${#temporals.format(c.dateHeureDebut, 'HH:mm')} + ' — ' + ${c.scene.nom}"></li>
+    </ul>
+    <p th:if="${#lists.isEmpty(vue.concertsAVenir)}" style="color:var(--hm-text-muted);">
+        Aucun concert dans l'heure.</p>
+</div>
+
+<!-- ============ ALERTES_CHANGEOVER ============ -->
+<div th:fragment="alertesChangeover" class="hm-card mb-4">
+    <div class="hm-card-title" style="color:#e57373;">⚠️ Changements de plateau serrés</div>
+    <ul th:if="${not #lists.isEmpty(vue.alertes)}">
+        <li th:each="a : ${vue.alertes}"
+            th:text="${a.nomScene} + ' : ' + ${a.minutesEntreLesDeux} + ' min entre '
+                   + ${a.concertPrecedent} + ' et ' + ${a.concertSuivant}"></li>
+    </ul>
+    <p th:if="${#lists.isEmpty(vue.alertes)}" style="color:var(--hm-text-muted);">
+        Aucun enchaînement à risque.</p>
+</div>
+
+<!-- ============ COMPTE_A_REBOURS ============ -->
+<div th:fragment="compteARebours" class="hm-card mb-4">
+    <div class="hm-tag">Compte à rebours</div>
+    <div th:if="${vue.edition != null}">
+        <div class="hm-card-title" style="font-size:1.8rem;"
+             th:text="${vue.edition.joursAvantOuverture} + ' jours'">0</div>
+        <div class="hm-tag" th:text="'avant ' + ${vue.edition.nom}">avant l'édition</div>
+    </div>
+    <p th:if="${vue.edition == null}" style="color:var(--hm-text-muted);">
+        Aucune édition active.</p>
+</div>
+
+<!-- ============ PROGRESSION ============ -->
+<div th:fragment="progression" class="hm-card mb-4">
+    <div class="hm-tag">Progression</div>
+    <div th:if="${vue.edition != null}">
+        <div class="hm-card-title" style="font-size:1.8rem;"
+             th:text="${vue.edition.concertsProgrammes} + ' / ' + ${vue.edition.concertsTotal}">0 / 0</div>
+        <div class="hm-tag">concerts programmés</div>
+    </div>
+    <p th:if="${vue.edition == null}" style="color:var(--hm-text-muted);">
+        Aucune édition active.</p>
+</div>
+
+</body>
+</html>

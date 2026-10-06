@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page introuvable</title>
+
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      min-height: 100vh;
+      background: #020617;
+      color: white;
+    }
+
+    .error-page {
+      min-height: 100vh;
+    }
+
+    .error-image {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .error-title {
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 800;
+    }
+
+    .error-text {
+      color: #cbd5e1;
+    }
+
+    .btn-neon {
+      background: linear-gradient(90deg, #0ea5e9, #1d4ed8);
+      border: none;
+      color: white;
+      padding: 0.9rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(14, 165, 233, 0.45);
+    }
+
+    .btn-neon:hover {
+      color: white;
+      box-shadow: 0 0 28px rgba(14, 165, 233, 0.7);
+    }
+
+    .error-code {
+      font-size: clamp(8rem, 20vw, 16rem);
+      font-weight: 900;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow:
+              0 0 10px rgba(255,255,255,0.3),
+              0 0 30px rgba(37,182,255,0.5);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container error-page d-flex align-items-center">
+
+  <div class="row align-items-center w-100 g-5">
+    <h1 class="error-code">404</h1>
+    <div class="col-lg-6 text-center text-lg-start">
+      <div class="error-title mb-3">Oups ! Cette page n’existe pas.</div>
+      <p class="error-text fs-5 mb-4">
+        La page que vous cherchez a été déplacée ou supprimée.
+      </p>
+
+      <a th:href="@{/dashboard}" class="btn btn-neon">
+        Retour à l'acceuil
+      </a>
+    </div>
+
+
+  </div>
+</div>
+
+</body>
+</html>

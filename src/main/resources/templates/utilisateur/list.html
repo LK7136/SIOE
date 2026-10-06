@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+  <title>Utilisateurs - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+  <div class="hm-card">
+    <div class="hm-card-header">
+      <div>
+        <div class="hm-tag">Administration</div>
+        <div class="hm-card-title">Gestion des utilisateurs</div>
+      </div>
+      <a th:href="@{/register}" class="hm-btn-primary">
+        <span>＋</span>
+        <span>Nouvel utilisateur</span>
+      </a>
+    </div>
+
+    <div th:if="${succes}" class="alert alert-success" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+    <div th:if="${#lists.isEmpty(utilisateurs)}" style="padding: 40px; text-align: center;">
+      <p>Aucun utilisateur enregistré.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(utilisateurs)}" class="table-responsive">
+      <table class="hm-table">
+        <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Identifiant</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Créé le</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${utilisateurs}">
+          <td><strong th:text="${u.nom + ' ' + u.prenom}"></strong></td>
+          <td th:text="${u.identifiant}"></td>
+          <td th:text="${u.email}"></td>
+          <td>
+            <span th:if="${u.roles != null}">
+              <span th:each="role : ${u.roles}"
+                    class="hm-pill"
+                    th:text="${role.libelle}">
+              </span>
+            </span>
+          </td>
+          <td>
+            <span th:if="${u.actif != null and u.actif}" class="hm-pill">Actif</span>
+            <span th:unless="${u.actif != null and u.actif}" class="hm-pill" style="opacity:0.5;">Inactif</span>
+          </td>
+          <td th:text="${u.dateCreation != null ? #dates.format(u.dateCreation, 'dd/MM/yyyy') : '-'}"></td>
+          <td>
+            <a class="hm-link-site"
+               th:href="@{/festival/utilisateurs/ajouter(id=${u.id})}">
+              ✏️ éditer
+            </a>
+            &nbsp;|&nbsp;
+            <a class="hm-link-site"
+               th:href="@{/festival/utilisateurs/delete/{id}(id=${u.id})}"
+               onclick="return confirm('Supprimer cet utilisateur ?')"
+               style="color: #e74c3c;">
+              🗑️ supprimer
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

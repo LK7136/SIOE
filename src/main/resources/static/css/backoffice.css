@@ -1,0 +1,448 @@
+/* ================================
+   Thème HellMetz Backoffice
+   Style : Bleu abyssal métallique
+   ================================ */
+
+:root {
+    /* Fond & texte */
+    --hm-bg: #020617;            /* fond global très sombre */
+    --hm-bg-soft: #020819;       /* panneaux / cartes */
+    --hm-border: #0f172a;        /* bordures */
+    --hm-text: #e5e7eb;          /* texte principal */
+    --hm-text-muted: #9ca3af;    /* texte secondaire */
+
+    /* Accent bleu abyssal */
+    --hm-accent: #1e3a8a;        /* bleu marine */
+    --hm-accent-light: #38bdf8;  /* cyan lumineux */
+    --hm-accent-dark: #020617;   /* bleu presque noir */
+
+    /* Effets */
+    --hm-glow: rgba(56, 189, 248, 0.5);   /* halo cyan */
+
+    /* Variables de dimensions pour la Sidebar responsive */
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 75px;
+}
+
+/* Reset léger */
+* {
+    box-sizing: border-box;
+}
+
+/* ================================
+   Body & liens
+   ================================ */
+
+body {
+    margin: 0;
+    font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+            radial-gradient(circle at 10% 0%, #1e293b 0, transparent 45%),
+            radial-gradient(circle at 90% 0%, #0f172a 0, transparent 50%),
+            radial-gradient(circle at 50% 100%, #020617 0, #000 60%);
+    color: var(--hm-text);
+}
+
+a {
+    color: var(--hm-accent-light);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--hm-accent);
+}
+
+/* ================================
+   Layout principal
+   ================================ */
+
+.backoffice-wrapper {
+    min-height: 100vh;
+    display: flex;
+    width: 100%;
+}
+
+/* ================================
+   Sidebar (Menu latéral gauche)
+   ================================ */
+
+.backoffice-sidebar.hm-sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: radial-gradient(circle at top left, #020617 0, #020617 30%, #020819 60%, #020617 100%);
+    border-right: 1px solid var(--hm-border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    box-shadow: 18px 0 40px rgba(0, 0, 0, 0.7);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+/* ÉTAT REPLIÉ : La barre complète passe à 75px, fond compris */
+.backoffice-sidebar.hm-sidebar.collapsed {
+    width: var(--sidebar-collapsed-width) !important;
+    min-width: var(--sidebar-collapsed-width) !important;
+    padding: 1.5rem 0;
+}
+
+.backoffice-logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    color: var(--hm-accent-light);
+    text-shadow: 0 0 8px var(--hm-glow);
+}
+
+.backoffice-subtitle {
+    font-size: 0.85rem;
+    color: var(--hm-text-muted);
+    margin-bottom: 1.5rem;
+}
+
+/* On masque les textes et sous-titres quand la sidebar est repliée */
+.backoffice-sidebar.collapsed .menu-text,
+.backoffice-sidebar.collapsed .sidebar-text,
+.backoffice-sidebar.collapsed .backoffice-subtitle {
+    display: none !important;
+}
+
+.backoffice-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Liens du menu */
+.backoffice-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.55rem;
+    font-size: 0.95rem;
+    color: var(--hm-text-muted);
+    position: relative;
+    transition:
+            background 0.18s ease-out,
+            color 0.18s ease-out,
+            transform 0.12s ease-out,
+            box-shadow 0.18s ease-out,
+            justify-content 0.3s ease,
+            padding 0.3s ease;
+}
+
+.backoffice-nav a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid transparent;
+    background: linear-gradient(120deg, rgba(56, 189, 248, 0.0), rgba(56, 189, 248, 0.35), rgba(56, 189, 248, 0.0));
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    z-index: -1;
+}
+
+.backoffice-nav a:hover {
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--hm-text);
+    transform: translateX(2px);
+    box-shadow: 0 0 16px rgba(15, 23, 42, 0.9);
+}
+
+.backoffice-nav a:hover::before {
+    opacity: 1;
+}
+
+/* Centrage visuel parfait des icônes en mode replié */
+.backoffice-sidebar.collapsed .backoffice-nav a {
+    justify-content: center !important;
+    padding: 12px 0 !important;
+    transform: none !important;
+}
+
+.backoffice-sidebar.collapsed .menu-icon {
+    margin: 0 !important;
+    font-size: 1.25rem;
+}
+
+/* État actif */
+.backoffice-nav a.active {
+    background: linear-gradient(120deg, #0b1120, #1e3a8a);
+    color: #e5e7eb;
+    font-weight: 600;
+    box-shadow:
+            0 0 24px rgba(15, 23, 42, 0.95),
+            0 0 18px var(--hm-glow);
+}
+
+.backoffice-nav a.active::before {
+    opacity: 1;
+}
+
+/* Liens désactivés */
+.backoffice-nav a.disabled {
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
+}
+.backoffice-nav a.disabled:hover {
+    transform: none;
+    background: transparent;
+}
+
+/* Info utilisateur en bas de sidebar */
+.backoffice-user {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hm-border);
+    font-size: 0.85rem;
+    color: var(--hm-text-muted);
+}
+
+.backoffice-user strong {
+    color: var(--hm-text);
+}
+
+/* ================================
+   Zone principale (Main Content)
+   ================================ */
+
+.backoffice-main.main-content {
+    flex: 1;
+    width: calc(100% - var(--sidebar-width));
+    padding: 1.8rem 2.2rem;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quand la barre à sa gauche est réduite, le bloc s'élargit */
+.backoffice-sidebar.collapsed + .backoffice-main.main-content {
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+.backoffice-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--hm-border);
+    padding-bottom: 0.75rem;
+}
+
+.backoffice-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.backoffice-header .subtitle {
+    font-size: 0.9rem;
+    color: var(--hm-text-muted);
+    margin-top: 0.2rem;
+}
+
+/* ================================
+   Cartes & tableaux
+   ================================ */
+
+.hm-card {
+    background: radial-gradient(circle at top left, #020617 0, #020819 40%, #020617 100%);
+    border-radius: 1rem;
+    border: 1px solid var(--hm-border);
+    padding: 1.2rem 1.4rem;
+    box-shadow:
+            0 16px 40px rgba(0, 0, 0, 0.8),
+            0 0 30px rgba(15, 23, 42, 0.9);
+}
+
+.hm-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.hm-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.hm-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--hm-text-muted);
+}
+
+/* Bouton principal */
+
+.hm-btn-primary {
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    font-size: 0.9rem;
+    background: radial-gradient(circle at 0 0, var(--hm-accent-light) 0, var(--hm-accent) 45%, #020617 100%);
+    color: #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    box-shadow: 0 0 18px var(--hm-glow);
+    transition:
+            transform 0.12s ease-out,
+            box-shadow 0.18s ease-out,
+            filter 0.18s ease-out;
+}
+.hm-btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow:
+            0 0 26px var(--hm-glow),
+            0 0 10px rgba(30, 64, 175, 0.9);
+}
+
+/* Tableau */
+
+table.hm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+table.hm-table thead {
+    background: linear-gradient(90deg, #020617, #020819);
+}
+
+table.hm-table th,
+table.hm-table td {
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.95);
+}
+
+table.hm-table th {
+    font-weight: 500;
+    color: var(--hm-text-muted);
+}
+
+table.hm-table tbody tr:nth-child(2n) {
+    background: rgba(15, 23, 42, 0.65);
+}
+
+table.hm-table tbody tr:hover {
+    background: radial-gradient(circle at left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.9));
+}
+
+table.hm-table th:last-child,
+table.hm-table td:last-child {
+    text-align: right;
+}
+
+/* Pastilles de style */
+
+.hm-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: linear-gradient(120deg, rgba(15, 23, 42, 0.9), rgba(37, 99, 235, 0.6));
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    font-size: 0.75rem;
+    color: var(--hm-text-muted);
+}
+
+/* Liens d’action */
+
+.hm-link-site {
+    font-size: 0.8rem;
+    color: var(--hm-accent-light);
+}
+.hm-link-site:hover {
+    color: var(--hm-accent);
+    text-decoration: underline;
+}
+
+/* ================================
+   Scrollbar (Chrome/Edge)
+   ================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Style pour les messages d'erreur du formulaire de connexion */
+erreurCnx {
+    display: block;
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+erreurCnx p {
+    margin: 0;
+}
+
+.grid-stack-item-content { overflow: auto; }
+.grid-stack-item-content > .hm-card { height: 100%; margin: 0; }
+
+/* ================================
+   ADAPTATION AUTOMATIQUE (Responsive)
+   ================================ */
+
+@media (max-width: 1024px) {
+    .backoffice-sidebar.hm-sidebar {
+        width: var(--sidebar-collapsed-width) !important;
+        min-width: var(--sidebar-collapsed-width) !important;
+        padding: 1.5rem 0;
+    }
+    .backoffice-sidebar .menu-text,
+    .backoffice-sidebar .sidebar-text,
+    .backoffice-sidebar .backoffice-subtitle {
+        display: none !important;
+    }
+    .backoffice-sidebar .backoffice-nav a {
+        justify-content: center !important;
+        padding: 12px 0 !important;
+    }
+    .backoffice-sidebar .menu-icon {
+        margin: 0 !important;
+        font-size: 1.25rem;
+    }
+    .backoffice-main.main-content {
+        width: calc(100% - var(--sidebar-collapsed-width)) !important;
+    }
+    #toggleSidebarBtn {
+        display: none !important; /* Masque le bouton hamburger sur tablette/mobile */
+    }
+}
+
+
+.theme-clair {
+    --hm-bg: #f8fafc;
+    --hm-bg-soft: #ffffff;
+    --hm-border: #cbd5e1;
+    --hm-text: #1e293b;
+    --hm-text-muted: #64748b;
+
+    --hm-accent: #2563eb;
+    --hm-accent-light: #0ea5e9;
+    --hm-accent-dark: #1e40af;
+
+    --hm-glow: rgba(37, 99, 235, 0.25);
+}
