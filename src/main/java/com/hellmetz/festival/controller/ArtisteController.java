@@ -21,10 +21,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/artistes")
 public class ArtisteController {
+
+    private static final Logger log = LoggerFactory.getLogger(ArtisteController.class);
 
     @Autowired
     private ArtisteService artisteService;
@@ -38,6 +44,8 @@ public class ArtisteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") String taille,
             Model model) {
+
+        log.debug("Liste des artistes : page={}, taille={}", page, taille);
 
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Artiste> pageArtistes = tout
@@ -57,6 +65,7 @@ public class ArtisteController {
             int t = Integer.parseInt(taille);
             return t > 0 ? t : 10;
         } catch (NumberFormatException e) {
+            log.warn("Taille de page invalide '{}', valeur par défaut 10 utilisée", taille);
             return 10;
         }
     }
@@ -86,7 +95,9 @@ public class ArtisteController {
     public String save(@ModelAttribute Artiste artiste,
                        @RequestParam(required = false) Integer idGroupeParam,
                        @RequestParam(required = false) MultipartFile urlPhotoArtiste,
-                       @RequestParam(required = false) String supprimerPhoto) {
+                       @RequestParam(required = false) String supprimerPhoto,
+                       RedirectAttributes redirectAttributes,
+                       Principal principal) {
 
         if ("true".equals(supprimerPhoto)) {
             artiste.setUrlPhoto(null);
@@ -105,13 +116,18 @@ public class ArtisteController {
                 artiste.setUrlPhoto(fileName);
 
             } catch (IOException e) {
-                e.printStackTrace();
-                return "artiste/edit";
+                log.error("Échec de l'upload du fichier {} pour l'artiste {}",
+                        urlPhotoArtiste.getOriginalFilename(), artiste.getId(), e);
+                redirectAttributes.addFlashAttribute("erreur", "La photo n'a pas pu être envoyée.");
+                return "redirect:/artistes/ajouter" + (artiste.getId() != null ? "?id=" + artiste.getId() : "");
             }
         }
 
-
+        boolean creation = artiste.getId() == null;
         artisteService.save(artiste);
+
+        log.info("Artiste {} {} par l'utilisateur {}",
+                artiste.getId(), creation ? "créé" : "modifié", principal.getName());
 
         if (idGroupeParam != null) {
             return "redirect:/groupe/edit?id=" + idGroupeParam;
@@ -125,6 +141,7 @@ public class ArtisteController {
         Resource resource = new UrlResource(cheminFichier.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
+            log.warn("Photo introuvable ou illisible : {}", nomFichier);
             return ResponseEntity.notFound().build();
         }
 
@@ -135,8 +152,9 @@ public class ArtisteController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, Principal principal) {
         artisteService.deleteById(id);
+        log.info("Artiste {} supprimé par l'utilisateur {}", id, principal.getName());
         return "redirect:/artistes/liste";
     }
 }
