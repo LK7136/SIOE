@@ -27,10 +27,16 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/groupes")
 public class GroupeController {
 
+    private static final Logger log = LoggerFactory.getLogger(GroupeController.class);
     @Autowired
     private GroupeService groupeService;
     @Autowired
@@ -50,6 +56,8 @@ public class GroupeController {
             @RequestParam(defaultValue = "10") String taille,
             Model model) {
 
+        log.debug("Liste des groupes : page={}, taille={}", page, taille);   // <- LIGNE À AJOUTER
+
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Groupe> pageGroupes = tout
                 ? groupeService.findTout()
@@ -68,6 +76,7 @@ public class GroupeController {
             int t = Integer.parseInt(taille);
             return t > 0 ? t : 10;
         } catch (NumberFormatException e) {
+            log.warn("Taille de page invalide '{}', valeur par défaut 10 utilisée", taille);
             return 10;
         }
     }
@@ -77,6 +86,8 @@ public class GroupeController {
                        @RequestParam(defaultValue = "0") int concertPage,
                        @RequestParam(defaultValue = "10") String concertTaille,
                        Model model) {
+
+        log.debug("Affichage du formulaire groupe, id={}", id);
 
         boolean tout = "tout".equalsIgnoreCase(concertTaille);
 
@@ -116,7 +127,8 @@ public class GroupeController {
     @PostMapping("/{groupeId}/concerts")
     public String saveConcerts(@PathVariable Long groupeId,
                                @RequestParam(required = false) List<Long> concertIds,
-                               @RequestParam(required = false) List<Long> visibleConcertIds) {
+                               @RequestParam(required = false) List<Long> visibleConcertIds,
+                               Principal principal) {
 
         // si aucune case n'est cochée on initialise une liste vide
         // pour éviter les NullPointerException
@@ -151,8 +163,10 @@ public class GroupeController {
 
                 concertService.save(concert);
             }
+        } else {
+            log.warn("Aucun concert affiché pour le groupe {} : rien à mettre à jour", groupeId);
         }
-
+        log.info("Concerts du groupe {} mis à jour par l'utilisateur {}", groupeId, principal.getName());
         return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=concerts";
     }
 
@@ -164,7 +178,9 @@ public class GroupeController {
     public String save(@ModelAttribute Groupe groupe,
                        @RequestParam(value = "stylesId", required = false) List<Long> stylesId,
                        @RequestParam(required = false) MultipartFile urlLogoGroupe,
-                       @RequestParam(required = false) String supprimerPhoto) {
+                       @RequestParam(required = false) String supprimerPhoto,
+                       RedirectAttributes redirectAttributes,
+                       Principal principal) {
 
         if ("true".equals(supprimerPhoto)) {
             groupe.setUrlLogo(null);
@@ -183,8 +199,10 @@ public class GroupeController {
                 groupe.setUrlLogo(fileName);
 
             } catch (IOException e) {
-                e.printStackTrace();
-                return "groupe/edit";
+                log.error("Échec de l'upload du fichier {} pour le groupe {}",
+                        urlLogoGroupe.getOriginalFilename(), groupe.getId(), e);
+                redirectAttributes.addFlashAttribute("erreur", "Le logo n'a pas pu être envoyé.");
+                return "redirect:/groupes/ajouter" + (groupe.getId() != null ? "?id=" + groupe.getId() : "");
             }
         }
 
@@ -205,10 +223,14 @@ public class GroupeController {
             }
         }
 
+        boolean creation = groupe.getId() == null;
         groupeService.save(groupe);
+        log.info("Groupe {} {} par l'utilisateur {}",
+                groupe.getId(), creation ? "créé" : "modifié", principal.getName());
 
         return "redirect:/groupes/liste";
     }
+
 
     @GetMapping("/uploads/{nomFichier:.+}")
     public ResponseEntity<Resource> voirPhoto(@PathVariable String nomFichier) throws IOException {
@@ -216,6 +238,7 @@ public class GroupeController {
         Resource resource = new UrlResource(cheminFichier.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
+            log.warn("Logo introuvable ou illisible : {}", nomFichier);
             return ResponseEntity.notFound().build();
         }
 
@@ -226,8 +249,9 @@ public class GroupeController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, Principal principal) {
         groupeService.deleteById(id);
+        log.info("Groupe {} supprimé par l'utilisateur {}", id, principal.getName());
         return "redirect:/groupes/liste";
     }
 }
