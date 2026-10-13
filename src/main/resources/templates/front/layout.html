@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Layout du site public : chaque page de templates/front/ reprend ces morceaux -->
+
+<head th:fragment="head(titre)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titre} + ' - HellMetz'">HellMetz</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-festava-live.css}" rel="stylesheet">
+    <style>
+        .navbar.front-nav { position: static; background-color: #212529; }
+        .front-nav .navbar-brand, .front-nav .nav-link { color: #ffffff; }
+        .front-footer { background-color: #212529; color: #ffffff; }
+    </style>
+</head>
+
+<body>
+
+<!-- Menu public -->
+<nav th:fragment="menu" class="navbar navbar-expand-lg navbar-dark front-nav">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">HellMetz</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#menuFront" aria-controls="menuFront"
+                aria-expanded="false" aria-label="Ouvrir le menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menuFront">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/programme}">Programme</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/line-up}">Line-up</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/infos-pratiques}">Infos pratiques</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/contact}">Contact</a></li>
+            </ul>
+
+            <!-- visiteur : lien vers la connexion / utilisateur connecte : lien vers le tableau de bord -->
+            <a th:unless="${connecte}" th:href="@{/login}" class="btn custom-btn">Accès organisateurs</a>
+            <a th:if="${connecte}" th:href="@{/dashboard}" class="btn custom-btn">Tableau de bord</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Pied de page public -->
+<footer th:fragment="pied" class="front-footer py-4 mt-5">
+    <div class="container text-center">
+        <p class="mb-0">HellMetz Festival</p>
+    </div>
+</footer>
+
+<!-- Scripts communs -->
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</th:block>
+
+</body>
+</html>
