@@ -38,6 +38,12 @@
       <span class="menu-icon">🎵</span><span class="menu-text">Concerts</span>
     </a>
 
+    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+       th:href="@{/festival/utilisateurs/liste}"
+       th:class="${activeMenu eq 'utilisateurs' ? 'active' : ''}">
+      <span class="menu-icon">👥</span><span class="menu-text">Utilisateurs</span>
+    <a/>
+
     <a class="disabled"><span class="menu-icon">📦</span><span class="menu-text">Logistique & Matériel</span></a>
     <a class="disabled"><span class="menu-icon">🧑‍🤝‍🧑</span><span class="menu-text">RH & Bénévoles</span></a>
     <a class="disabled"><span class="menu-icon">📍</span><span class="menu-text">Points d'intérêt</span></a>
@@ -46,13 +52,6 @@
        th:href="@{/parametres/liste}" th:class="${activeMenu eq 'parametres' ? 'active' : ''}">
       <span class="menu-icon">⚙️</span><span class="menu-text">Paramètres</span>
     </a>
-    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-       th:href="@{/festival/utilisateurs/liste}"
-       th:class="${activeMenu eq 'utilisateurs' ? 'active' : ''}">
-      <span class="menu-icon">👥</span><span class="menu-text">Utilisateurs</span>
-    <a/>
-
-
 
   </nav>
 </div>
