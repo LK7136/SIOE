@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
 @Transactional
 public class RoleService {
@@ -27,16 +28,9 @@ public class RoleService {
         return roleRepository.findById(id).orElse(null);
     }
 
-    // ajouter pour recupere les roles avec perm
     @Transactional(readOnly = true)
-    public List<Role> findAllAvecPermissions() {
-        List<Role> roles = roleRepository.findAll();
-        roles.forEach(r -> r.getPermissions().size());
-        return roles;
-    }
+    public List<Role> findAllAvecPermissions() {return roleRepository.findAllAvecPermissions();}
 
     public Role save(Role role) { return roleRepository.save(role);}
-
-
 
 }
