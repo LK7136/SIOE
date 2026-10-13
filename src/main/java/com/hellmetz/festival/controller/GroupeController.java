@@ -37,6 +37,7 @@ import java.security.Principal;
 public class GroupeController {
 
     private static final Logger log = LoggerFactory.getLogger(GroupeController.class);
+
     @Autowired
     private GroupeService groupeService;
     @Autowired
