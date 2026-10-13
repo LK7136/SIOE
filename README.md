@@ -336,7 +336,15 @@ Pour travailler dans votre propre repo :
 - Ou créez votre propre dépôt à partir de ce squelette
 
 ---
+## 🔐 Sécurité & Keystore
 
+Le fichier `keystore` n'est plus inclus dans le dépôt pour des raisons de sécurité.
+
+Pour générer votre propre fichier localement :
+
+```bash
+keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-alias
+```
 # 📬 Besoin d’aide ?
 
 Le projet est progressif, les difficultés sont normales.  
