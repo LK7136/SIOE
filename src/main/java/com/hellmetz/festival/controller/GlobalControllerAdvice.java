@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Rend la variable {@code utilisateurConnecte} (entite metier Utilisateur)
  * disponible automatiquement dans tous les templates Thymeleaf.
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
  */
 @ControllerAdvice
 public class GlobalControllerAdvice {
-
+    private static final Logger log = LoggerFactory.getLogger(GlobalControllerAdvice.class);
     @Autowired
     private ParametreService parametreService;
 
