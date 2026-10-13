@@ -1,6 +1,5 @@
 package com.hellmetz.festival.config;
 
-
 import com.hellmetz.festival.service.UtilisateurDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,39 +21,41 @@ public class SecurityConfig {
     @Lazy
     private UtilisateurDetailService utilisateurDetailService;
 
-    @Bean  // Ce Bean remplace votre AuthenticationFilter
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+
                         // Ressources publiques : CSS, JS, images
                         .requestMatchers("/css/**", "/js/**").permitAll()
+
+                        // Permet l'accès aux pages d'erreur générées par Spring Boot
+                        .requestMatchers("/error", "/error/**").permitAll()
+
                         // nimporte qui peut se login
                         .requestMatchers("/login").permitAll()
 
-
-
-                        //seule l'admin est organisateur ont accès a la page de parametres
+                        // seule l'admin et organisateur ont accès à la page de paramètres
                         .requestMatchers("/parametres/liste").hasAnyRole("ADMIN", "ORGANISATEUR")
 
-
-                        //suppression
+                        // suppression
                         .requestMatchers("/*/delete/**").hasRole("ADMIN")
 
-                        //edition et ajout
+                        // édition et ajout
                         .requestMatchers("/*/ajouter").hasAnyRole("ADMIN", "ORGANISATEUR")
                         .requestMatchers(HttpMethod.POST, "/*/edit").hasAnyRole("ADMIN", "ORGANISATEUR")
 
-                        //acces a la creation de roles que pour l'admin
+                        // accès à la création de rôles uniquement pour l'admin
                         .requestMatchers(HttpMethod.POST, "/roles").hasRole("ADMIN")
 
-
-                        // acces au back office que pr les admins
+                        // accès au back office uniquement pour les admins
                         .requestMatchers("/festival/**").hasRole("ADMIN")
-                        // acces au reste des ressource que si on est authentifier
+
+                        // accès au reste des ressources uniquement si authentifié
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")      // Votre page de login Thymeleaf
+                        .loginPage("/login")
                         .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
@@ -63,13 +64,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Ce Bean remplace votre usage direct de BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    // A vous : implémentez UserDetailsService pour charger vos Utilisateur
 
     @Bean
     public DaoAuthenticationProvider chargerUtilisateur() {

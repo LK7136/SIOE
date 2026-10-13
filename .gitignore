@@ -36,11 +36,4 @@ build/
 .DS_Store
 
 ### Config locale ###
-src/main/resources/application.properties
-.idea/
-log/
-uploads/
-*.p12
-*.keystore
-*.jks
-keystore.properties
+src/main/resources/application.properties.example
