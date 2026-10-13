@@ -57,7 +57,7 @@ public class GroupeController {
             @RequestParam(defaultValue = "10") String taille,
             Model model) {
 
-        log.debug("Liste des groupes : page={}, taille={}", page, taille);   // <- LIGNE À AJOUTER
+        log.debug("Liste des groupes : page={}, taille={}", page, taille);
 
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Groupe> pageGroupes = tout
