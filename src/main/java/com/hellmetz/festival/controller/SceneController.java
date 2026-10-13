@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-//pour recuper les fichier uploader d'une scene et les afficher quand on clique sur voir
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +36,7 @@ public class SceneController {
 
     @GetMapping("/liste")
     public String liste(Model model) {
+        log.debug("Liste des scènes");
         model.addAttribute("scenes", sceneService.findAll());
         model.addAttribute("pageTitle", "HellMetz - Scenes");
         model.addAttribute("activeMenu", "templates");
