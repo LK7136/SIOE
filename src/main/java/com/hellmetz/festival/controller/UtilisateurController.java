@@ -153,32 +153,38 @@ public class UtilisateurController {
         return "redirect:/festival/utilisateurs/liste";
     }
 
-
     private void alimenterPermissions(Model model, Utilisateur utilisateur){
         List<Role> roles = roleService.findAllAvecPermissions();
-
-        model.addAttribute("roles", roles);
-        model.addAttribute("permissions", permissionService.findAll());
-
         Map<Long, List<Long>> permissionsParRole = new HashMap<>();
+
         for (Role role : roles) {
             List<Long> ids = role.getPermissions().stream()
                     .map(Permission::getIdPermission)
                     .collect(Collectors.toList());
             permissionsParRole.put(role.getIdRole(), ids);
         }
+
+        model.addAttribute("permissions", permissionService.findAll());
+        model.addAttribute("roles", roles);
         model.addAttribute("permissionsParRole", permissionsParRole);
 
         List<Long> utilisateurPermissionsIds = new java.util.ArrayList<>();
+
         if (utilisateur != null && utilisateur.getRoles() != null){
             for (Role roleUtilisateur : utilisateur.getRoles()) {
-                for (Permission permission : roleUtilisateur.getPermissions()) {
-                    utilisateurPermissionsIds.add(permission.getIdPermission());
+                List<Long> ids = permissionsParRole.get(roleUtilisateur.getIdRole());
+                if (ids != null) {
+                    for (Long id : ids) {
+                        if (!utilisateurPermissionsIds.contains(id)) {
+                            utilisateurPermissionsIds.add(id);
+                        }
+                    }
                 }
             }
         }
         model.addAttribute("utilisateurPermissionsIds", utilisateurPermissionsIds);
     }
+
 
 
 }

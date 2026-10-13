@@ -1,13 +1,12 @@
 package com.hellmetz.festival.service;
 
 import com.hellmetz.festival.model.Role;
-import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 
 import java.util.List;
+
 
 @Service
 @Transactional
@@ -29,13 +28,8 @@ public class RoleService {
         return roleRepository.findById(id).orElse(null);
     }
 
-    // ajouter pour recupere les roles avec perm
     @Transactional(readOnly = true)
-    public List<Role> findAllAvecPermissions() {
-        List<Role> roles = roleRepository.findAll();
-        roles.forEach(r -> r.getPermissions().size());
-        return roles;
-    }
+    public List<Role> findAllAvecPermissions() {return roleRepository.findAllAvecPermissions();}
 
     public Role save(Role role) { return roleRepository.save(role);}
 
