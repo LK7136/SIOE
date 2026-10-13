@@ -12,9 +12,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/concerts")
 public class ConcertController {
+
+    private static final Logger log = LoggerFactory.getLogger(ConcertController.class);
 
     @Autowired
     private ConcertService concertService;
@@ -30,6 +36,8 @@ public class ConcertController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") String taille,
             Model model) {
+
+        log.debug("Liste des concerts : page={}, taille={}", page, taille);
 
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Concert> pageConcerts = tout
@@ -49,6 +57,7 @@ public class ConcertController {
             int t = Integer.parseInt(taille);
             return t > 0 ? t : 10;
         } catch (NumberFormatException e) {
+            log.warn("Taille de page invalide '{}', valeur par défaut 10 utilisée", taille);
             return 10;
         }
     }
@@ -58,6 +67,8 @@ public class ConcertController {
                        @RequestParam(defaultValue = "0") int groupesPage,
                        @RequestParam(defaultValue = "10") String groupesTaille,
                        Model model) {
+
+        log.debug("Affichage du formulaire concert, id={}", id);
 
         boolean tout = "tout".equalsIgnoreCase(groupesTaille);
 
@@ -86,15 +97,16 @@ public class ConcertController {
 
     @PostMapping("/edit")
     public String save(@ModelAttribute Concert concert,
-                       @RequestParam(value = "groupeId", required = false) Long groupeId) {
+                       @RequestParam(value = "groupeId", required = false) Long groupeId,
+                       Principal principal) {
 
-        // vérifie si le concert existait déjà et s'il avait un groupe
+        boolean creation = concert.getId() == null;
+
         boolean avaitUnGroupe = false;
         if (concert.getId() != null) {
             Concert existant = concertService.findById(concert.getId());
             avaitUnGroupe = existant.getGroupe() != null;
         }
-
 
         if (groupeId != null) {
             Groupe groupe = groupeService.findById(groupeId);
@@ -104,6 +116,7 @@ public class ConcertController {
             concert.setGroupe(null);
 
             if (avaitUnGroupe) {
+                log.warn("Concert {} annulé : son groupe a été retiré", concert.getId());
                 concert.setStatut("Annulé");
             } else {
                 concert.setStatut("Non programmé");
@@ -111,12 +124,15 @@ public class ConcertController {
         }
 
         concertService.save(concert);
+        log.info("Concert {} {} par l'utilisateur {} (statut : {})",
+                concert.getId(), creation ? "créé" : "modifié", principal.getName(), concert.getStatut());
         return "redirect:/concerts/liste";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, Principal principal) {
         concertService.deleteById(id);
+        log.info("Concert {} supprimé par l'utilisateur {}", id, principal.getName());
         return "redirect:/concerts/liste";
     }
 }
