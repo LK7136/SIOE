@@ -47,7 +47,7 @@ public class Edition {
     @Column(name = "lattitude")
     private BigDecimal lattitude;
 
-    @Column(name = "actif", nullable = false)
+    @Column(name = "actif")
     private boolean actif;
 
     public Edition() {}
