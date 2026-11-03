@@ -1,4 +1,4 @@
-CREATE TABLE parametre (
+CREATE TABLE IF NOT EXISTS parametre (
                            id_parametre      BIGSERIAL    PRIMARY KEY,
                            code_parametre    VARCHAR(100) NOT NULL UNIQUE,
                            libelle_parametre VARCHAR(100) NOT NULL,
@@ -12,4 +12,5 @@ INSERT INTO parametre (code_parametre, libelle_parametre, valeur_parametre) VALU
                                                                                 ('contact.email',                    'E-mail de contact',             'contact@hellmetz.fr'),
                                                                                 ('contact.telephone',                'Téléphone',                     '+33387000000'),
                                                                                 ('affichage.elements_par_page',      'Éléments par page',             '10'),
-                                                                                ('affichage.theme',                  'Thème par défaut',              'Sombre');
+                                                                                ('affichage.theme',                  'Thème par défaut',              'Sombre')
+ON CONFLICT (code_parametre) DO NOTHING;
