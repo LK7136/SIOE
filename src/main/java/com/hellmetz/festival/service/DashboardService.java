@@ -10,8 +10,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class DashboardService {
+
+    private static final Logger log = LoggerFactory.getLogger(DashboardService.class);
 
     private static final int SEUIL_CHANGEOVER_MINUTES = 15; // en-deçà = alerte
 
@@ -28,6 +33,7 @@ public class DashboardService {
     }
 
     public DashboardView build() {
+        log.debug("Construction du tableau de bord");
         LocalDateTime maintenant = LocalDateTime.now();
 
         // --- Concerts du jour ---
@@ -57,6 +63,9 @@ public class DashboardService {
         EditionResume edition = editionRepo.findByActifTrue()
                 .map(e -> resumeEdition(e, maintenant))
                 .orElse(null);
+        if (edition == null) {
+            log.warn("Aucune édition active : la section édition du tableau de bord sera vide");
+        }
 
         return new DashboardView(
                 artisteRepo.count(),
@@ -117,6 +126,8 @@ public class DashboardService {
                 long ecart = Duration.between(
                         courant.getDateHeureFin(), suivant.getDateHeureDebut()).toMinutes();
                 if (ecart < SEUIL_CHANGEOVER_MINUTES) {
+                    log.warn("Conflit de planning sur la scène {} : {} min entre le concert {} et le concert {}",
+                            entree.getKey().getNom(), ecart, courant.getId(), suivant.getId());
                     alertes.add(new ChangeoverAlert(
                             entree.getKey().getNom(),
                             libelle(courant), libelle(suivant), ecart));
