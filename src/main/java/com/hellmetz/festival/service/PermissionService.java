@@ -7,9 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @Transactional
 public class PermissionService {
+
+    private static final Logger log = LoggerFactory.getLogger(PermissionService.class);
 
     private final PermissionRepository permissionRepository;
 
@@ -19,6 +24,7 @@ public class PermissionService {
 
     @Transactional(readOnly = true)
     public List<Permission> findAll() {
+        log.debug("Recherche de toutes les permissions");
         return permissionRepository.findAll();
     }
 
