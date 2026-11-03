@@ -9,17 +9,20 @@ ALTER TABLE utilisateur
 UPDATE utilisateur u
 SET id_role = r.id_role
 FROM role r
-WHERE r.code_role = 'ADMIN';
+WHERE r.code_role = 'ADMIN'
+  AND u.is_admin = true;
 
 UPDATE utilisateur u
 SET id_role = r.id_role
 FROM role r
-WHERE r.code_role = 'BENEVOLE';
+WHERE r.code_role = 'BENEVOLE'
+  AND u.is_admin = false;
 
 UPDATE utilisateur u
 SET id_role = r.id_role
 FROM role r
-WHERE r.code_role = 'ORGANISATEUR';
+WHERE r.code_role = 'ORGANISATEUR'
+  AND u.is_admin = false;
 
 UPDATE utilisateur u
 SET id_role = r.id_role
