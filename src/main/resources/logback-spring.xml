@@ -12,7 +12,7 @@
             value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%thread] %logger{36} [user:%X{user}] - %msg%n"/>
 
   <!-- Permet de conditionner les blocs XML selon le profil actif (dev ou prod). -->
-  <springProfile name="dev">
+  <springProfile name="develop">
     <!-- Définit où et comment écrire les logs. -->
     <!-- ConsoleAppende permet d'écrire sur la sortie standard -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -58,7 +58,7 @@
   </springProfile>
 
   <!-- 5. CONFIGURATION PAR PROFIL DES NIVEAUX DE LOGS -->
-  <springProfile name="dev">
+  <springProfile name="develop">
     <!--cible un package précis pour lui assigner un niveau (DEBUG, INFO, WARN).-->
     <logger name="com.hellmetz.festival" level="DEBUG"/>
     <logger name="org.hibernate.SQL" level="DEBUG"/>
