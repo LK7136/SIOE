@@ -6,13 +6,17 @@ import com.hellmetz.festival.dashboard.WidgetGeometry;
 import com.hellmetz.festival.model.DashboardPreference;
 import com.hellmetz.festival.repository.DashboardPreferenceRepository;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.stream.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class DashboardPreferenceService {
+
+    private static final Logger log = LoggerFactory.getLogger(DashboardPreferenceService.class);
 
     private final DashboardPreferenceRepository repo;
     private final ObjectMapper json = new ObjectMapper();
@@ -24,9 +28,11 @@ public class DashboardPreferenceService {
         p.setUsername(username);
         p.setLayout(layoutJson);
         repo.save(p);
+        log.debug("Disposition du tableau de bord enregistrée pour l'utilisateur {}", username);
     }
 
     public Map<String, WidgetGeometry> layout(String username) {
+        log.debug("Lecture de la disposition du tableau de bord de l'utilisateur {}", username);
         return repo.findById(username)
                 .map(DashboardPreference::getLayout)
                 .filter(s -> s != null && !s.isBlank())
@@ -47,6 +53,7 @@ public class DashboardPreferenceService {
             }
             return map;
         } catch (Exception e) {
+            log.warn("Disposition du tableau de bord illisible, placement automatique utilisé", e);
             return Map.of(); // layout corrompu -> on repart sur le placement auto
         }
     }
@@ -55,6 +62,7 @@ public class DashboardPreferenceService {
 
     /** Widgets visibles, ordonnés, pour un utilisateur (défaut si aucune préférence). */
     public List<WidgetDashboard> widgetsVisibles(String username) {
+        log.debug("Recherche des widgets visibles de l'utilisateur {}", username);
         return repo.findById(username)
                 .map(p -> parse(p.getWidgetsVisibles()))
                 .filter(l -> !l.isEmpty())
@@ -66,6 +74,7 @@ public class DashboardPreferenceService {
         p.setUsername(username);
         p.setWidgetsVisibles(String.join(",", idsOrdonnes));
         repo.save(p);
+        log.debug("{} widgets enregistrés pour l'utilisateur {}", idsOrdonnes.size(), username);
     }
 
     public List<WidgetDashboard> parDefaut() {
@@ -85,6 +94,9 @@ public class DashboardPreferenceService {
 
     private WidgetDashboard versWidget(String id) {
         try { return WidgetDashboard.valueOf(id); }
-        catch (IllegalArgumentException e) { return null; } // widget supprimé du catalogue
+        catch (IllegalArgumentException e) {
+            log.warn("Widget inconnu ignoré : {}", id);
+            return null; // widget supprimé du catalogue
+        }
     }
 }
