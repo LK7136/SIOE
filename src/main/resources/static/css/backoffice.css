@@ -446,3 +446,10 @@ erreurCnx p {
 
     --hm-glow: rgba(37, 99, 235, 0.25);
 }
+
+
+/* Option 1 : Si vous souhaitez centrer toute la ligne contenant l'input Général */
+.parametres-general-row, /* Remplacez par votre classe spécifique si besoin */
+.bm-card-body .row:has(#nom_application) {
+    justify-content: center;
+}
