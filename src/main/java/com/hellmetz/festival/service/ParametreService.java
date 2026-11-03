@@ -47,7 +47,7 @@ public class ParametreService {
 
     public Parametre save(Parametre parametre) {
         Parametre saved = parametreRepository.save(parametre);
-        log.info("Paramètre {} enregistré", saved.getId());
+        log.info("Paramètre {} enregistré", saved.getIdParametre());
         return saved;
     }
 
