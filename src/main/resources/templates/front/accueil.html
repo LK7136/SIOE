@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{front/layout :: head('Accueil')}"></head>
+<body>
+
+<nav th:replace="~{front/layout :: menu}"></nav>
+
+<main class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1>HellMetz Festival</h1>
+        <p class="lead">Le festival metal de Metz.</p>
+        <a th:href="@{/programme}" class="btn custom-btn">Voir le programme</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <h2 class="h4">Programme</h2>
+            <p>Les concerts, jour par jour.</p>
+            <a th:href="@{/programme}">Consulter le programme</a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h2 class="h4">Line-up</h2>
+            <p>Les groupes à l'affiche.</p>
+            <a th:href="@{/line-up}">Découvrir le line-up</a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h2 class="h4">Infos pratiques</h2>
+            <p>Accès, horaires et billetterie.</p>
+            <a th:href="@{/infos-pratiques}">Préparer sa venue</a>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{front/layout :: pied}"></footer>
+<th:block th:replace="~{front/layout :: scripts}"></th:block>
+
+</body>
+</html>
