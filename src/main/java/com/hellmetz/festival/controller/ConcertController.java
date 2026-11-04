@@ -46,7 +46,7 @@ public class ConcertController {
         model.addAttribute("concerts", pageConcerts.getContent());
         model.addAttribute("page", pageConcerts);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "HellMetz - Concerts");
+        model.addAttribute("pageTitle", "Concerts");
         model.addAttribute("activeMenu", "concerts");
         return "concert/list";
     }

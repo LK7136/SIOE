@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.hellmetz.festival.model.Parametre;
+
 /**
  * Rend la variable {@code utilisateurConnecte} (entite metier Utilisateur)
  * disponible automatiquement dans tous les templates Thymeleaf.
@@ -40,5 +42,13 @@ public class GlobalControllerAdvice {
         );
     }
 
+    @ModelAttribute
+    public void ajouterNomApplication(Model model) {
+        Parametre p = parametreService.findByCode("app.nom");
+        String nom = (p != null && p.getValeurParametre() != null && !p.getValeurParametre().isBlank())
+                ? p.getValeurParametre()
+                : "Backoffice";
+        model.addAttribute("appNom", nom);
+    }
 
 }

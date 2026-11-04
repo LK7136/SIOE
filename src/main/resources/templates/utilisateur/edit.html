@@ -1,71 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
 <head>
+  <title>Groupes - HellMetz</title>
   <meta charset="UTF-8">
-  <title>Modifier un utilisateur - HellMetz</title>
+  <title>Modifier un utilisateur</title>
   <meta name="_csrf"        th:content="${_csrf.token}"/>
   <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
   <link th:href="@{/css/backoffice.css}"    rel="stylesheet">
   <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
-  <style>
-    .section-card .card-header {
-      background-color: #1a1a2e;
-      color: white;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    .form-label {
-      color: #212529 !important;
-      font-weight: 700 !important;
-    }
-
-    /* Styles de la grille de permissions repris de ta page de création */
-    .perm-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 0.5rem;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .perm-grid::-webkit-scrollbar { width: 6px; }
-    .perm-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-    .perm-grid::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 3px; }
-    .perm-item {
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      background: white;
-    }
-    .perm-item:hover  { border-color: #0d6efd; background: #f0f5ff; }
-    .perm-item.checked { border-color: #0d6efd; background: #e8f0fe; }
-    .perm-item.checked .perm-badge { background-color: #0d6efd !important; }
-    .perm-badge { font-size: 0.7rem; font-family: monospace; }
-
-    option.opt-new { color: #0d6efd; font-style: italic; }
-  </style>
+  <link th:href="@{/css/editUtilisateurStyle.css}" rel="stylesheet">
 </head>
 <body>
-
+<div th:fragment="content">
 <div class="container-fluid py-4 px-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-          <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
-          <li class="breadcrumb-item"><a th:href="@{/festival/utilisateurs/liste}">Utilisateurs</a></li>
-          <li class="breadcrumb-item active">Édition</li>
-        </ol>
-      </nav>
-      <h2 class="mb-0">
-        Modifier : <span th:text="${utilisateur.prenom} + ' ' + ${utilisateur.nom}" class="text-primary"></span>
-      </h2>
-    </div>
-    <a th:href="@{/festival/utilisateurs/liste}" class="btn btn-outline-secondary">
+  <div class="d-flex justify-content-between align-items-center mb-4 btn-retour">
+    <a th:href="@{/festival/utilisateurs/liste}" class="btn btn-outline-secondary " >
       <i class="bi bi-arrow-left me-1"></i> Retour
     </a>
   </div>
@@ -84,22 +37,22 @@
     <div class="row g-4">
 
       <div class="col-xl-6">
-        <div class="card shadow-sm section-card h-100">
+        <div class="hm-card">
           <div class="card-header py-3">
             <i class="bi bi-person-fill me-2"></i>Informations personnelles
           </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-sm-6">
-                <label class="form-label">Nom</label>
+                <label class="form-label titrecard">Nom</label>
                 <input type="text" class="form-control" name="nom" th:value="${utilisateur.nom}" required>
               </div>
               <div class="col-sm-6">
-                <label class="form-label">Prénom</label>
+                <label class="form-label titrecard">Prénom</label>
                 <input type="text" class="form-control" name="prenom" th:value="${utilisateur.prenom}" required>
               </div>
               <div class="col-12">
-                <label class="form-label">Adresse email</label>
+                <label class="form-label titrecard">Adresse email</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                   <input type="email" class="form-control" name="email" th:value="${utilisateur.email}" required>
@@ -119,21 +72,21 @@
       </div>
 
       <div class="col-xl-6">
-        <div class="card shadow-sm section-card h-100">
+        <div class="hm-card">
           <div class="card-header py-3">
             <i class="bi bi-key-fill me-2"></i>Identifiants et Accès
           </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-12">
-                <label class="form-label">Identifiant</label>
+                <label class="form-label titrecard">Identifiant</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-at"></i></span>
                   <input type="text" class="form-control" name="identifiant" th:value="${utilisateur.identifiant}" required>
                 </div>
               </div>
               <div class="col-12">
-                <label class="form-label">Nouveau mot de passe</label>
+                <label class="form-label titrecard">Nouveau mot de passe</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-lock"></i></span>
                   <input type="password" class="form-control" name="motDePasse" id="motDePasse" placeholder="••••••••">
@@ -150,7 +103,7 @@
                 <div class="form-check form-switch fs-5">
                   <input class="form-check-input" type="checkbox" name="actif" id="checkActif"
                          th:checked="${utilisateur.actif != null and utilisateur.actif}">
-                  <label class="form-check-label fs-6 fw-bold ms-2 text-dark" for="checkActif">Compte actif</label>
+                  <label class="form-check-label fs-6 fw-bold ms-2 titrecard" for="checkActif">Compte actif</label>
                 </div>
                 <div class="form-text mt-1">Si désactivé, l'utilisateur ne pourra plus se connecter.</div>
               </div>
@@ -160,7 +113,7 @@
       </div>
 
       <div class="col-12">
-        <div class="card shadow-sm section-card">
+        <div class="hm-card">
           <div class="card-header py-3">
             <i class="bi bi-shield-lock-fill me-2"></i>Rôle &amp; Permissions
           </div>
@@ -168,7 +121,7 @@
             <div class="row g-4 align-items-start">
 
               <div class="col-lg-4">
-                <label class="form-label">Rôle de l'utilisateur</label>
+                <label class="form-label titrecard">Rôle de l'utilisateur</label>
                 <select class="form-select" name="idRole" id="selectRole" required>
                   <option value="">-- Choisir un rôle --</option>
                   <option th:each="r : ${roles}"
@@ -183,7 +136,7 @@
 
               <div class="col-lg-8">
                 <div class="d-flex align-items-center mb-2 gap-2">
-                  <label class="form-label mb-0">Permissions accordées</label>
+                  <label class="form-label mb-0 titrecard">Permissions accordées</label>
                   <span class="badge bg-primary rounded-pill" id="badgeCount">0</span>
                 </div>
 
@@ -211,7 +164,7 @@
                   </div>
                 </div>
 
-                <p class="mt-1 mb-0 text-muted" style="font-size: 0.8rem;">
+                <p class="mt-1 mb-0 text-muted titrecard" style="font-size: 0.8rem;">
                   Cliquez sur les cases pour personnaliser les accès.
                 </p>
               </div>
@@ -232,7 +185,6 @@
     </div>
   </form>
 </div>
-
 <script th:inline="javascript">
   /*<![CDATA[*/
   var permissionsParRole = /*[[${permissionsParRole}]]*/ {};
@@ -297,6 +249,6 @@
   updateUI();
   /*]]>*/
 </script>
-
+</div>
 </body>
 </html>
