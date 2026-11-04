@@ -1,5 +1,6 @@
 package com.hellmetz.festival.controller;
 
+import com.hellmetz.festival.model.Parametre;
 import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.security.UtilisateurDetails;
 import com.hellmetz.festival.service.ParametreService;
@@ -35,9 +36,10 @@ public class GlobalControllerAdvice {
 
     @ModelAttribute
     public void ajouterTheme(Model model) {
+        Parametre theme = parametreService.findByCode("affichage.theme");
         model.addAttribute("theme",
-                parametreService.findByCode("affichage.theme").getValeurParametre()
-        );
+                theme != null && theme.getValeurParametre() != null ? theme.getValeurParametre() : "Sombre");
+        model.addAttribute("appLogo", parametreService.getLogoUrl());
     }
 
 

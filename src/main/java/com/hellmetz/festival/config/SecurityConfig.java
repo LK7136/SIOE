@@ -35,6 +35,8 @@ public class SecurityConfig {
 
                         //seule l'admin est organisateur ont accès a la page de parametres
                         .requestMatchers("/parametres/liste").hasAnyRole("ADMIN", "ORGANISATEUR")
+                        .requestMatchers(HttpMethod.POST, "/parametres").hasAnyRole("ADMIN", "ORGANISATEUR")
+                        .requestMatchers("/parametres/uploads/**").authenticated()
 
 
                         //suppression

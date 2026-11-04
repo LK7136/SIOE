@@ -17,7 +17,7 @@ public class Parametre {
     @Column(name = "libelle_parametre")
     private String libelleParametre;
 
-    @Column(name = "valeur_parametre")
+    @Column(name = "valeur_parametre", length = 500)
     private String valeurParametre;
 
 
