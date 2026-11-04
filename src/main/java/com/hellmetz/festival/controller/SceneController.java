@@ -31,7 +31,7 @@ public class SceneController {
     @GetMapping("/liste")
     public String liste(Model model) {
         model.addAttribute("scenes", sceneService.findAll());
-        model.addAttribute("pageTitle", "HellMetz - Scenes");
+        model.addAttribute("pageTitle", "Scenes");
         model.addAttribute("activeMenu", "templates");
         return "scene/list";
     }
@@ -43,10 +43,10 @@ public class SceneController {
         if (id != null) {
             Scene concert = sceneService.findById(id);
             model.addAttribute("scene", concert);
-            model.addAttribute("pageTitle", "Modifier la scene - HellMetz");
+            model.addAttribute("pageTitle", "Modifier la scene");
         } else {
             model.addAttribute("scene", new Scene());
-            model.addAttribute("pageTitle", "Nouvel scene - HellMetz");
+            model.addAttribute("pageTitle", "Nouvel scene");
         }
 
         model.addAttribute("scenes", sceneService.findAll());
