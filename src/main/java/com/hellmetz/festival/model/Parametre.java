@@ -20,13 +20,14 @@ public class Parametre {
     @Column(name = "valeur_parametre", length = 500)
     private String valeurParametre;
 
+    /** Contenu binaire du logo (partagé pour tous les utilisateurs). */
+    @Column(name = "contenu_binaire")
+    private byte[] contenuBinaire;
 
-
+    @Column(name = "content_type", length = 100)
+    private String contentType;
 
     public Parametre() {}
-
-
-
 
     public Long getIdParametre() { return idParametre;}
     public void setIdParametre(Long idParametre) { this.idParametre = idParametre; }
@@ -40,6 +41,9 @@ public class Parametre {
     public String getValeurParametre() {return valeurParametre;}
     public void setValeurParametre(String valeurParametre) { this.valeurParametre = valeurParametre; }
 
+    public byte[] getContenuBinaire() { return contenuBinaire; }
+    public void setContenuBinaire(byte[] contenuBinaire) { this.contenuBinaire = contenuBinaire; }
 
-
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
 }

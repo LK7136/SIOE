@@ -36,11 +36,23 @@ public class GlobalControllerAdvice {
 
     @ModelAttribute
     public void ajouterTheme(Model model) {
-        Parametre theme = parametreService.findByCode("affichage.theme");
-        model.addAttribute("theme",
-                theme != null && theme.getValeurParametre() != null ? theme.getValeurParametre() : "Sombre");
-        model.addAttribute("appLogo", parametreService.getLogoUrl());
+        String theme = "Sombre";
+        try {
+            Parametre themeParam = parametreService.findByCode("affichage.theme");
+            if (themeParam != null && themeParam.getValeurParametre() != null) {
+                theme = themeParam.getValeurParametre();
+            }
+        } catch (Exception ignored) {
+            // BDD KO → valeurs par défaut
+        }
+        model.addAttribute("theme", theme);
+
+        try {
+            model.addAttribute("appLogo", parametreService.getLogoUrl());
+            model.addAttribute("hasCustomLogo", parametreService.hasCustomLogo());
+        } catch (Exception e) {
+            model.addAttribute("appLogo", ParametreService.DEFAULT_LOGO_URL);
+            model.addAttribute("hasCustomLogo", false);
+        }
     }
-
-
 }

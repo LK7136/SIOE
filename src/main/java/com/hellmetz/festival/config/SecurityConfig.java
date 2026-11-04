@@ -26,8 +26,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Ressources publiques : CSS, JS, images
-                        .requestMatchers("/css/**", "/js/**").permitAll()
+                        // Ressources publiques : CSS, JS, images, logo de base
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
                         // nimporte qui peut se login
                         .requestMatchers("/login").permitAll()
 

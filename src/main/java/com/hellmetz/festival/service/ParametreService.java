@@ -17,6 +17,9 @@ import java.util.UUID;
 @Transactional
 public class ParametreService {
 
+    /** Logo de secours (1re visite / BDD indisponible ou incorrecte). */
+    public static final String DEFAULT_LOGO_URL = "/assets/752692.png";
+
     private static final Set<String> EXTENSIONS_AUTORISEES = Set.of(".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg");
     private static final Set<String> CONTENT_TYPES_AUTORISES = Set.of(
             "image/png", "image/jpeg", "image/gif", "image/webp",
@@ -41,16 +44,31 @@ public class ParametreService {
     public Parametre save(Parametre parametre) {return parametreRepository.save(parametre);}
 
     @Transactional(readOnly = true)
+    public boolean hasCustomLogo() {
+        return resolveCustomLogoUrl() != null;
+    }
+
+    @Transactional(readOnly = true)
     public String getLogoUrl() {
-        ParametreRepository.LogoMeta meta = parametreRepository.findLogoMeta("app.logo");
-        if (meta == null || meta.getContentType() == null || meta.getContentType().isBlank()) {
+        String custom = resolveCustomLogoUrl();
+        return custom != null ? custom : DEFAULT_LOGO_URL;
+    }
+
+    private String resolveCustomLogoUrl() {
+        try {
+            ParametreRepository.LogoMeta meta = parametreRepository.findLogoMeta("app.logo");
+            if (meta == null || meta.getContentType() == null || meta.getContentType().isBlank()) {
+                return null;
+            }
+            String version = meta.getValeurParametre();
+            if (version == null || version.isBlank()) {
+                return "/parametres/logo";
+            }
+            return "/parametres/logo?v=" + version;
+        } catch (Exception e) {
+            // Mauvaise BDD / table absente / connexion KO → logo de base
             return null;
         }
-        String version = meta.getValeurParametre();
-        if (version == null || version.isBlank()) {
-            return "/parametres/logo";
-        }
-        return "/parametres/logo?v=" + version;
     }
 
     @Transactional(readOnly = true)
