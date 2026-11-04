@@ -2,15 +2,12 @@ package com.hellmetz.festival.service;
 
 import com.hellmetz.festival.model.Parametre;
 import com.hellmetz.festival.repository.ParametreRepository;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -20,12 +17,11 @@ import java.util.UUID;
 @Transactional
 public class ParametreService {
 
-    private static final Path LOGO_UPLOAD_DIR = Paths.get(
-            System.getProperty("user.home"), "Desktop", "StageHellMetz", "uploads", "logo");
-    private static final Path LEGACY_DESKTOP_UPLOAD_DIR = Paths.get(
-            System.getProperty("user.home"), "Desktop", "StageHellMetz", "uploads");
-    private static final Path LEGACY_PROJECT_UPLOAD_DIR = Paths.get("uploads");
     private static final Set<String> EXTENSIONS_AUTORISEES = Set.of(".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg");
+    private static final Set<String> CONTENT_TYPES_AUTORISES = Set.of(
+            "image/png", "image/jpeg", "image/gif", "image/webp",
+            "image/x-icon", "image/vnd.microsoft.icon", "image/svg+xml"
+    );
 
     private final ParametreRepository parametreRepository;
 
@@ -46,53 +42,57 @@ public class ParametreService {
 
     @Transactional(readOnly = true)
     public String getLogoUrl() {
-        Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
-        if (logoParam == null) {
+        ParametreRepository.LogoMeta meta = parametreRepository.findLogoMeta("app.logo");
+        if (meta == null || meta.getContentType() == null || meta.getContentType().isBlank()) {
             return null;
+        }
+        String version = meta.getValeurParametre();
+        if (version == null || version.isBlank()) {
+            return "/parametres/logo";
+        }
+        return "/parametres/logo?v=" + version;
+    }
+
+    @Transactional(readOnly = true)
+    public LogoData getLogoData() {
+        Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
+        if (logoParam == null
+                || logoParam.getContenuBinaire() == null
+                || logoParam.getContenuBinaire().length == 0) {
+            return null;
+        }
+        String contentType = logoParam.getContentType();
+        if (contentType == null || contentType.isBlank()) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
         String fileName = extraireNomFichier(logoParam.getValeurParametre());
         if (fileName == null) {
-            return null;
+            fileName = "logo";
         }
-        return "/parametres/uploads/" + fileName;
-    }
-
-    public Path findLogoFile(String nomFichier) {
-        String fileName = extraireNomFichier(nomFichier);
-        if (fileName == null) {
-            return null;
-        }
-        for (Path dir : List.of(LOGO_UPLOAD_DIR, LEGACY_DESKTOP_UPLOAD_DIR, LEGACY_PROJECT_UPLOAD_DIR)) {
-            Path dirAbs = dir.toAbsolutePath().normalize();
-            Path file = dirAbs.resolve(fileName).normalize();
-            if (file.startsWith(dirAbs) && Files.isRegularFile(file)) {
-                return file;
-            }
-        }
-        return null;
+        return new LogoData(logoParam.getContenuBinaire(), contentType, fileName);
     }
 
     public void updateLogo(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            try {
-                Files.createDirectories(LOGO_UPLOAD_DIR);
+        if (file == null || file.isEmpty()) {
+            return;
+        }
+        try {
+            String extension = extraireExtension(file);
+            String contentType = normaliserContentType(file.getContentType(), extension);
+            String fileName = "logo_" + UUID.randomUUID().toString().substring(0, 8) + extension;
 
-                String extension = extraireExtension(file);
-                String fileName = "logo_" + UUID.randomUUID().toString().substring(0, 8) + extension;
-                Path filePath = LOGO_UPLOAD_DIR.resolve(fileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
-                if (logoParam == null) {
-                    logoParam = new Parametre();
-                    logoParam.setCodeParametre("app.logo");
-                    logoParam.setLibelleParametre("Logo de l'application");
-                }
-                logoParam.setValeurParametre(fileName);
-                parametreRepository.save(logoParam);
-            } catch (IOException e) {
-                throw new RuntimeException("Erreur lors de l'enregistrement du logo", e);
+            Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
+            if (logoParam == null) {
+                logoParam = new Parametre();
+                logoParam.setCodeParametre("app.logo");
+                logoParam.setLibelleParametre("Logo de l'application");
             }
+            logoParam.setValeurParametre(fileName);
+            logoParam.setContentType(contentType);
+            logoParam.setContenuBinaire(file.getBytes());
+            parametreRepository.save(logoParam);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de l'enregistrement du logo", e);
         }
     }
 
@@ -101,16 +101,24 @@ public class ParametreService {
         if (logoParam == null) {
             return;
         }
-        Path file = findLogoFile(logoParam.getValeurParametre());
-        if (file != null) {
-            try {
-                Files.deleteIfExists(file);
-            } catch (IOException e) {
-                throw new RuntimeException("Erreur lors de la suppression du logo", e);
-            }
-        }
         logoParam.setValeurParametre(null);
+        logoParam.setContentType(null);
+        logoParam.setContenuBinaire(null);
         parametreRepository.save(logoParam);
+    }
+
+    private String normaliserContentType(String contentType, String extension) {
+        if (contentType != null && CONTENT_TYPES_AUTORISES.contains(contentType.toLowerCase(Locale.ROOT))) {
+            return contentType;
+        }
+        return switch (extension) {
+            case ".jpg", ".jpeg" -> "image/jpeg";
+            case ".gif" -> "image/gif";
+            case ".webp" -> "image/webp";
+            case ".ico" -> "image/x-icon";
+            case ".svg" -> "image/svg+xml";
+            default -> "image/png";
+        };
     }
 
     private String extraireExtension(MultipartFile file) {
@@ -132,6 +140,8 @@ public class ParametreService {
                     extension = ".webp";
                 } else if (contentType.contains("svg")) {
                     extension = ".svg";
+                } else if (contentType.contains("icon")) {
+                    extension = ".ico";
                 } else {
                     extension = ".png";
                 }
@@ -154,6 +164,6 @@ public class ParametreService {
         }
         return fileName;
     }
+
+    public record LogoData(byte[] bytes, String contentType, String fileName) {}
 }
-
-
