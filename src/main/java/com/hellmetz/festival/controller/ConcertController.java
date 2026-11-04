@@ -39,7 +39,7 @@ public class ConcertController {
         model.addAttribute("concerts", pageConcerts.getContent());
         model.addAttribute("page", pageConcerts);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "HellMetz - Concerts");
+        model.addAttribute("pageTitle", "Concerts");
         model.addAttribute("activeMenu", "concerts");
         return "concert/list";
     }
@@ -72,10 +72,10 @@ public class ConcertController {
         if (id != null) {
             Concert concert = concertService.findById(id);
             model.addAttribute("concert", concert);
-            model.addAttribute("pageTitle", "Modifier le concert - HellMetz");
+            model.addAttribute("pageTitle", "Modifier le concert");
         } else {
             model.addAttribute("concert", new Concert());
-            model.addAttribute("pageTitle", "Nouveau concert - HellMetz");
+            model.addAttribute("pageTitle", "Nouveau concert");
         }
 
         model.addAttribute("scenes", sceneService.findAll());
