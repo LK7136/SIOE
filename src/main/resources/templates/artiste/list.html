@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout :: layout(~{::content})}">
 <head>
-    <title>Artistes - HellMetz</title>
+    <title>Artistes</title>
 </head>
 <body>
 <div th:fragment="content">
@@ -11,7 +11,7 @@
         <div class="hm-card-header">
             <div>
                 <div class="hm-tag">Programmation</div>
-                <div class="hm-card-title">Artistes du HellMetz Festival</div>
+                <div class="hm-card-title" th:text="'Artistes du ' + ${appNom} + ' Festival'">Artistes</div>
             </div>
 
             <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
