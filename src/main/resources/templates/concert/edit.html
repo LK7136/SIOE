@@ -68,8 +68,11 @@
               <label for="dateHeureDebut" class="form-label fw-bold">Date et heure de début</label>
               <input type="datetime-local" id="dateHeureDebut" name="dateHeureDebut"
                      class="form-control" th:value="${concert.dateHeureDebut}"
-                     th:min="${dateMin}" th:max="${dateMax}"
+                     th:min="${dateMin}" th:max="${dateMax}" onchange="lierFinAuDebut()"
                      th:classappend="${erreurs.containsKey('dateHeureDebut')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('dateHeureDebut')}"
+                   th:text="${erreurs['dateHeureDebut']}"></div>
             </div>
             <div class="col-md-6">
               <label for="dateHeureFin" class="form-label fw-bold">Date et heure de fin</label>
@@ -77,6 +80,9 @@
                      class="form-control" th:value="${concert.dateHeureFin}"
                      th:min="${dateMin}" th:max="${dateMax}"
                      th:classappend="${erreurs.containsKey('dateHeureFin')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('dateHeureFin')}"
+                   th:text="${erreurs['dateHeureFin']}"></div>
             </div>
           </div>
 
@@ -84,15 +90,24 @@
             <div class="col-md-6">
               <label for="heureBalanceDebut" class="form-label fw-bold">Balance début</label>
               <input type="datetime-local" id="heureBalanceDebut" name="heureBalanceDebut"
-                     class="form-control" th:value="${concert.heureBalanceDebut}">
+                     class="form-control" th:value="${concert.heureBalanceDebut}"
+                     th:min="${dateMin}" th:max="${dateMax}" onchange="lierFinAuDebut()"
+                     th:classappend="${erreurs.containsKey('heureBalanceDebut')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('heureBalanceDebut')}"
+                   th:text="${erreurs['heureBalanceDebut']}"></div>
             </div>
             <div class="col-md-6">
               <label for="heureBalanceFin" class="form-label fw-bold">Balance fin</label>
               <input type="datetime-local" id="heureBalanceFin" name="heureBalanceFin"
-                     class="form-control" th:value="${concert.heureBalanceFin}">
+                     class="form-control" th:value="${concert.heureBalanceFin}"
+                     th:min="${dateMin}" th:max="${dateMax}"
+                     th:classappend="${erreurs.containsKey('heureBalanceFin')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('heureBalanceFin')}"
+                   th:text="${erreurs['heureBalanceFin']}"></div>
             </div>
           </div>
-
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="decibelsMax" class="form-label fw-bold">Décibels max</label>
@@ -238,6 +253,8 @@
           }
         });
       }
+      const CHAMPS_DATES = ['dateHeureDebut', 'dateHeureFin', 'heureBalanceDebut', 'heureBalanceFin'];
+
       // Bornes des champs date : dates de l'édition choisie, sinon dates des Paramètres
       function majBornesDates(corrigerValeurs) {
         const form = document.getElementById('form-concert');
@@ -251,10 +268,7 @@
           max = opt.dataset.fin + 'T23:59';
         }
 
-        const debut = document.getElementById('dateHeureDebut');
-        const fin = document.getElementById('dateHeureFin');
-
-        ['dateHeureDebut', 'dateHeureFin'].forEach(function (id) {
+        CHAMPS_DATES.forEach(function (id) {
           const el = document.getElementById(id);
           if (min) { el.min = min; } else { el.removeAttribute('min'); }
           if (max) { el.max = max; } else { el.removeAttribute('max'); }
@@ -262,22 +276,50 @@
 
         // Changement d'édition : on recale les valeurs devenues hors bornes
         if (corrigerValeurs && min) {
+          const debut = document.getElementById('dateHeureDebut');
           if (!debut.value || debut.value < min || debut.value > max) {
             debut.value = min.substring(0, 10) + 'T18:00';
           }
-          if (fin.value && (fin.value < min || fin.value > max)) {
-            fin.value = '';
-          }
+          ['dateHeureFin', 'heureBalanceDebut', 'heureBalanceFin'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el.value && (el.value < min || el.value > max)) { el.value = ''; }
+          });
+        }
+        lierFinAuDebut();
+      }
+
+      // Un champ « fin » ne peut pas proposer de date antérieure à son champ « début »
+      function lierFinAuDebut() {
+        lier('dateHeureDebut', 'dateHeureFin');
+        lier('heureBalanceDebut', 'heureBalanceFin');
+      }
+
+      function lier(idDebut, idFin) {
+        const d = document.getElementById(idDebut);
+        const f = document.getElementById(idFin);
+        if (d.value) {
+          f.min = d.value;
+        } else if (d.min) {
+          f.min = d.min;
+        } else {
+          f.removeAttribute('min');
         }
       }
 
       // Contrôle de cohérence côté navigateur (le serveur revalide de toute façon)
       document.getElementById('form-concert').addEventListener('submit', function (e) {
-        const d = document.getElementById('dateHeureDebut').value;
-        const f = document.getElementById('dateHeureFin').value;
-        if (d && f && f <= d) {
-          e.preventDefault();
-          alert('La date de fin doit être postérieure à la date de début.');
+        const paires = [
+          ['dateHeureDebut', 'dateHeureFin', 'La date de fin doit être postérieure à la date de début.'],
+          ['heureBalanceDebut', 'heureBalanceFin', 'La date de fin de balance doit être postérieure à la date de début de balance.']
+        ];
+        for (const p of paires) {
+          const d = document.getElementById(p[0]).value;
+          const f = document.getElementById(p[1]).value;
+          if (d && f && f <= d) {
+            e.preventDefault();
+            alert(p[2]);
+            return;
+          }
         }
       });
 

@@ -154,35 +154,48 @@ public class ConcertService {
     }
 
     /**
-     * Valide dateHeureDebut / dateHeureFin d'un concert.
+     * Valide les dates d'un concert :
+     *  - début / fin du concert et début / fin de balance dans la fenêtre du festival ;
+     *  - fin du concert après son début ;
+     *  - fin de balance après son début.
      * @return map champ -> message d'erreur (vide si tout est valide)
      */
     @Transactional(readOnly = true)
     public Map<String, String> validerDates(Concert concert) {
         Map<String, String> erreurs = new LinkedHashMap<>();
-        LocalDateTime debut = concert.getDateHeureDebut();
-        LocalDateTime fin = concert.getDateHeureFin();
 
         getFenetre(concert.getEdition()).ifPresent(f -> {
-            String plage = "comprise entre le " + f.debut().format(FMT_AFFICHAGE)
-                    + " et le " + f.fin().format(FMT_AFFICHAGE);
-            if (debut != null && horsFenetre(debut, f)) {
-                erreurs.put("dateHeureDebut", "La date de début doit être " + plage + ".");
-            }
-            if (fin != null && horsFenetre(fin, f)) {
-                erreurs.put("dateHeureFin", "La date de fin doit être " + plage + ".");
-            }
+            verifierDansFenetre(erreurs, "dateHeureDebut",   "La date de début",           concert.getDateHeureDebut(),   f);
+            verifierDansFenetre(erreurs, "dateHeureFin",     "La date de fin",             concert.getDateHeureFin(),     f);
+            verifierDansFenetre(erreurs, "heureBalanceDebut", "La date de début de balance", concert.getHeureBalanceDebut(), f);
+            verifierDansFenetre(erreurs, "heureBalanceFin",  "La date de fin de balance",  concert.getHeureBalanceFin(),  f);
         });
 
-        if (debut != null && fin != null && !fin.isAfter(debut)) {
-            erreurs.putIfAbsent("dateHeureFin", "La date de fin doit être postérieure à la date de début.");
-        }
+        verifierOrdre(erreurs, "dateHeureFin",
+                "La date de fin", "la date de début",
+                concert.getDateHeureDebut(), concert.getDateHeureFin());
+        verifierOrdre(erreurs, "heureBalanceFin",
+                "La date de fin de balance", "la date de début de balance",
+                concert.getHeureBalanceDebut(), concert.getHeureBalanceFin());
+
         return erreurs;
     }
 
-    private static boolean horsFenetre(LocalDateTime d, FenetreFestival f) {
-        LocalDateTime minute = d.truncatedTo(ChronoUnit.MINUTES);
-        return minute.isBefore(f.debut()) || minute.isAfter(f.fin());
+    private void verifierDansFenetre(Map<String, String> erreurs, String champ, String libelle,
+                                     LocalDateTime valeur, FenetreFestival f) {
+        if (valeur == null) return;
+        LocalDateTime minute = valeur.truncatedTo(ChronoUnit.MINUTES);
+        if (minute.isBefore(f.debut()) || minute.isAfter(f.fin())) {
+            erreurs.put(champ, libelle + " doit être comprise entre le "
+                    + f.debut().format(FMT_AFFICHAGE) + " et le " + f.fin().format(FMT_AFFICHAGE) + ".");
+        }
+    }
+
+    private void verifierOrdre(Map<String, String> erreurs, String champFin, String libelleFin,
+                               String libelleDebut, LocalDateTime debut, LocalDateTime fin) {
+        if (debut != null && fin != null && !fin.isAfter(debut)) {
+            erreurs.putIfAbsent(champFin, libelleFin + " doit être postérieure à " + libelleDebut + ".");
+        }
     }
 
     private LocalDate lireDateParametre(String code) {
