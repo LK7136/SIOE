@@ -20,14 +20,8 @@
 
                 <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
                     <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">⚙️ Général</div>
-                    <div class="row">
+                    <div class="row justify-content-center">
                         <div th:each="p : ${parametres}" th:if="${#strings.startsWith(p.codeParametre, 'app.')}"
-                             class="col-md-6 mb-3">
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                        </div>
-                        <div th:each="p : ${parametres}" th:if="${p.codeParametre == 'festival.edition'}"
                              class="col-md-6 mb-3">
                             <input type="hidden" name="ids" th:value="${p.idParametre}">
                             <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
@@ -36,18 +30,7 @@
                     </div>
                 </div>
 
-                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
-                    <div style="color:#e74c3c; font-weight:700; margin-bottom:16px;">📅 Dates</div>
-                    <div class="row">
-                        <div th:each="p : ${parametres}"
-                             th:if="${#strings.startsWith(p.codeParametre, 'festival.date')}"
-                             class="col-md-6 mb-3">
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-                            <input type="date" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
                     <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">🔑 Programmation</div>

@@ -32,7 +32,7 @@ public class SceneController {
     public String liste(Model model) {
         model.addAttribute("scenes", sceneService.findAll());
         model.addAttribute("pageTitle", "HellMetz - Scenes");
-        model.addAttribute("activeMenu", "templates");
+        model.addAttribute("activeMenu", "scenes");
         return "scene/list";
     }
 
