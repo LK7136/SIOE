@@ -48,7 +48,7 @@ public class ArtisteController {
         model.addAttribute("page", pageArtistes);
         model.addAttribute("taille", taille);
         model.addAttribute("pageTitle", "Artistes");
-        model.addAttribute("activeMenu", "templates");
+        model.addAttribute("activeMenu", "artiste");
         return "artiste/list";
     }
 
