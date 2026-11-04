@@ -446,3 +446,8 @@ erreurCnx p {
 
     --hm-glow: rgba(37, 99, 235, 0.25);
 }
+
+.btn-retour{
+    display: flex;
+    flex-direction: row-reverse;
+}
