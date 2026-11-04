@@ -23,7 +23,14 @@
 
     <div class="p-4">
 
-      <form th:action="@{/concerts/edit}" method="post">
+      <form th:action="@{/concerts/edit}" method="post" id="form-concert"
+            th:attr="data-defaut-min=${defautMin},data-defaut-max=${defautMax}">
+
+        <div class="alert alert-danger" th:if="${!#maps.isEmpty(erreurs)}">
+          <ul class="mb-0">
+            <li th:each="e : ${erreurs}" th:text="${e.value}"></li>
+          </ul>
+        </div>
 
         <input type="hidden" name="id" th:value="${concert.id}">
 
@@ -43,12 +50,14 @@
 
             <div class="col-md-6">
               <label for="edition" class="form-label fw-bold">Édition <span class="text-danger">*</span></label>
-              <select id="edition" name="edition" class="form-control">
+              <select id="edition" name="edition" class="form-control" onchange="majBornesDates(true)">
                 <option value="">-- Sélectionner une édition --</option>
                 <option th:each="edition : ${editions}"
                         th:value="${edition.id}"
                         th:text="${edition.nomEdition}"
-                        th:selected="${edition.actif}">
+                        th:attr="data-debut=${edition.dateDebut != null ? #dates.format(edition.dateDebut, 'yyyy-MM-dd') : ''},
+                                 data-fin=${edition.dateFin != null ? #dates.format(edition.dateFin, 'yyyy-MM-dd') : ''}"
+                        th:selected="${concert.edition != null and concert.edition.id == edition.id}">
                 </option>
               </select>
             </div>
@@ -58,12 +67,22 @@
             <div class="col-md-6">
               <label for="dateHeureDebut" class="form-label fw-bold">Date et heure de début</label>
               <input type="datetime-local" id="dateHeureDebut" name="dateHeureDebut"
-                     class="form-control" th:value="${concert.dateHeureDebut}">
+                     class="form-control" th:value="${concert.dateHeureDebut}"
+                     th:min="${dateMin}" th:max="${dateMax}" onchange="lierFinAuDebut()"
+                     th:classappend="${erreurs.containsKey('dateHeureDebut')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('dateHeureDebut')}"
+                   th:text="${erreurs['dateHeureDebut']}"></div>
             </div>
             <div class="col-md-6">
               <label for="dateHeureFin" class="form-label fw-bold">Date et heure de fin</label>
               <input type="datetime-local" id="dateHeureFin" name="dateHeureFin"
-                     class="form-control" th:value="${concert.dateHeureFin}">
+                     class="form-control" th:value="${concert.dateHeureFin}"
+                     th:min="${dateMin}" th:max="${dateMax}"
+                     th:classappend="${erreurs.containsKey('dateHeureFin')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('dateHeureFin')}"
+                   th:text="${erreurs['dateHeureFin']}"></div>
             </div>
           </div>
 
@@ -71,15 +90,24 @@
             <div class="col-md-6">
               <label for="heureBalanceDebut" class="form-label fw-bold">Balance début</label>
               <input type="datetime-local" id="heureBalanceDebut" name="heureBalanceDebut"
-                     class="form-control" th:value="${concert.heureBalanceDebut}">
+                     class="form-control" th:value="${concert.heureBalanceDebut}"
+                     th:min="${dateMin}" th:max="${dateMax}" onchange="lierFinAuDebut()"
+                     th:classappend="${erreurs.containsKey('heureBalanceDebut')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('heureBalanceDebut')}"
+                   th:text="${erreurs['heureBalanceDebut']}"></div>
             </div>
             <div class="col-md-6">
               <label for="heureBalanceFin" class="form-label fw-bold">Balance fin</label>
               <input type="datetime-local" id="heureBalanceFin" name="heureBalanceFin"
-                     class="form-control" th:value="${concert.heureBalanceFin}">
+                     class="form-control" th:value="${concert.heureBalanceFin}"
+                     th:min="${dateMin}" th:max="${dateMax}"
+                     th:classappend="${erreurs.containsKey('heureBalanceFin')} ? 'is-invalid'">
+              <div class="invalid-feedback d-block"
+                   th:if="${erreurs.containsKey('heureBalanceFin')}"
+                   th:text="${erreurs['heureBalanceFin']}"></div>
             </div>
           </div>
-
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="decibelsMax" class="form-label fw-bold">Décibels max</label>
@@ -225,6 +253,81 @@
           }
         });
       }
+      const CHAMPS_DATES = ['dateHeureDebut', 'dateHeureFin', 'heureBalanceDebut', 'heureBalanceFin'];
+
+      // Bornes des champs date : dates de l'édition choisie, sinon dates des Paramètres
+      function majBornesDates(corrigerValeurs) {
+        const form = document.getElementById('form-concert');
+        const sel = document.getElementById('edition');
+        const opt = sel.options[sel.selectedIndex];
+
+        let min = form.dataset.defautMin || '';
+        let max = form.dataset.defautMax || '';
+        if (opt && opt.dataset.debut && opt.dataset.fin) {
+          min = opt.dataset.debut + 'T00:00';
+          max = opt.dataset.fin + 'T23:59';
+        }
+
+        CHAMPS_DATES.forEach(function (id) {
+          const el = document.getElementById(id);
+          if (min) { el.min = min; } else { el.removeAttribute('min'); }
+          if (max) { el.max = max; } else { el.removeAttribute('max'); }
+        });
+
+        // Changement d'édition : on recale les valeurs devenues hors bornes
+        if (corrigerValeurs && min) {
+          const debut = document.getElementById('dateHeureDebut');
+          if (!debut.value || debut.value < min || debut.value > max) {
+            debut.value = min.substring(0, 10) + 'T18:00';
+          }
+          ['dateHeureFin', 'heureBalanceDebut', 'heureBalanceFin'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el.value && (el.value < min || el.value > max)) { el.value = ''; }
+          });
+        }
+        lierFinAuDebut();
+      }
+
+      // Un champ « fin » ne peut pas proposer de date antérieure à son champ « début »,
+      // et la balance ne peut pas dépasser le début du concert
+      function lierFinAuDebut() {
+        lier('dateHeureDebut', 'dateHeureFin');
+        lier('heureBalanceDebut', 'heureBalanceFin');
+        lierBalanceAuConcert();
+      }
+
+      function lierBalanceAuConcert() {
+        const concert = document.getElementById('dateHeureDebut');
+        ['heureBalanceDebut', 'heureBalanceFin'].forEach(function (id) {
+          const el = document.getElementById(id);
+          const max = concert.value || concert.max;
+          if (max) { el.max = max; } else { el.removeAttribute('max'); }
+        });
+      }
+
+      // Contrôle de cohérence côté navigateur (le serveur revalide de toute façon)
+      document.getElementById('form-concert').addEventListener('submit', function (e) {
+        const v = function (id) { return document.getElementById(id).value; };
+        const regles = [
+          [v('dateHeureDebut') && v('dateHeureFin') && v('dateHeureFin') <= v('dateHeureDebut'),
+            'La date de fin doit être postérieure à la date de début.'],
+          [v('heureBalanceDebut') && v('heureBalanceFin') && v('heureBalanceFin') <= v('heureBalanceDebut'),
+            'La date de fin de balance doit être postérieure à la date de début de balance.'],
+          [v('dateHeureDebut') && v('heureBalanceDebut') && v('heureBalanceDebut') >= v('dateHeureDebut'),
+            'La balance doit commencer avant le début du concert.'],
+          [v('dateHeureDebut') && v('heureBalanceFin') && v('heureBalanceFin') > v('dateHeureDebut'),
+            'La balance doit se terminer avant le début du concert.']
+        ];
+        for (const r of regles) {
+          if (r[0]) {
+            e.preventDefault();
+            alert(r[1]);
+            return;
+          }
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function () { majBornesDates(false); });
     </script>
 
   </div>
