@@ -178,6 +178,23 @@ public class ConcertService {
                 "La date de fin de balance", "la date de début de balance",
                 concert.getHeureBalanceDebut(), concert.getHeureBalanceFin());
 
+        // La balance doit avoir lieu avant le début du concert
+        LocalDateTime debutConcert = concert.getDateHeureDebut();
+        if (debutConcert != null) {
+            String heureConcert = debutConcert.format(FMT_AFFICHAGE);
+            LocalDateTime balanceDebut = concert.getHeureBalanceDebut();
+            LocalDateTime balanceFin = concert.getHeureBalanceFin();
+
+            if (balanceDebut != null && !balanceDebut.isBefore(debutConcert)) {
+                erreurs.putIfAbsent("heureBalanceDebut",
+                        "La date de début de balance doit être antérieure au début du concert (" + heureConcert + ").");
+            }
+            if (balanceFin != null && balanceFin.isAfter(debutConcert)) {
+                erreurs.putIfAbsent("heureBalanceFin",
+                        "La balance doit se terminer au plus tard au début du concert (" + heureConcert + ").");
+            }
+        }
+
         return erreurs;
     }
 

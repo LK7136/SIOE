@@ -288,36 +288,40 @@
         lierFinAuDebut();
       }
 
-      // Un champ « fin » ne peut pas proposer de date antérieure à son champ « début »
+      // Un champ « fin » ne peut pas proposer de date antérieure à son champ « début »,
+      // et la balance ne peut pas dépasser le début du concert
       function lierFinAuDebut() {
         lier('dateHeureDebut', 'dateHeureFin');
         lier('heureBalanceDebut', 'heureBalanceFin');
+        lierBalanceAuConcert();
       }
 
-      function lier(idDebut, idFin) {
-        const d = document.getElementById(idDebut);
-        const f = document.getElementById(idFin);
-        if (d.value) {
-          f.min = d.value;
-        } else if (d.min) {
-          f.min = d.min;
-        } else {
-          f.removeAttribute('min');
-        }
+      function lierBalanceAuConcert() {
+        const concert = document.getElementById('dateHeureDebut');
+        ['heureBalanceDebut', 'heureBalanceFin'].forEach(function (id) {
+          const el = document.getElementById(id);
+          const max = concert.value || concert.max;
+          if (max) { el.max = max; } else { el.removeAttribute('max'); }
+        });
       }
 
       // Contrôle de cohérence côté navigateur (le serveur revalide de toute façon)
       document.getElementById('form-concert').addEventListener('submit', function (e) {
-        const paires = [
-          ['dateHeureDebut', 'dateHeureFin', 'La date de fin doit être postérieure à la date de début.'],
-          ['heureBalanceDebut', 'heureBalanceFin', 'La date de fin de balance doit être postérieure à la date de début de balance.']
+        const v = function (id) { return document.getElementById(id).value; };
+        const regles = [
+          [v('dateHeureDebut') && v('dateHeureFin') && v('dateHeureFin') <= v('dateHeureDebut'),
+            'La date de fin doit être postérieure à la date de début.'],
+          [v('heureBalanceDebut') && v('heureBalanceFin') && v('heureBalanceFin') <= v('heureBalanceDebut'),
+            'La date de fin de balance doit être postérieure à la date de début de balance.'],
+          [v('dateHeureDebut') && v('heureBalanceDebut') && v('heureBalanceDebut') >= v('dateHeureDebut'),
+            'La balance doit commencer avant le début du concert.'],
+          [v('dateHeureDebut') && v('heureBalanceFin') && v('heureBalanceFin') > v('dateHeureDebut'),
+            'La balance doit se terminer avant le début du concert.']
         ];
-        for (const p of paires) {
-          const d = document.getElementById(p[0]).value;
-          const f = document.getElementById(p[1]).value;
-          if (d && f && f <= d) {
+        for (const r of regles) {
+          if (r[0]) {
             e.preventDefault();
-            alert(p[2]);
+            alert(r[1]);
             return;
           }
         }
