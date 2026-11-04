@@ -13,7 +13,6 @@
                 <div class="hm-tag">Gestion</div>
                 <div class="hm-card-title" th:text="'Groupes du ' + ${appNom} + ' Festival'">Groupes</div>
             </div>
-
             <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
                th:href="@{/groupes/ajouter}" class="hm-btn-primary">
                 <span>＋</span>

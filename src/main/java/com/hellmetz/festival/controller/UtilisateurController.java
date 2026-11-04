@@ -107,6 +107,7 @@ public class UtilisateurController {
     @GetMapping("/festival/utilisateurs/liste")
     public String liste(Model model) {
         model.addAttribute("utilisateurs", utilisateurDetailService.findAll());
+        model.addAttribute("activeMenu", "utilisateurs");
         return "utilisateur/list";
     }
 
