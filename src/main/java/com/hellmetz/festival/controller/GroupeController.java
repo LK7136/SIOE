@@ -8,6 +8,7 @@ import com.hellmetz.festival.service.ConcertService;
 import com.hellmetz.festival.service.GroupeService;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.service.ParametreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.core.io.Resource;
@@ -32,6 +33,8 @@ import java.util.List;
 public class GroupeController {
 
     @Autowired
+    private ParametreService parametreService;
+    @Autowired
     private GroupeService groupeService;
     @Autowired
     private ArtisteService artisteService;
@@ -47,36 +50,35 @@ public class GroupeController {
     @GetMapping("/liste")
     public String listGroupes(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") String taille,
+            @RequestParam(required = false) String taille,
             Model model) {
+
+        if (taille == null) {
+            taille = parametreService.tailleParDefaut();
+        }
 
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Groupe> pageGroupes = tout
                 ? groupeService.findTout()
-                : groupeService.findPage(page, parseTaille(taille));
+                : groupeService.findPage(page, parametreService.parseTaille(taille));
 
         model.addAttribute("groupes", pageGroupes.getContent());
         model.addAttribute("page", pageGroupes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "Groupes");
+        model.addAttribute("pageTitle", "HellMetz - Groupes");
         model.addAttribute("activeMenu", "groupes");
         return "groupe/list";
-    }
-
-    private int parseTaille(String taille) {
-        try {
-            int t = Integer.parseInt(taille);
-            return t > 0 ? t : 10;
-        } catch (NumberFormatException e) {
-            return 10;
-        }
     }
 
     @GetMapping("/ajouter")
     public String edit(@RequestParam(required = false) Long id,
                        @RequestParam(defaultValue = "0") int concertPage,
-                       @RequestParam(defaultValue = "10") String concertTaille,
+                       @RequestParam(required = false) String concertTaille,
                        Model model) {
+
+        if (concertTaille == null) {
+            concertTaille = parametreService.tailleParDefaut();
+        }
 
         boolean tout = "tout".equalsIgnoreCase(concertTaille);
 
@@ -86,12 +88,12 @@ public class GroupeController {
         if (id != null) {
             Groupe groupe = groupeService.findByIdWithStyles(id);
             model.addAttribute("groupe", groupe);
-            model.addAttribute("pageTitle", "Modifier le groupe");
+            model.addAttribute("pageTitle", "Modifier le groupe - HellMetz");
             model.addAttribute("artistes", artisteService.findByGroupeId(id));
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesOuGroupeTout(id)
-                    : concertService.findDisponiblesOuAnnulesOuGroupe(id, concertPage, parseTaille(concertTaille));
+                    : concertService.findDisponiblesOuAnnulesOuGroupe(id, concertPage, parametreService.parseTaille(concertTaille));
 
             model.addAttribute("concertsDispo", pageConcerts.getContent());
             model.addAttribute("pageConcerts", pageConcerts);
@@ -99,12 +101,12 @@ public class GroupeController {
 
         } else {
             model.addAttribute("groupe", new Groupe());
-            model.addAttribute("pageTitle", "Nouveau groupe");
+            model.addAttribute("pageTitle", "Nouveau groupe - HellMetz");
             model.addAttribute("artistes", java.util.Collections.emptyList());
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesTout()
-                    : concertService.findDisponiblesOuAnnules(concertPage, parseTaille(concertTaille));
+                    : concertService.findDisponiblesOuAnnules(concertPage, parametreService.parseTaille(concertTaille));
 
             model.addAttribute("concertsDispo", pageConcerts.getContent());
             model.addAttribute("pageConcerts", pageConcerts);

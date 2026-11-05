@@ -1,8 +1,10 @@
 package com.hellmetz.festival.controller;
 
 import com.hellmetz.festival.model.Scene;
+import com.hellmetz.festival.service.ParametreService;
 import com.hellmetz.festival.service.SceneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +27,31 @@ import org.springframework.http.ResponseEntity;
 public class SceneController {
     @Autowired
     private SceneService sceneService;
+    @Autowired
+    private ParametreService parametreService;
 
     private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/";
 
     @GetMapping("/liste")
-    public String liste(Model model) {
-        model.addAttribute("scenes", sceneService.findAll());
-        model.addAttribute("pageTitle", "Scenes");
-        model.addAttribute("activeMenu", "scenes");
+    public String liste(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String taille,
+            Model model) {
+
+        if (taille == null) {
+            taille = parametreService.tailleParDefaut();
+        }
+
+        boolean tout = "tout".equalsIgnoreCase(taille);
+        Page<Scene> pageScenes = tout
+                ? sceneService.findTout()
+                : sceneService.findPage(page, parametreService.parseTaille(taille));
+
+        model.addAttribute("scenes", pageScenes.getContent());
+        model.addAttribute("page", pageScenes);
+        model.addAttribute("taille", taille);
+        model.addAttribute("pageTitle", "HellMetz - Scenes");
+        model.addAttribute("activeMenu", "templates");
         return "scene/list";
     }
 
@@ -43,10 +62,10 @@ public class SceneController {
         if (id != null) {
             Scene concert = sceneService.findById(id);
             model.addAttribute("scene", concert);
-            model.addAttribute("pageTitle", "Modifier la scene");
+            model.addAttribute("pageTitle", "Modifier la scene - HellMetz");
         } else {
             model.addAttribute("scene", new Scene());
-            model.addAttribute("pageTitle", "Nouvel scene");
+            model.addAttribute("pageTitle", "Nouvel scene - HellMetz");
         }
 
         model.addAttribute("scenes", sceneService.findAll());

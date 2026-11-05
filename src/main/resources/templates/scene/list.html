@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout :: layout(~{::content})}">
 <head>
-    <title>Scenes</title>
+    <title>Scenes - HellMetz</title>
 </head>
 <body>
 <div th:fragment="content">
@@ -11,13 +11,30 @@
         <div class="hm-card-header d-flex justify-content-between align-items-center">
             <div>
                 <div class="hm-tag">Gestion</div>
-                <div class="hm-card-title" th:text="'Scènes du ' + ${appNom} + ' Festival'">Scènes</div>
+                <div class="hm-card-title">Scènes du HellMetz Festival</div>
             </div>
             <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
                th:href="@{/scenes/ajouter}" class="hm-btn-primary">
-                <span>＋</span>
-                <span>Nouvelle scène</span>
+                <span>＋</span><span>Nouvelle scène</span>
             </a>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
+            <form th:action="@{/scenes/liste}" method="get"
+                  style="display:flex; align-items:center; gap:.5rem; margin:0;">
+                <input type="hidden" name="page" value="0">
+                <label for="taille" style="font-size:.9rem;">Afficher</label>
+                <select id="taille" name="taille" class="form-select" style="width:auto;"
+                        onchange="this.form.submit()">
+                    <option value="5"    th:selected="${taille == '5'}">5</option>
+                    <option value="10"   th:selected="${taille == '10'}">10</option>
+                    <option value="20"   th:selected="${taille == '20'}">20</option>
+                    <option value="50"   th:selected="${taille == '50'}">50</option>
+                    <option value="100"  th:selected="${taille == '100'}">100</option>
+                    <option value="tout" th:selected="${taille == 'tout'}">Tout</option>
+                </select>
+                <span style="font-size:.9rem;">par page</span>
+            </form>
         </div>
 
         <div th:if="${#lists.isEmpty(scenes)}" style="padding: 40px; text-align: center;">
@@ -68,6 +85,28 @@
                 </tr>
                 </tbody>
             </table>
+            <nav th:if="${taille != 'tout' and page.totalPages > 1}"
+                 style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+                <span style="font-size:.85rem; color:var(--hm-text-muted);"
+                      th:text="${page.totalElements} + ' scènes au total'">0 scènes</span>
+                <ul class="pagination mb-0">
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/scenes/liste(page=${page.number - 1}, taille=${taille})}">‹</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/scenes/liste(page=${i}, taille=${taille})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/scenes/liste(page=${page.number + 1}, taille=${taille})}">›</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

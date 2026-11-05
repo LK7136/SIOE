@@ -4,6 +4,7 @@ import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.service.ParametreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -27,6 +28,8 @@ import java.nio.file.StandardCopyOption;
 public class ArtisteController {
 
     @Autowired
+    private ParametreService parametreService;
+    @Autowired
     private ArtisteService artisteService;
     @Autowired
     private StyleService styleService;
@@ -36,29 +39,24 @@ public class ArtisteController {
     @GetMapping("/liste")
     public String liste(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") String taille,
+            @RequestParam(required = false) String taille,
             Model model) {
+
+        if (taille == null) {
+            taille = parametreService.tailleParDefaut();
+        }
 
         boolean tout = "tout".equalsIgnoreCase(taille);
         Page<Artiste> pageArtistes = tout
                 ? artisteService.findTout()
-                : artisteService.findPage(page, parseTaille(taille));
+                : artisteService.findPage(page, parametreService.parseTaille(taille));
 
         model.addAttribute("artistes", pageArtistes.getContent());
         model.addAttribute("page", pageArtistes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "Artistes");
-        model.addAttribute("activeMenu", "artiste");
+        model.addAttribute("pageTitle", "HellMetz - Artistes");
+        model.addAttribute("activeMenu", "templates");
         return "artiste/list";
-    }
-
-    private int parseTaille(String taille) {
-        try {
-            int t = Integer.parseInt(taille);
-            return t > 0 ? t : 10;
-        } catch (NumberFormatException e) {
-            return 10;
-        }
     }
 
     @GetMapping("/ajouter")
@@ -68,10 +66,10 @@ public class ArtisteController {
         if (id != null) {
             Artiste artiste = artisteService.findById(id);
             model.addAttribute("artiste", artiste);
-            model.addAttribute("pageTitle", "Modifier l'artiste");
+            model.addAttribute("pageTitle", "Modifier l'artiste - HellMetz");
         } else {
             model.addAttribute("artiste", new Artiste());
-            model.addAttribute("pageTitle", "Nouvel artiste");
+            model.addAttribute("pageTitle", "Nouvel artiste - HellMetz");
         }
 
         if (idGroupeParam != null) {
