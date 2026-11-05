@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout :: layout(~{::content})}">
 <head>
     <title>Paramètres - HellMetz</title>
@@ -15,87 +16,180 @@
         </div>
 
         <div class="p-4">
-            <form action="/parametres" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
-                    <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">⚙️ Général</div>
-                    <div class="row justify-content-center">
-                        <div th:each="p : ${parametres}" th:if="${#strings.startsWith(p.codeParametre, 'app.')}"
-                             class="col-md-6 mb-3">
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-0" style="border-bottom: 2px solid #dee2e6; display:flex; gap:4px;">
+                <button type="button" id="tab-general" onclick="switchTab('general')"
+                        style="padding:10px 22px; border:none; border-radius:6px 6px 0 0;
+                               font-weight:600; cursor:pointer; background:#f0f0f0; color:#1a1a2e;
+                               border-bottom:2px solid #f0f0f0; margin-bottom:-2px;">
+                    ⚙️ Général
+                </button>
+                <button type="button" id="tab-editions" onclick="switchTab('editions')"
+                        style="padding:10px 22px; border:none; border-radius:6px 6px 0 0;
+                               font-weight:600; cursor:pointer; background:#1a1a2e; color:white;
+                               border-bottom:2px solid transparent; margin-bottom:-2px;">
+                    🎪 Éditions
+                </button>
+            </div>
 
+            <div id="panel-general" class="mt-3">
+                <form th:action="@{/parametres}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-
-                <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
-                    <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">🔑 Programmation</div>
-                    <small style="color:var(--hm-text-muted);">Délais pris en compte lors de la génération du planning des scènes.</small>
-                    <div class="row mt-2">
-                        <div th:each="p : ${parametres}"
-                             th:if="${#strings.startsWith(p.codeParametre, 'programmation.')}"
-                             class="col-md-6 mb-3">
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <input type="number" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                                <span style="color:var(--hm-text-muted);">min</span>
+                    <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                        <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">⚙️ Général</div>
+                        <div class="row justify-content-center">
+                            <div th:each="p : ${parametres}" th:if="${#strings.startsWith(p.codeParametre, 'app.')}"
+                                 class="col-md-6 mb-3">
+                                <input type="hidden" name="ids" th:value="${p.idParametre}">
+                                <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                                <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
-                    <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">✉️ Coordonnées</div>
-                    <div class="row">
-                        <div th:each="p : ${parametres}"
-                             th:if="${#strings.startsWith(p.codeParametre, 'contact.')}"
-                             class="col-md-6 mb-3">
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                    <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
+                        <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">🔑 Programmation</div>
+                        <small style="color:var(--hm-text-muted);">Délais pris en compte lors de la génération du planning des scènes.</small>
+                        <div class="row mt-2">
+                            <div th:each="p : ${parametres}"
+                                 th:if="${#strings.startsWith(p.codeParametre, 'programmation.')}"
+                                 class="col-md-6 mb-3">
+                                <input type="hidden" name="ids" th:value="${p.idParametre}">
+                                <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="number" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                                    <span style="color:var(--hm-text-muted);">min</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
-                    <div style="color:#9b59b6; font-weight:700; margin-bottom:16px;">🖥️ Affichage & système</div>
-                    <div class="row">
-                        <div th:each="p : ${parametres}"
-                             th:if="${#strings.startsWith(p.codeParametre, 'affichage.')}"
-                             class="col-md-6 mb-3">
-
-                            <input type="hidden" name="ids" th:value="${p.idParametre}">
-                            <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-
-                            <th:block th:if="${p.codeParametre == 'affichage.theme'}">
-                                <select class="form-select" name="valeurs">
-                                    <option value="Sombre" th:selected="${p.valeurParametre == 'Sombre'}">Sombre</option>
-                                    <option value="Claire" th:selected="${p.valeurParametre == 'Claire'}">Claire</option>
-                                </select>
-                            </th:block>
-
-                            <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
+                    <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                        <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">✉️ Coordonnées</div>
+                        <div class="row">
+                            <div th:each="p : ${parametres}"
+                                 th:if="${#strings.startsWith(p.codeParametre, 'contact.')}"
+                                 class="col-md-6 mb-3">
+                                <input type="hidden" name="ids" th:value="${p.idParametre}">
+                                <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
                                 <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                            </th:block>
-
+                            </div>
                         </div>
                     </div>
+
+                    <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                        <div style="color:#9b59b6; font-weight:700; margin-bottom:16px;">🖥️ Affichage & système</div>
+                        <div class="row">
+                            <div th:each="p : ${parametres}"
+                                 th:if="${#strings.startsWith(p.codeParametre, 'affichage.')}"
+                                 class="col-md-6 mb-3">
+
+                                <input type="hidden" name="ids" th:value="${p.idParametre}">
+                                <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
+
+                                <th:block th:if="${p.codeParametre == 'affichage.theme'}">
+                                    <select class="form-select" name="valeurs">
+                                        <option value="Sombre" th:selected="${p.valeurParametre == 'Sombre'}">Sombre</option>
+                                        <option value="Claire" th:selected="${p.valeurParametre == 'Claire'}">Claire</option>
+                                    </select>
+                                </th:block>
+
+                                <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
+                                    <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="hm-btn-primary" style="border:none;">
+                            <span>💾</span><span>Enregistrer</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="panel-editions" class="table-responsive mt-3" style="display:none;">
+
+                <div style="display:flex; justify-content:flex-end; padding:.5rem 0;">
+                    <a th:href="@{/editions/ajouter}" class="hm-btn-primary">
+                        <span>＋</span><span>Nouvelle édition</span>
+                    </a>
                 </div>
 
-                <div class="text-end mt-3">
-                    <button type="submit" class="hm-btn-primary" style="border:none;">
-                        <span>💾</span><span>Enregistrer</span>
-                    </button>
-                </div>
+                <table class="hm-table">
+                    <thead>
+                    <tr>
+                        <th>Affiche</th>
+                        <th>Édition</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="e : ${editions}">
+                        <td>
+                            <img th:src="${#strings.isEmpty(e.urlAfficheOfficielle)} ? @{/images/edition/defaultAffiche.png} : (${#strings.startsWith(e.urlAfficheOfficielle, 'http')} ? ${e.urlAfficheOfficielle} : @{/uploads/edition/{p}(p=${e.urlAfficheOfficielle})})"
+                                 th:alt="${'Affiche de ' + e.nomEdition}"
+                                 style="width:40px; height:56px; border-radius:4px; object-fit:cover;">
+                        </td>
+                        <td><strong th:text="${e.nomEdition}"></strong></td>
+                        <td>
+                            <span th:if="${e.actif}"
+                                  style="background:#27ae60; color:white; padding:3px 10px;
+                                         border-radius:12px; font-size:0.8em; font-weight:600;">
+                                ✅ Active
+                            </span>
+                            <span th:unless="${e.actif}" class="hm-pill">Inactive</span>
+                        </td>
+                        <td>
+                            <a class="hm-link-site"
+                               th:href="@{/editions/ajouter(id=${e.id})}">
+                                ✏️ éditer
+                            </a>
+                            <th:block th:unless="${e.actif}">
+                                &nbsp;|&nbsp;
+                                <form th:action="@{/editions/{id}/activer(id=${e.id})}" method="post"
+                                      style="display:inline; margin:0;">
+                                    <button type="submit" class="hm-link-site"
+                                            style="background:none; border:none; padding:0; cursor:pointer;">
+                                        ⭐ activer
+                                    </button>
+                                </form>
+                            </th:block>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(editions)}">
+                        <td colspan="4" style="text-align:center; color:#999; padding:20px;">
+                            Aucune édition enregistrée
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            </form>
         </div>
     </div>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('panel-general').style.display  = tab === 'general'  ? '' : 'none';
+            document.getElementById('panel-editions').style.display = tab === 'editions' ? '' : 'none';
+
+            const base     = 'padding:10px 22px; border:none; border-radius:6px 6px 0 0; font-weight:600; cursor:pointer; margin-bottom:-2px; ';
+            const active   = 'background:#f0f0f0; color:#1a1a2e; border-bottom:2px solid #f0f0f0;';
+            const inactive = 'background:#1a1a2e; color:white; border-bottom:2px solid transparent;';
+
+            document.getElementById('tab-general').style.cssText  = base + (tab === 'general'  ? active : inactive);
+            document.getElementById('tab-editions').style.cssText = base + (tab === 'editions' ? active : inactive);
+        }
+
+        // Ouvre directement l'onglet via /parametres/liste?tab=editions
+        if (new URLSearchParams(window.location.search).get('tab') === 'editions') {
+            switchTab('editions');
+        }
+    </script>
 </div>
 </body>
 </html>

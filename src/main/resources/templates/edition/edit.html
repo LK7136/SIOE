@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title>Éditions - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header">
+            <div>
+                <div class="hm-tag">Édition</div>
+                <div class="hm-card-title">
+                    <span th:if="${edition.id != null}"
+                          th:text="'Modifier l\'édition : ' + ${edition.nomEdition}"></span>
+                    <span th:unless="${edition.id != null}">Nouvelle édition</span>
+                </div>
+            </div>
+            <a th:href="@{/parametres/liste(tab='editions')}" class="hm-btn-primary"
+               style="background-color:#6c757d; color:white;">
+                <span>←</span><span>Retour à la liste</span>
+            </a>
+        </div>
+
+        <div class="p-4">
+
+            <form th:action="@{/editions/edit}" method="post" enctype="multipart/form-data">
+
+                <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+                <input th:if="${edition.id != null}" type="hidden" name="id" th:value="${edition.id}">
+                <input type="hidden" name="supprimerAffiche" id="supprimer_affiche" value="false">
+                <input type="hidden" name="urlAfficheOfficielle" id="urlAfficheOfficielle" th:value="${edition.urlAfficheOfficielle}">
+
+                <!-- Informations générales + affiche -->
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#e67e22; font-weight:700; margin-bottom:16px;">🎪 Informations générales</div>
+
+                    <div class="row mb-3">
+                        <div class="col-auto" style="text-align:center">
+                            <label for="afficheFile" style="cursor:pointer; display:inline-block;">
+                                <img id="preview"
+                                     th:src="${not #strings.isEmpty(edition.urlAfficheOfficielle)} ? @{/uploads/edition_affiche/{p}(p=${edition.urlAfficheOfficielle})} : @{/images/edition/defaultAffiche.png}"
+                                     style="width:180px; height:250px; border-radius:5%; object-fit:cover;">
+                            </label>
+                            <input type="file" id="afficheFile" name="afficheFile" accept="image/*" style="display:none;">
+                            <div id="containerBtnSupprimer"
+                                 th:style="${#strings.isEmpty(edition.urlAfficheOfficielle)} ? 'display:none; margin-top:6px;' : 'display:block; margin-top:6px;'">
+                                <button type="button" id="btnSupprimerAffiche" class="hm-btn-primary"
+                                        style="background-color:#6c757d; color:white;">
+                                    🗑️ Supprimer l'affiche
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <label for="nomEdition" class="form-label fw-bold">
+                                        Nom de l'édition <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="nomEdition" name="nomEdition" class="form-control"
+                                           th:value="${edition.nomEdition}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="annee" class="form-label fw-bold">
+                                        Année <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" id="annee" name="annee" class="form-control"
+                                           min="1900" max="2100"
+                                           th:value="${edition.annee != 0} ? ${edition.annee} : ''" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="dateDebut" class="form-label fw-bold">
+                                        Date de début <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" id="dateDebut" name="dateDebut" class="form-control"
+                                           th:value="${edition.dateDebut != null} ? ${#dates.format(edition.dateDebut, 'yyyy-MM-dd')} : ''"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="dateFin" class="form-label fw-bold">
+                                        Date de fin <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" id="dateFin" name="dateFin" class="form-control"
+                                           th:value="${edition.dateFin != null} ? ${#dates.format(edition.dateFin, 'yyyy-MM-dd')} : ''"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="theme" class="form-label fw-bold">Thème</label>
+                                    <input type="text" id="theme" name="theme" class="form-control"
+                                           th:value="${edition.theme}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lieu -->
+                <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
+                    <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">📍 Lieu</div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="lieu" class="form-label fw-bold">Lieu</label>
+                            <input type="text" id="lieu" name="lieu" class="form-control"
+                                   th:value="${edition.lieu}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="lattitude" class="form-label fw-bold">Latitude</label>
+                            <input type="number" id="lattitude" name="lattitude" class="form-control"
+                                   step="any" min="-90" max="90"
+                                   th:value="${edition.lattitude}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="longitude" class="form-label fw-bold">Longitude</label>
+                            <input type="number" id="longitude" name="longitude" class="form-control"
+                                   step="any" min="-180" max="180"
+                                   th:value="${edition.longitude}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organisation -->
+                <div class="mb-4 p-3" style="border:1px solid #333; border-radius:8px;">
+                    <div style="color:#9b59b6; font-weight:700; margin-bottom:16px;">📋 Organisation</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="budgetPrevisionnel" class="form-label fw-bold">Budget prévisionnel</label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="number" id="budgetPrevisionnel" name="budgetPrevisionnel"
+                                       class="form-control" step="0.01" min="0"
+                                       th:value="${edition.budgetPrevisionnel}">
+                                <span style="color:var(--hm-text-muted);">€</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="jaugeMaximale" class="form-label fw-bold">
+                                Jauge maximale <span class="text-danger">*</span>
+                            </label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="number" id="jaugeMaximale" name="jaugeMaximale"
+                                       class="form-control" min="0"
+                                       th:value="${edition.jaugeMaximale != 0} ? ${edition.jaugeMaximale} : ''"
+                                       required>
+                                <span style="color:var(--hm-text-muted);">pers.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4 pt-3 border-top">
+                    <button type="submit" class="hm-btn-primary" style="border:none;">
+                        <span>💾</span>
+                        <span th:text="${edition.id != null} ? 'Enregistrer les modifications' : 'Créer l\'édition'"></span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const defaultAfficheUrl = /*[[@{/images/edition/defaultAffiche.png}]]*/ '';
+
+        const containerBtn = document.getElementById('containerBtnSupprimer');
+        const inputAffiche = document.getElementById('afficheFile');
+
+        inputAffiche.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('preview').src = URL.createObjectURL(file);
+                document.getElementById('supprimer_affiche').value = "false";
+                if (containerBtn) {
+                    containerBtn.style.display = "block";
+                }
+            }
+        });
+
+        const btnSuppr = document.getElementById('btnSupprimerAffiche');
+        if (btnSuppr) {
+            btnSuppr.addEventListener('click', function () {
+                document.getElementById('preview').src = defaultAfficheUrl;
+                document.getElementById('urlAfficheOfficielle').value = "";
+                document.getElementById('supprimer_affiche').value = "true";
+                inputAffiche.value = ""; // Vide l'input file si une nouvelle image avait été choisie
+
+                if (containerBtn) {
+                    containerBtn.style.display = "none"; // Cache le bouton
+                }
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

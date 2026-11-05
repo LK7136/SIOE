@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface EditionRepository extends JpaRepository<Edition, Long>{
     // l'édition courante = celle dont on a mis actif = true
     Optional<Edition> findByActifTrue();
+
 }
