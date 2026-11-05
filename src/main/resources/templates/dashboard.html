@@ -43,11 +43,27 @@
 
       btnEnregistrer.addEventListener('click', function () {
         const disposition = grid.save(false);
-        fetch(/*[[@{/dashboard/disposition}]]*/ '/dashboard/disposition', {
+        fetch(/*[[@{/interne/dashboard/disposition}]]*/ '/interne/dashboard/disposition', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', [headerCsrf]: tokenCsrf },
           body: JSON.stringify(disposition)
-        }).then(() => location.reload());
+        }).then(function (resp) {
+          if (resp.ok) {
+            location.reload();
+            return;
+          }
+          if (resp.status === 403) {
+            alert("Session expirée ou action non autorisée : rechargez la page.");
+            return;
+          }
+          return resp.json().then(function (j) {
+            alert("Impossible d'enregistrer la disposition : " + (j.erreur || 'erreur ' + resp.status));
+          }, function () {
+            alert("Impossible d'enregistrer la disposition (erreur " + resp.status + ").");
+          });
+        }).catch(function () {
+          alert("Impossible de contacter le serveur.");
+        });
       });
 
     });
