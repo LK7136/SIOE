@@ -4,6 +4,7 @@ import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.util.FlashMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,6 +32,8 @@ public class ArtisteController {
     private ArtisteService artisteService;
     @Autowired
     private StyleService styleService;
+    @Autowired
+    private FlashMessages flash;
 
     private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/artistes/";
 
@@ -86,7 +90,8 @@ public class ArtisteController {
     public String save(@ModelAttribute Artiste artiste,
                        @RequestParam(required = false) Integer idGroupeParam,
                        @RequestParam(required = false) MultipartFile urlPhotoArtiste,
-                       @RequestParam(required = false) String supprimerPhoto) {
+                       @RequestParam(required = false) String supprimerPhoto,
+                       RedirectAttributes ra) {
 
         if ("true".equals(supprimerPhoto)) {
             artiste.setUrlPhoto(null);
@@ -112,6 +117,7 @@ public class ArtisteController {
 
 
         artisteService.save(artiste);
+        flash.succes(ra, "succes.artiste.enregistre");
 
         if (idGroupeParam != null) {
             return "redirect:/groupe/edit?id=" + idGroupeParam;
@@ -135,8 +141,9 @@ public class ArtisteController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
         artisteService.deleteById(id);
+        flash.succes(ra, "succes.artiste.supprime");
         return "redirect:/artistes/liste";
     }
 }

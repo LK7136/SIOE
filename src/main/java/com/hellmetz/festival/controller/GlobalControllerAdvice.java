@@ -11,13 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.hellmetz.festival.model.Parametre;
-
-/**
- * Rend la variable {@code utilisateurConnecte} (entite metier Utilisateur)
- * disponible automatiquement dans tous les templates Thymeleaf.
- * Aucune requete BDD : l'utilisateur vit deja en session via Spring Security.
- */
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
@@ -45,14 +38,15 @@ public class GlobalControllerAdvice {
                 theme = themeParam.getValeurParametre();
             }
         } catch (Exception ignored) {
-            // BDD KO → valeurs par défaut
         }
         model.addAttribute("theme", theme);
 
         try {
+            model.addAttribute("appNom", parametreService.getAppNom());
             model.addAttribute("appLogo", parametreService.getLogoUrl());
             model.addAttribute("hasCustomLogo", parametreService.hasCustomLogo());
         } catch (Exception e) {
+            model.addAttribute("appNom", ParametreService.DEFAULT_APP_NOM);
             model.addAttribute("appLogo", ParametreService.DEFAULT_LOGO_URL);
             model.addAttribute("hasCustomLogo", false);
         }

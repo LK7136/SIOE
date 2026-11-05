@@ -8,6 +8,7 @@ import com.hellmetz.festival.service.ConcertService;
 import com.hellmetz.festival.service.GroupeService;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.util.FlashMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.core.io.Resource;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,6 +43,8 @@ public class GroupeController {
     private StyleService styleService;
     @Autowired
     private StyleRepository styleRepository;
+    @Autowired
+    private FlashMessages flash;
 
     private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/groupes/";
 
@@ -116,7 +120,8 @@ public class GroupeController {
     @PostMapping("/{groupeId}/concerts")
     public String saveConcerts(@PathVariable Long groupeId,
                                @RequestParam(required = false) List<Long> concertIds,
-                               @RequestParam(required = false) List<Long> visibleConcertIds) {
+                               @RequestParam(required = false) List<Long> visibleConcertIds,
+                               RedirectAttributes ra) {
 
         // si aucune case n'est cochée on initialise une liste vide
         // pour éviter les NullPointerException
@@ -153,6 +158,7 @@ public class GroupeController {
             }
         }
 
+        flash.succes(ra, "succes.groupe.concerts");
         return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=concerts";
     }
 
@@ -164,7 +170,8 @@ public class GroupeController {
     public String save(@ModelAttribute Groupe groupe,
                        @RequestParam(value = "stylesId", required = false) List<Long> stylesId,
                        @RequestParam(required = false) MultipartFile urlLogoGroupe,
-                       @RequestParam(required = false) String supprimerPhoto) {
+                       @RequestParam(required = false) String supprimerPhoto,
+                       RedirectAttributes ra) {
 
         if ("true".equals(supprimerPhoto)) {
             groupe.setUrlLogo(null);
@@ -206,7 +213,7 @@ public class GroupeController {
         }
 
         groupeService.save(groupe);
-
+        flash.succes(ra, "succes.groupe.enregistre");
         return "redirect:/groupes/liste";
     }
 
@@ -226,8 +233,9 @@ public class GroupeController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
         groupeService.deleteById(id);
+        flash.succes(ra, "succes.groupe.supprime");
         return "redirect:/groupes/liste";
     }
 }

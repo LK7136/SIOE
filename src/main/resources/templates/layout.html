@@ -42,7 +42,7 @@
         <header class="backoffice-header"
                 style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
             <div>
-                <h1 th:text="${pageTitle != null ? appNom + ' - ' + pageTitle : appNom}">Backoffice</h1>
+                <h1 th:text="${(appNom != null ? appNom : 'HellMetz') + (pageTitle != null ? ' - ' + pageTitle : '')}">Backoffice</h1>
                 <p class="subtitle">Interface d'administration du festival (groupes, concerts, logistique…)</p>
             </div>
 
@@ -60,6 +60,7 @@
         </header>
 
         <section>
+            <div th:replace="~{fragments/messages :: messages}"></div>
             <div th:replace="${content}"></div>
         </section>
     </main>

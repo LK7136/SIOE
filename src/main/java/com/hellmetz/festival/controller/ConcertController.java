@@ -8,12 +8,14 @@ import com.hellmetz.festival.service.ConcertService.FenetreFestival;
 import com.hellmetz.festival.service.EditionService;
 import com.hellmetz.festival.service.GroupeService;
 import com.hellmetz.festival.service.SceneService;
+import com.hellmetz.festival.util.FlashMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +33,8 @@ public class ConcertController {
     private EditionService editionService;
     @Autowired
     private GroupeService groupeService;
+    @Autowired
+    private FlashMessages flash;
 
     @GetMapping("/liste")
     public String listConcerts(
@@ -90,7 +94,8 @@ public class ConcertController {
     public String save(@ModelAttribute Concert concert,
                        BindingResult binding,
                        @RequestParam(value = "groupeId", required = false) Long groupeId,
-                       Model model) {
+                       Model model,
+                       RedirectAttributes ra) {
 
         // 1. Validation (avant toute écriture)
         Map<String, String> erreurs = new LinkedHashMap<>();
@@ -131,12 +136,14 @@ public class ConcertController {
         }
 
         concertService.save(concert);
+        flash.succes(ra, "succes.concert.enregistre");
         return "redirect:/concerts/liste";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
         concertService.deleteById(id);
+        flash.succes(ra, "succes.concert.supprime");
         return "redirect:/concerts/liste";
     }
 

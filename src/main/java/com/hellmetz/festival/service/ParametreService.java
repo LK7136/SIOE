@@ -17,8 +17,8 @@ import java.util.UUID;
 @Transactional
 public class ParametreService {
 
-    /** Logo de secours (1re visite / BDD indisponible ou incorrecte). */
     public static final String DEFAULT_LOGO_URL = "/assets/752692.png";
+    public static final String DEFAULT_APP_NOM = "HellMetz";
 
     private static final Set<String> EXTENSIONS_AUTORISEES = Set.of(".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg");
     private static final Set<String> CONTENT_TYPES_AUTORISES = Set.of(
@@ -52,6 +52,18 @@ public class ParametreService {
     public String getLogoUrl() {
         String custom = resolveCustomLogoUrl();
         return custom != null ? custom : DEFAULT_LOGO_URL;
+    }
+
+    @Transactional(readOnly = true)
+    public String getAppNom() {
+        try {
+            Parametre nom = parametreRepository.findByCodeParametre("app.nom");
+            if (nom != null && nom.getValeurParametre() != null && !nom.getValeurParametre().isBlank()) {
+                return nom.getValeurParametre();
+            }
+        } catch (Exception ignored) {
+        }
+        return DEFAULT_APP_NOM;
     }
 
     private String resolveCustomLogoUrl() {

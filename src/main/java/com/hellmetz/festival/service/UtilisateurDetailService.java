@@ -75,6 +75,11 @@ public class UtilisateurDetailService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
+    public long countAdmins() {
+        return utilisateurRepository.countAdmins();
+    }
+
+    @Transactional(readOnly = true)
     public boolean isAdmin(Utilisateur utilisateur) {
         if (utilisateur.getRoles() == null) return false;
         return utilisateur.getRoles().stream()

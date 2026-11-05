@@ -3,16 +3,20 @@ package com.hellmetz.festival.controller;
 import com.hellmetz.festival.model.Permission;
 import com.hellmetz.festival.model.Role;
 import com.hellmetz.festival.model.Utilisateur;
+import com.hellmetz.festival.security.UtilisateurDetails;
 import com.hellmetz.festival.service.PermissionService;
 import com.hellmetz.festival.service.RoleService;
 import com.hellmetz.festival.service.UtilisateurDetailService;
+import com.hellmetz.festival.util.FlashMessages;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +35,9 @@ public class UtilisateurController {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private FlashMessages flash;
+
 
 
 
@@ -40,7 +47,7 @@ public class UtilisateurController {
                             Model model) {
 
         if ("created".equals(success)) {
-            model.addAttribute("erreur", "Le compte a été créé avec succès !");
+            model.addAttribute("successMessage", flash.get("succes.utilisateur.cree"));
         }
 
         // chercher l'erreur d'authentification cachée en session par Spring Security
@@ -85,7 +92,7 @@ public class UtilisateurController {
         Role roleChoisi = roleService.findById(idRole);
 
         if (roleChoisi == null) {
-            model.addAttribute("erreur", "Rôle invalide.");
+            model.addAttribute("erreur", flash.get("erreur.utilisateur.role.invalide"));
             model.addAttribute("roles", roleService.findAll());
             return "register";
         }
@@ -133,24 +140,57 @@ public class UtilisateurController {
     @PostMapping("/festival/utilisateurs/edit")
     public String save(@ModelAttribute Utilisateur utilisateur,
                        @RequestParam Long idRole,
-                       @RequestParam(required = false) Boolean actif) {
+                       @RequestParam(required = false) Boolean actif,
+                       RedirectAttributes ra) {
         Role role = roleService.findById(idRole);
+        if (role == null) {
+            flash.erreur(ra, "erreur.utilisateur.role.invalide");
+            return "redirect:/festival/utilisateurs/liste";
+        }
         if (utilisateur.getId() != null) {
             Utilisateur existing = utilisateurDetailService.findById(utilisateur.getId());
-            existing.setRoles(java.util.List.of(role));
+            if (existing == null) {
+                return "redirect:/festival/utilisateurs/liste";
+            }
+            if (utilisateurDetailService.isAdmin(existing)
+                    && !"ADMIN".equals(role.getCodeRole())
+                    && utilisateurDetailService.countAdmins() <= 1) {
+                flash.erreur(ra, "erreur.utilisateur.dernier.admin");
+                return "redirect:/festival/utilisateurs/liste";
+            }
+            if (existing.getRoles() == null) {
+                existing.setRoles(new java.util.ArrayList<>());
+            } else {
+                existing.getRoles().clear();
+            }
+            existing.getRoles().add(role);
             existing.setActif(actif != null && actif);
             utilisateurDetailService.save(existing);
         } else {
-            // Création
-            utilisateur.setRoles(java.util.List.of(role));
+            utilisateur.setRoles(new java.util.ArrayList<>(java.util.List.of(role)));
             utilisateurDetailService.creerUtilisateur(utilisateur);
         }
+        flash.succes(ra, "succes.utilisateur.enregistre");
         return "redirect:/festival/utilisateurs/liste";
     }
 
     @GetMapping("/festival/utilisateurs/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, Authentication auth, RedirectAttributes ra) {
+        Utilisateur cible = utilisateurDetailService.findById(id);
+        if (cible == null) {
+            return "redirect:/festival/utilisateurs/liste";
+        }
+        if (auth != null && auth.getPrincipal() instanceof UtilisateurDetails ud
+                && java.util.Objects.equals(ud.getUtilisateur().getId(), id)) {
+            flash.erreur(ra, "erreur.utilisateur.auto.suppression");
+            return "redirect:/festival/utilisateurs/liste";
+        }
+        if (utilisateurDetailService.isAdmin(cible) && utilisateurDetailService.countAdmins() <= 1) {
+            flash.erreur(ra, "erreur.utilisateur.dernier.admin");
+            return "redirect:/festival/utilisateurs/liste";
+        }
         utilisateurDetailService.deleteById(id);
+        flash.succes(ra, "succes.utilisateur.supprime");
         return "redirect:/festival/utilisateurs/liste";
     }
 

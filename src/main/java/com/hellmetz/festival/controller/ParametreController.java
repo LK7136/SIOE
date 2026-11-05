@@ -2,6 +2,7 @@ package com.hellmetz.festival.controller;
 
 import com.hellmetz.festival.model.Parametre;
 import com.hellmetz.festival.service.ParametreService;
+import com.hellmetz.festival.util.FlashMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class ParametreController {
 
     @Autowired
     private ParametreService parametreService;
+    @Autowired
+    private FlashMessages flash;
 
     @GetMapping("/liste")
     public String edit(Model model) {
@@ -35,7 +39,8 @@ public class ParametreController {
     public String save(@RequestParam(required = false) List<Long> ids,
                        @RequestParam(required = false) List<String> valeurs,
                        @RequestParam(value = "logoFile", required = false) MultipartFile logoFile,
-                       @RequestParam(value = "deleteLogo", required = false) String deleteLogo) {
+                       @RequestParam(value = "deleteLogo", required = false) String deleteLogo,
+                       RedirectAttributes ra) {
 
         if (ids != null && valeurs != null) {
             int taille = Math.min(ids.size(), valeurs.size());
@@ -55,6 +60,7 @@ public class ParametreController {
             parametreService.deleteLogo();
         }
 
+        flash.succes(ra, "succes.parametres.enregistres");
         return "redirect:/parametres/liste";
     }
 

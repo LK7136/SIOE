@@ -4,9 +4,11 @@ import com.hellmetz.festival.dashboard.*;
 import com.hellmetz.festival.model.DashboardProperties;
 import com.hellmetz.festival.service.DashboardPreferenceService;
 import com.hellmetz.festival.service.DashboardService;
+import com.hellmetz.festival.util.FlashMessages;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -19,13 +21,16 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final DashboardPreferenceService preferenceService;
     private final DashboardProperties props;
+    private final FlashMessages flash;
 
     public DashboardController(DashboardService dashboardService,
                                DashboardPreferenceService preferenceService,
-                               DashboardProperties props) {
+                               DashboardProperties props,
+                               FlashMessages flash) {
         this.dashboardService = dashboardService;
         this.preferenceService = preferenceService;
         this.props = props;
+        this.flash = flash;
     }
 
     @GetMapping({"/", "/dashboard"})
@@ -74,8 +79,10 @@ public class DashboardController {
 
     @PostMapping("/dashboard/parametres")
     public String enregistrer(@RequestParam(name = "widgets", required = false) List<String> widgets,
-                              Principal principal) {
+                              Principal principal,
+                              RedirectAttributes ra) {
         preferenceService.enregistrer(principal.getName(), widgets == null ? List.of() : widgets);
+        flash.succes(ra, "succes.dashboard.enregistre");
         return "redirect:/dashboard";
     }
 }
