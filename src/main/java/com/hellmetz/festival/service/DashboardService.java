@@ -129,9 +129,7 @@ public class DashboardService {
     private EditionResume resumeEdition(Edition e, LocalDateTime maintenant) {
         long jours = 0;
         if (e.getDateDebut() != null) {
-            LocalDateTime ouverture = e.getDateDebut().toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDateTime();
-            jours = Math.max(0, ChronoUnit.DAYS.between(maintenant, ouverture));
+            jours = Math.max(0, ChronoUnit.DAYS.between(maintenant.toLocalDate(), e.getDateDebut()));
         }
         List<Concert> concerts = concertRepo.findByEdition(e);
         int programmes = (int) concerts.stream()

@@ -1,8 +1,8 @@
 package com.hellmetz.festival.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,10 +21,10 @@ public class Edition {
     private String nomEdition;
 
     @Column(name = "date_debut")
-    private Date dateDebut;
+    private LocalDate dateDebut;
 
     @Column(name = "date_fin")
-    private Date dateFin;
+    private LocalDate dateFin;
 
     @Column(name = "longitude")
     private BigDecimal longitude;
@@ -62,11 +62,11 @@ public class Edition {
     public String getNomEdition() { return nomEdition; }
     public void setNomEdition(String nomEdition) { this.nomEdition = nomEdition; }
 
-    public Date getDateDebut() { return dateDebut; }
-    public void setDateDebut(Date dateDebut) { this.dateDebut = dateDebut; }
+    public LocalDate getDateDebut() {return dateDebut;}
+    public void setDateDebut(LocalDate dateDebut) {this.dateDebut = dateDebut;}
 
-    public Date getDateFin() { return dateFin; }
-    public void setDateFin(Date dateFin) { this.dateFin = dateFin; }
+    public LocalDate getDateFin() {return dateFin;}
+    public void setDateFin(LocalDate dateFin) {this.dateFin = dateFin;}
 
     public BigDecimal getLongitude() { return longitude; }
     public void setLongitude(BigDecimal longitude) { this.longitude = longitude; }

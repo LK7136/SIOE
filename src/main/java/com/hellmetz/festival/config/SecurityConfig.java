@@ -27,15 +27,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         // Ressources publiques : CSS, JS, images
-                        .requestMatchers("/css/**", "/js/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                         // nimporte qui peut se login
                         .requestMatchers("/login").permitAll()
 
-
-
                         //seule l'admin est organisateur ont accès a la page de parametres
-                        .requestMatchers("/parametres/liste").hasAnyRole("ADMIN", "ORGANISATEUR")
-
+                        .requestMatchers("/parametres/**").hasAnyRole("ADMIN", "ORGANISATEUR")
 
                         //suppression
                         .requestMatchers("/*/delete/**").hasRole("ADMIN")
@@ -47,9 +44,9 @@ public class SecurityConfig {
                         //acces a la creation de roles que pour l'admin
                         .requestMatchers(HttpMethod.POST, "/roles").hasRole("ADMIN")
 
-
                         // acces au back office que pr les admins
                         .requestMatchers("/festival/**").hasRole("ADMIN")
+
                         // acces au reste des ressource que si on est authentifier
                         .anyRequest().authenticated()
                 )

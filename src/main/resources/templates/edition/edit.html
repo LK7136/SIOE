@@ -43,8 +43,7 @@
                                      th:src="${not #strings.isEmpty(edition.urlAfficheOfficielle)} ? @{/uploads/edition_affiche/{p}(p=${edition.urlAfficheOfficielle})} : @{/images/edition/defaultAffiche.png}"
                                      style="width:180px; height:250px; border-radius:5%; object-fit:cover;">
                             </label>
-                            <input type="file" id="afficheFile" name="afficheFile" accept="image/*" style="display:none;">
-                            <div id="containerBtnSupprimer"
+                            <input type="file" id="afficheFile" name="afficheFile" accept="image/png, image/jpeg, image/gif, image/webp, image/svg+xml" style="display:none;">                            <div id="containerBtnSupprimer"
                                  th:style="${#strings.isEmpty(edition.urlAfficheOfficielle)} ? 'display:none; margin-top:6px;' : 'display:block; margin-top:6px;'">
                                 <button type="button" id="btnSupprimerAffiche" class="hm-btn-primary"
                                         style="background-color:#6c757d; color:white;">
@@ -77,7 +76,7 @@
                                         Date de début <span class="text-danger">*</span>
                                     </label>
                                     <input type="date" id="dateDebut" name="dateDebut" class="form-control"
-                                           th:value="${edition.dateDebut != null} ? ${#dates.format(edition.dateDebut, 'yyyy-MM-dd')} : ''"
+                                           th:value="${edition.dateDebut != null} ? ${#temporals.format(edition.dateDebut, 'yyyy-MM-dd')} : ''"
                                            required>
                                 </div>
                                 <div class="col-md-6">
@@ -85,7 +84,7 @@
                                         Date de fin <span class="text-danger">*</span>
                                     </label>
                                     <input type="date" id="dateFin" name="dateFin" class="form-control"
-                                           th:value="${edition.dateFin != null} ? ${#dates.format(edition.dateFin, 'yyyy-MM-dd')} : ''"
+                                           th:value="${edition.dateFin != null} ? ${#temporals.format(edition.dateFin, 'yyyy-MM-dd')} : ''"
                                            required>
                                 </div>
                             </div>
@@ -156,10 +155,11 @@
 
                 <div class="text-end mt-4 pt-3 border-top">
                     <button type="submit" class="hm-btn-primary" style="border:none;">
-                        <span>💾</span>
-                        <span th:text="${edition.id != null} ? 'Enregistrer les modifications' : 'Créer l\'édition'"></span>
+                        <span>💾</span><span>Enregistrer les modifications</span>
                     </button>
                 </div>
+
+
 
             </form>
         </div>

@@ -1,6 +1,7 @@
 package com.hellmetz.festival.controller;
 
 import com.hellmetz.festival.model.Parametre;
+import com.hellmetz.festival.service.EditionService;
 import com.hellmetz.festival.service.ParametreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,10 +16,13 @@ public class ParametreController {
 
     @Autowired
     private ParametreService parametreService;
+    @Autowired
+    private EditionService editionService;
 
     @GetMapping("/liste")
     public String edit(Model model) {
         model.addAttribute("parametres", parametreService.findAll());
+        model.addAttribute("editions", editionService.findAll());
         model.addAttribute("pageTitle", "HellMetz - Paramètres");
         model.addAttribute("activeMenu", "parametres");
 

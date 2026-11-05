@@ -50,7 +50,6 @@
 
                     <div class="mb-4 p-3" style="border:1px solid #3d6baa; border-radius:8px;">
                         <div style="color:#3d9be9; font-weight:700; margin-bottom:16px;">🔑 Programmation</div>
-                        <small style="color:var(--hm-text-muted);">Délais pris en compte lors de la génération du planning des scènes.</small>
                         <div class="row mt-2">
                             <div th:each="p : ${parametres}"
                                  th:if="${#strings.startsWith(p.codeParametre, 'programmation.')}"
@@ -130,7 +129,7 @@
                     <tbody>
                     <tr th:each="e : ${editions}">
                         <td>
-                            <img th:src="${#strings.isEmpty(e.urlAfficheOfficielle)} ? @{/images/edition/defaultAffiche.png} : (${#strings.startsWith(e.urlAfficheOfficielle, 'http')} ? ${e.urlAfficheOfficielle} : @{/uploads/edition/{p}(p=${e.urlAfficheOfficielle})})"
+                            <img th:src="${#strings.isEmpty(e.urlAfficheOfficielle)} ? @{/images/edition/defaultAffiche.png} : (${#strings.startsWith(e.urlAfficheOfficielle, 'http')} ? ${e.urlAfficheOfficielle} : @{/uploads/edition_affiche/{p}(p=${e.urlAfficheOfficielle})})"
                                  th:alt="${'Affiche de ' + e.nomEdition}"
                                  style="width:40px; height:56px; border-radius:4px; object-fit:cover;">
                         </td>

@@ -10,7 +10,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.lang.NonNull;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Convertit les identifiants (String issus des <select>) en entites JPA,
@@ -20,17 +24,31 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    private final StorageProperties storageProperties;
     private final StyleService styleService;
     private final SceneService sceneService;
     private final EditionService editionService;
 
-    public WebMvcConfig(StyleService styleService,
+    public WebMvcConfig(StorageProperties storageProperties,
+                        StyleService styleService,
                         SceneService sceneService,
                         EditionService editionService) {
+        this.storageProperties = storageProperties;
         this.styleService = styleService;
         this.sceneService = sceneService;
         this.editionService = editionService;
     }
+
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        Path rootUploadDir = Paths.get(storageProperties.getLocation()).toAbsolutePath().normalize();
+
+        // expose tout le dossier uploads/
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(rootUploadDir.toUri().toString() + "/");
+    }
+
 
     @Override
     public void addFormatters(@NonNull FormatterRegistry registry) {
@@ -56,4 +74,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
             }
         });
     }
+
+
 }
