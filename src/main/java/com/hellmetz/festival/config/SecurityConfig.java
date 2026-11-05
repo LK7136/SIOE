@@ -45,8 +45,11 @@ public class SecurityConfig {
                         .requestMatchers("/*/ajouter").hasAnyRole("ADMIN", "ORGANISATEUR")
                         .requestMatchers(HttpMethod.POST, "/*/edit").hasAnyRole("ADMIN", "ORGANISATEUR")
 
-                        // création de rôles réservée à l'admin
-                        .requestMatchers(HttpMethod.POST, "/roles").hasRole("ADMIN")
+                        // endpoints internes du back-office (AJAX) : création de rôles réservée à l'admin
+                        .requestMatchers(HttpMethod.POST, "/interne/roles").hasRole("ADMIN")
+
+                        // endpoints internes du dashboard : mêmes règles que l'écran (utilisateur connecté)
+                        .requestMatchers("/interne/dashboard/**").authenticated()
 
                         // accès au back office réservé aux admins
                         .requestMatchers("/festival/**").hasRole("ADMIN")
