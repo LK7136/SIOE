@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title>Concerts - HellMetz</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="hm-card">
+        <div class="hm-card-header">
+            <div>
+                <div class="hm-tag">Gestion</div>
+                <div class="hm-card-title">Concerts du HellMetz Festival</div>
+            </div>
+            <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
+               th:href="@{/concerts/ajouter}" class="hm-btn-primary">
+                <span>＋</span>
+                <span>Nouveau concert</span>
+            </a>
+        </div>
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
+            <form th:action="@{/concerts/liste}" method="get"
+                  style="display:flex; align-items:center; gap:.5rem; margin:0;">
+                <!-- on revient en page 1 quand on change la taille -->
+                <input type="hidden" name="page" value="0">
+                <label for="taille" style="font-size:.9rem;">Afficher</label>
+                <select id="taille" name="taille" class="form-select" style="width:auto;"
+                        onchange="this.form.submit()">
+                    <option value="10"   th:selected="${taille == '10'}">10</option>
+                    <option value="20"   th:selected="${taille == '20'}">20</option>
+                    <option value="50"   th:selected="${taille == '50'}">50</option>
+                    <option value="100"  th:selected="${taille == '100'}">100</option>
+                    <option value="tout" th:selected="${taille == 'tout'}">Tout</option>
+                </select>
+                <span style="font-size:.9rem;">par page</span>
+            </form>
+        </div>
+        <div th:if="${#lists.isEmpty(concerts)}" style="padding: 40px; text-align: center;">
+            <p>Aucun concert enregistré pour le moment.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(concerts)}" class="table-responsive">
+            <table class="hm-table">
+                <thead>
+                <tr>
+                    <th>Scène</th>
+                    <th>Groupe</th>
+                    <th>Statut</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    <th>Balance début</th>
+                    <th>Balance fin</th>
+                    <th>Décibels max</th>
+                    <th sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${concerts}">
+                    <td th:text="${c.scene != null ? c.scene.nom : ''}"></td>
+
+                    <td>
+                        <span th:if="${c.groupe != null}" th:text="${c.groupe.nomGroupe}"></span>
+                        <span th:unless="${c.groupe != null}">Aucun groupe</span>
+                    </td>
+
+                    <td>
+                        <span th:if="${#strings.equalsIgnoreCase(c.statut, 'Annulé')}"
+                              style="background:#e74c3c; color:white; padding:3px 10px;
+                              border-radius:12px; font-size:0.8em; font-weight:600; display:inline-block;">❌ Annulé
+                        </span>
+
+                        <span th:unless="${#strings.equalsIgnoreCase(c.statut, 'Annulé')}"
+                              class="hm-pill"
+                              th:text="${c.statut}">
+
+                        </span>
+                    </td>
+                    <td th:text="${c.dateHeureDebut}"></td>
+                    <td th:text="${c.dateHeureFin}"></td>
+                    <td th:text="${c.heureBalanceDebut}"></td>
+                    <td th:text="${c.heureBalanceFin}"></td>
+                    <td><span class="hm-pill" th:text="${c.decibelsMax} + ' dB'"></span></td>
+
+                    <td sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">
+                        <a class="hm-link-site"
+                           th:href="@{/concerts/ajouter(id=${c.id})}">
+                            ✏️ éditer
+                        </a>
+                        &nbsp;|&nbsp;
+                        <a class="hm-link-site"
+                           th:href="@{/concerts/delete/{id}(id=${c.id})}"
+                           onclick="return confirm('Supprimer ce concert ?');">
+                            🗑️ supprimer
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <nav th:if="${taille != 'tout' and page.totalPages > 1}"
+                 style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+
+    <span style="font-size:.85rem; color:var(--hm-text-muted);"
+          th:text="${page.totalElements} + ' concerts au total'">0 concerts</span>
+
+                <ul class="pagination mb-0">
+                    <!-- Précédent -->
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/concerts/liste(page=${page.number - 1}, taille=${taille})}">‹</a>
+                    </li>
+
+                    <!-- Numéros de page (affichage 1-based) -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/concerts/liste(page=${i}, taille=${taille})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Suivant -->
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/concerts/liste(page=${page.number + 1}, taille=${taille})}">›</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

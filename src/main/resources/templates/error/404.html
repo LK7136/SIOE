@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page introuvable</title>
+
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/errorStyle.css">
+
+</head>
+<body>
+
+<div class="container error-page d-flex align-items-center">
+
+  <div class="row align-items-center w-100 g-5">
+    <h1 class="error-code">404</h1>
+    <div class="col-lg-6 text-center text-lg-start">
+      <div class="error-title mb-3">Oups ! Cette page n’existe pas.</div>
+      <p class="error-text fs-5 mb-4">
+        La page que vous cherchez a été déplacée ou supprimée.
+      </p>
+
+      <a th:href="@{/dashboard}" class="btn btn-neon">
+        Retour à l'acceuil
+      </a>
+    </div>
+
+
+  </div>
+</div>
+
+</body>
+</html>
