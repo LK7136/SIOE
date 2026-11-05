@@ -6,12 +6,18 @@ import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.service.PermissionService;
 import com.hellmetz.festival.service.RoleService;
 import com.hellmetz.festival.service.UtilisateurDetailService;
+import com.hellmetz.festival.validation.Creation;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,6 +28,8 @@ import java.util.stream.Collectors;
 @Controller
 public class UtilisateurController {
 
+    private static final Logger log = LoggerFactory.getLogger(UtilisateurController.class);
+
     @Autowired
     private UtilisateurDetailService utilisateurDetailService;
 
@@ -30,8 +38,6 @@ public class UtilisateurController {
 
     @Autowired
     private PermissionService permissionService;
-
-
 
 
     @GetMapping("/login")
@@ -78,36 +84,62 @@ public class UtilisateurController {
 
 
     @PostMapping("/register")
-    public String register(@ModelAttribute Utilisateur utilisateur,
-                           @RequestParam Long idRole,
+    public String register(@Validated(Creation.class) @ModelAttribute Utilisateur utilisateur,
+                           BindingResult result,   // doit suivre immédiatement l'objet validé
+                           @RequestParam(required = false) Long idRole,
                            Model model) {
 
-        Role roleChoisi = roleService.findById(idRole);
-
-        if (roleChoisi == null) {
-            model.addAttribute("erreur", "Rôle invalide.");
-            model.addAttribute("roles", roleService.findAll());
-            return "register";
+        // 1. Unicité : on ne vérifie que si le champ est déjà valide (évite d'empiler les messages)
+        if (!result.hasFieldErrors("identifiant")
+                && utilisateurDetailService.identifiantExiste(utilisateur.getIdentifiant())) {
+            result.rejectValue("identifiant", "identifiant.existant", "Cet identifiant est déjà utilisé");
+        }
+        if (!result.hasFieldErrors("email")
+                && utilisateurDetailService.emailExiste(utilisateur.getEmail())) {
+            result.rejectValue("email", "email.existant", "Cette adresse e-mail est déjà utilisée");
         }
 
-        utilisateur.setRoles(java.util.List.of(roleChoisi));
+        // 2. Rôle : paramètre séparé de l'entité, donc contrôlé à la main
+        Role roleChoisi = (idRole != null) ? roleService.findById(idRole) : null;
+        if (roleChoisi == null) {
+            model.addAttribute("erreurRole", "Veuillez choisir un rôle");
+        }
 
+        if (result.hasErrors() || roleChoisi == null) {
+            return reafficherInscription(utilisateur, idRole, model);
+        }
+
+        utilisateur.setRoles(List.of(roleChoisi));
 
         try {
             utilisateurDetailService.creerUtilisateur(utilisateur);
             return "redirect:/login?success=created";
+        } catch (DataIntegrityViolationException e) {
+            // Filet de sécurité (ex. deux créations simultanées) : le détail SQL reste dans les logs
+            log.warn("Création de l'utilisateur '{}' refusée par la base : {}",
+                    utilisateur.getIdentifiant(), e.getMostSpecificCause().getMessage());
+            model.addAttribute("erreur",
+                    "Impossible de créer le compte : cet identifiant ou cette adresse e-mail est déjà utilisé.");
         } catch (Exception e) {
-            model.addAttribute("erreur", "Erreur : " + e.getMessage());
-            model.addAttribute("roles", roleService.findAll());
-            return "register";
+            log.error("Erreur inattendue lors de la création de l'utilisateur '{}'",
+                    utilisateur.getIdentifiant(), e);
+            model.addAttribute("erreur",
+                    "Une erreur est survenue lors de la création du compte. Veuillez réessayer.");
         }
+        return reafficherInscription(utilisateur, idRole, model);
+    }
+
+    /** Réaffiche le formulaire d'inscription avec tout ce dont la page a besoin. */
+    private String reafficherInscription(Utilisateur utilisateur, Long idRole, Model model) {
+        alimenterPermissions(model, utilisateur);          // roles, permissions, permissionsParRole
+        model.addAttribute("idRoleChoisi", idRole);        // pour garder le rôle sélectionné
+        return "register";
     }
 
 
     @GetMapping("/festival/utilisateurs/liste")
     public String liste(Model model) {
         model.addAttribute("utilisateurs", utilisateurDetailService.findAll());
-        model.addAttribute("activeMenu", "utilisateurs");
         return "utilisateur/list";
     }
 
@@ -118,10 +150,10 @@ public class UtilisateurController {
 
         if (id != null) {
             utilisateurExistant = utilisateurDetailService.findById(id);
-            model.addAttribute("pageTitle", "Modifier l'utilisateur");
+            model.addAttribute("pageTitle", "Modifier l'utilisateur - HellMetz");
         } else {
             utilisateurExistant = new Utilisateur();
-            model.addAttribute("pageTitle", "Nouvel utilisateur");
+            model.addAttribute("pageTitle", "Nouvel utilisateur - HellMetz");
         }
         model.addAttribute("utilisateur", utilisateurExistant);
 
@@ -130,6 +162,7 @@ public class UtilisateurController {
         return "utilisateur/edit";
     }
 
+    // INCHANGÉ pour l'instant (étape 2)
     @PostMapping("/festival/utilisateurs/edit")
     public String save(@ModelAttribute Utilisateur utilisateur,
                        @RequestParam Long idRole,
@@ -185,8 +218,4 @@ public class UtilisateurController {
         }
         model.addAttribute("utilisateurPermissionsIds", utilisateurPermissionsIds);
     }
-
-
-
 }
-
