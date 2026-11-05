@@ -345,6 +345,28 @@ Pour générer votre propre fichier localement :
 ```bash
 keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-alias
 ```
+---
+## 🧭 Back-office et API : qui fait quoi
+
+### Le back-office (cette application)
+
+Application Spring Boot / Thymeleaf pour les organisateurs du festival.
+Elle sert des **pages HTML** et ne contient que ce qui sert à ses propres écrans.
+
+Deux endpoints JSON existent, appelés en AJAX par les pages du back-office. Ils sont **internes** (ce ne sont pas des API publiques) et regroupés sous `/interne/**`.
+
+| Endpoint | Appelé par | Rôle requis | Réponses |
+|---|---|---|---|
+| `POST /interne/roles` | modale « Créer un nouveau rôle » (`register.html`) | `ADMIN` | 201 `{idRole, libelle}` ; 400, 409 ou 500 `{erreur}` |
+| `POST /interne/dashboard/disposition` | bouton « Enregistrer » du tableau de bord (`dashboard.html`) | utilisateur connecté | 204 ; 400, 413 ou 500 `{erreur}` |
+
+Règles communes : protégés par CSRF, mêmes règles d'accès que les écrans (voir `SecurityConfig`), erreurs au format JSON `{"erreur": "message"}`, actions journalisées.
+
+### L'API REST (phase 3)
+
+L'API pour l'application mobile (`/api/concerts`, `/api/points-interets`, `/api/groupes`) est distincte du back-office. 
+Le back-office ne contient aucun `@RestController` d'API : tout endpoint JSON conservé ici est interne et listé ci-dessus.
+
 # 📬 Besoin d’aide ?
 
 Le projet est progressif, les difficultés sont normales.  
