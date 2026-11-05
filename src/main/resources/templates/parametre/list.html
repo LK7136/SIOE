@@ -129,7 +129,18 @@
                                 </select>
                             </th:block>
 
-                            <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
+                            <th:block th:if="${p.codeParametre == 'affichage.elements_par_page'}">
+                                <select class="form-select" name="valeurs">
+                                    <option value="5" th:selected="${p.valeurParametre == '5'}">5</option>
+                                    <option value="10" th:selected="${p.valeurParametre == '10'}">10</option>
+                                    <option value="20" th:selected="${p.valeurParametre == '20'}">20</option>
+                                    <option value="50" th:selected="${p.valeurParametre == '50'}">50</option>
+                                    <option value="100" th:selected="${p.valeurParametre == '100'}">100</option>
+                                    <option value="tout" th:selected="${p.valeurParametre == 'tout'}">Tout</option>
+                                </select>
+                            </th:block>
+
+                            <th:block th:unless="${p.codeParametre == 'affichage.theme' or p.codeParametre == 'affichage.elements_par_page'}">
                                 <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
                             </th:block>
 
