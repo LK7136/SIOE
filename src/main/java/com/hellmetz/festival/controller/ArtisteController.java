@@ -134,7 +134,7 @@ public class ArtisteController {
                 .body(resource);
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         artisteService.deleteById(id);
         return "redirect:/artistes/liste";

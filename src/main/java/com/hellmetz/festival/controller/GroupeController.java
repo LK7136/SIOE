@@ -225,7 +225,7 @@ public class GroupeController {
                 .body(resource);
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         groupeService.deleteById(id);
         return "redirect:/groupes/liste";

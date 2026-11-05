@@ -107,7 +107,7 @@ public class SceneController {
 
 
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         sceneService.deleteById(id);
         return "redirect:/scenes/liste";

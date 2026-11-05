@@ -5,14 +5,17 @@ import com.hellmetz.festival.model.Role;
 import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.service.PermissionService;
 import com.hellmetz.festival.service.RoleService;
+import com.hellmetz.festival.security.UtilisateurDetails;
 import com.hellmetz.festival.service.UtilisateurDetailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -133,23 +136,62 @@ public class UtilisateurController {
     @PostMapping("/festival/utilisateurs/edit")
     public String save(@ModelAttribute Utilisateur utilisateur,
                        @RequestParam Long idRole,
-                       @RequestParam(required = false) Boolean actif) {
+                       @RequestParam(required = false) Boolean actif,
+                       @RequestParam(required = false) String motDePasse,
+                       RedirectAttributes ra) {
         Role role = roleService.findById(idRole);
+        if (role == null) {
+            ra.addFlashAttribute("erreur", "Rôle introuvable.");
+            return "redirect:/festival/utilisateurs/liste";
+        }
         if (utilisateur.getId() != null) {
             Utilisateur existing = utilisateurDetailService.findById(utilisateur.getId());
-            existing.setRoles(java.util.List.of(role));
+            if (existing == null) {
+                return "redirect:/festival/utilisateurs/liste";
+            }
+            if (utilisateurDetailService.isAdmin(existing)
+                    && !"ADMIN".equals(role.getCodeRole())
+                    && utilisateurDetailService.countAdmins() <= 1) {
+                ra.addFlashAttribute("erreur", "Impossible de retirer le rôle du dernier administrateur.");
+                return "redirect:/festival/utilisateurs/liste";
+            }
+            existing.setNom(utilisateur.getNom());
+            existing.setPrenom(utilisateur.getPrenom());
+            existing.setEmail(utilisateur.getEmail());
+            existing.setIdentifiant(utilisateur.getIdentifiant());
             existing.setActif(actif != null && actif);
+            if (motDePasse != null && !motDePasse.isBlank()) {
+                utilisateurDetailService.changerMotDePasse(existing, motDePasse);
+            }
+            if (existing.getRoles() == null) {
+                existing.setRoles(new java.util.ArrayList<>());
+            } else {
+                existing.getRoles().clear();
+            }
+            existing.getRoles().add(role);
             utilisateurDetailService.save(existing);
         } else {
-            // Création
-            utilisateur.setRoles(java.util.List.of(role));
+            utilisateur.setRoles(new java.util.ArrayList<>(java.util.List.of(role)));
             utilisateurDetailService.creerUtilisateur(utilisateur);
         }
         return "redirect:/festival/utilisateurs/liste";
     }
 
-    @GetMapping("/festival/utilisateurs/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    @PostMapping("/festival/utilisateurs/delete/{id}")
+    public String delete(@PathVariable Long id, Authentication auth, RedirectAttributes ra) {
+        Utilisateur cible = utilisateurDetailService.findById(id);
+        if (cible == null) {
+            return "redirect:/festival/utilisateurs/liste";
+        }
+        if (auth != null && auth.getPrincipal() instanceof UtilisateurDetails ud
+                && ud.getUtilisateur().getId().equals(id)) {
+            ra.addFlashAttribute("erreur", "Vous ne pouvez pas supprimer votre propre compte.");
+            return "redirect:/festival/utilisateurs/liste";
+        }
+        if (utilisateurDetailService.isAdmin(cible) && utilisateurDetailService.countAdmins() <= 1) {
+            ra.addFlashAttribute("erreur", "Impossible de supprimer le dernier administrateur.");
+            return "redirect:/festival/utilisateurs/liste";
+        }
         utilisateurDetailService.deleteById(id);
         return "redirect:/festival/utilisateurs/liste";
     }
