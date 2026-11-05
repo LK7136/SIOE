@@ -64,6 +64,17 @@
           </div>
 
           <div class="row mb-3">
+            <div class="col-12">
+              <small style="color:var(--hm-text-muted);">
+                Calcul automatique : la balance dure <strong th:text="${tempsBalance}">45</strong> min
+                et se termine au début du concert. Vous pouvez modifier les horaires manuellement.
+              </small>
+              <button type="button" id="btn-recalcul" class="hm-btn-primary ms-2"
+                      style="border:none; padding:4px 10px;">
+                <span>↺</span><span>Recalculer</span>
+              </button>
+            </div>
+          </div>
             <div class="col-md-6">
               <label for="dateHeureDebut" class="form-label fw-bold">Date et heure de début</label>
               <input type="datetime-local" id="dateHeureDebut" name="dateHeureDebut"
@@ -75,7 +86,7 @@
                    th:text="${erreurs['dateHeureDebut']}"></div>
             </div>
             <div class="col-md-6">
-              <label for="dateHeureFin" class="form-label fw-bold">Date et heure de fin</label>
+              <label for="dateHeureFin" class="form-label fw-bold">Date et heures de fin</label>
               <input type="datetime-local" id="dateHeureFin" name="dateHeureFin"
                      class="form-control" th:value="${concert.dateHeureFin}"
                      th:min="${dateMin}" th:max="${dateMax}"
@@ -88,7 +99,7 @@
 
           <div class="row mb-3">
             <div class="col-md-6">
-              <label for="heureBalanceDebut" class="form-label fw-bold">Balance début</label>
+              <label for="heureBalanceDebut" class="form-label fw-bold">Balance de début</label>
               <input type="datetime-local" id="heureBalanceDebut" name="heureBalanceDebut"
                      class="form-control" th:value="${concert.heureBalanceDebut}"
                      th:min="${dateMin}" th:max="${dateMax}" onchange="lierFinAuDebut()"
@@ -328,6 +339,46 @@
       });
 
       document.addEventListener('DOMContentLoaded', function () { majBornesDates(false); });
+      // Temps de balance (en minutes), fourni par le serveur via le paramètre en base
+      const TEMPS_BALANCE = /*[[${tempsBalance}]]*/ 45;
+
+      // Convertit une Date en texte "yyyy-MM-ddTHH:mm" attendu par <input type="datetime-local">
+      // (on n'utilise pas toISOString() car il convertit en UTC et décalerait l'heure)
+      function versChampDateTime(d) {
+        const p = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate())
+                + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+      }
+
+      function recalculerBalance() {
+        const champDebut = document.getElementById('dateHeureDebut');
+        if (!champDebut.value) return;                 // pas de début saisi : rien à calculer
+
+        const debut = new Date(champDebut.value);
+        if (isNaN(debut.getTime())) return;
+
+        const balanceFin = debut;                                           // la balance finit quand le concert commence
+        const balanceDebut = new Date(debut.getTime() - TEMPS_BALANCE * 60000); // 60000 ms = 1 minute
+
+        document.getElementById('heureBalanceDebut').value = versChampDateTime(balanceDebut);
+        document.getElementById('heureBalanceFin').value = versChampDateTime(balanceFin);
+      }
+
+      // Recalcul à chaque modification de l'heure de début
+      document.getElementById('dateHeureDebut').addEventListener('input', recalculerBalance);
+
+      // Bouton pour revenir à la règle par défaut après un ajustement manuel
+      document.getElementById('btn-recalcul').addEventListener('click', recalculerBalance);
+
+      // Cohérence avant l'envoi : balance début <= balance fin
+      document.querySelector('form').addEventListener('submit', function (e) {
+        const bd = document.getElementById('heureBalanceDebut').value;
+        const bf = document.getElementById('heureBalanceFin').value;
+        if (bd && bf && bd > bf) {
+          e.preventDefault();
+          alert("La balance doit commencer avant sa fin..");
+        }
+      });
     </script>
 
   </div>
