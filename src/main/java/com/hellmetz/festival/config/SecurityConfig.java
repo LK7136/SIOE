@@ -38,8 +38,8 @@ public class SecurityConfig {
                         // Logo lu depuis la BDD : visible par tous
                         .requestMatchers("/parametres/logo", "/parametres/uploads/**").permitAll()
 
-                        // suppression
-                        .requestMatchers("/*/delete/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/*/delete/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/festival/**/delete/**").hasRole("ADMIN")
 
                         // édition et ajout
                         .requestMatchers("/*/ajouter").hasAnyRole("ADMIN", "ORGANISATEUR")

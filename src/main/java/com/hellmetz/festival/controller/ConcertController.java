@@ -134,7 +134,7 @@ public class ConcertController {
         return "redirect:/concerts/liste";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         concertService.deleteById(id);
         return "redirect:/concerts/liste";
