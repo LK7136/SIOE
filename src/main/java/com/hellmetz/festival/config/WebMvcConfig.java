@@ -34,6 +34,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+        // Logo de base livré dans classpath:/assets/
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("classpath:/assets/");
+    }
+
+    @Override
     public void addFormatters(@NonNull FormatterRegistry registry) {
         registry.addConverter(new Converter<String, Style>() {
             @Override

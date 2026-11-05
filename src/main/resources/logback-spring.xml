@@ -11,17 +11,13 @@
   <property name="FILE_LOG_PATTERN"
             value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%thread] %logger{36} [user:%X{user}] - %msg%n"/>
 
-  <!-- Permet de conditionner les blocs XML selon le profil actif (dev ou prod). -->
-  <springProfile name="develop">
-    <!-- Définit où et comment écrire les logs. -->
-    <!-- ConsoleAppende permet d'écrire sur la sortie standard -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-        <charset>UTF-8</charset>
-      </encoder>
-    </appender>
-  </springProfile>
+  <!-- Console : profil develop, et aussi le lancement IDE sans profil. -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
 
   <!-- 4. APPENDERS FICHIERS (PROD) -->
   <springProfile name="prod">
@@ -62,6 +58,14 @@
     <!--cible un package précis pour lui assigner un niveau (DEBUG, INFO, WARN).-->
     <logger name="com.hellmetz.festival" level="DEBUG"/>
     <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <!-- Sans profil (lancement IDE) : les logs reviennent dans la console. -->
+  <springProfile name="!develop &amp; !prod">
+    <logger name="com.hellmetz.festival" level="INFO"/>
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
     </root>
