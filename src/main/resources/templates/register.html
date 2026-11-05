@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content})}">
 <head>
     <meta charset="UTF-8">
     <title th:text="'Création d\'un compte - ' + ${appNom}">Création d'un compte</title>
@@ -47,21 +49,15 @@
     </style>
 </head>
 <body>
-
+<div th:fragment="content">
 <div class="container-fluid py-4 px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/festival/utilisateurs/liste}">Utilisateurs</a></li>
-                    <li class="breadcrumb-item active">Nouveau compte</li>
-                </ol>
-            </nav>
-            <h2 class="mb-0">Création d'un compte utilisateur</h2>
+
+            <h2 class="mb-0 titrecard">Création d'un compte utilisateur</h2>
         </div>
-        <a th:href="@{/utilisateurs}" class="btn btn-outline-secondary">
+        <a th:href="@{/festival/utilisateurs/liste}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Retour
         </a>
     </div>
@@ -79,22 +75,22 @@
 
             <!-- ── SECTION 1 : Informations personnelles ── -->
             <div class="col-xl-6">
-                <div class="card shadow-sm section-card h-100">
+                <div class="hm-card">
                     <div class="card-header py-3">
                         <i class="bi bi-person-fill me-2"></i>Informations personnelles
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <label class="form-label">Nom</label>
+                                <label class="form-label titrecard">Nom</label>
                                 <input type="text" class="form-control" name="nom" placeholder="Votre nom" required>
                             </div>
                             <div class="col-sm-6">
-                                <label class="form-label">Prénom</label>
+                                <label class="form-label titrecard">Prénom</label>
                                 <input type="text" class="form-control" name="prenom" placeholder="Votre prénom" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Adresse email</label>
+                                <label class="form-label titrecard">Adresse email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" class="form-control" name="email"
@@ -108,14 +104,14 @@
 
             <!-- ── SECTION 2 : Identifiants de connexion ── -->
             <div class="col-xl-6">
-                <div class="card shadow-sm section-card h-100">
+                <div class="hm-card">
                     <div class="card-header py-3">
                         <i class="bi bi-key-fill me-2"></i>Identifiants de connexion
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label">Identifiant</label>
+                                <label class="form-label titrecard">Identifiant</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-at"></i></span>
                                     <input type="text" class="form-control" name="identifiant"
@@ -123,7 +119,7 @@
                                 </div>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Mot de passe</label>
+                                <label class="form-label titrecard">Mot de passe</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" name="motDePasse"
@@ -141,7 +137,7 @@
 
             <!-- ── SECTION 3 : Rôle et permissions ── -->
             <div class="col-12">
-                <div class="card shadow-sm section-card">
+                <div class="hm-card">
                     <div class="card-header py-3">
                         <i class="bi bi-shield-lock-fill me-2"></i>Rôle &amp; Permissions
                     </div>
@@ -150,7 +146,7 @@
 
                             <!-- Choix du rôle -->
                             <div class="col-lg-4">
-                                <label class="form-label">Rôle de l'utilisateur</label>
+                                <label class="form-label titrecard">Rôle de l'utilisateur</label>
                                 <select class="form-select" name="idRole" id="selectRole" required>
                                     <option value="">-- Choisir un rôle --</option>
                                     <option th:each="r : ${roles}"
@@ -167,7 +163,7 @@
                             <!-- Zone des permissions -->
                             <div class="col-lg-8">
                                 <div class="d-flex align-items-center mb-2 gap-2">
-                                    <label class="form-label mb-0">Permissions accordées</label>
+                                    <label class="form-label mb-0 titrecard">Permissions accordées</label>
                                     <span class="badge bg-primary rounded-pill" id="badgeCount">0</span>
                                 </div>
 
@@ -192,10 +188,11 @@
                                     </div>
                                 </div>
 
-                                <p class="mt-1 mb-0 text-muted" style="font-size: 0.8rem;">
+                                <p class="mt-1 mb-0 text-muted titrecard" style="font-size: 0.8rem;">
                                     Cliquez sur les cases pour personnaliser les accès.
                                 </p>
                             </div>
+
 
                         </div>
                     </div>
@@ -417,6 +414,6 @@
     updateUI();
     /*]]>*/
 </script>
-
+</div>
 </body>
 </html>
