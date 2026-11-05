@@ -25,7 +25,7 @@ public class ParametreController {
     @GetMapping("/liste")
     public String edit(Model model) {
         model.addAttribute("parametres", parametreService.findAll());
-        model.addAttribute("pageTitle", "HellMetz - Paramètres");
+        model.addAttribute("pageTitle", "Paramètres");
         model.addAttribute("activeMenu", "parametres");
 
         return "parametre/list";

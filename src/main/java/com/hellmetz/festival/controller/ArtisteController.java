@@ -47,8 +47,8 @@ public class ArtisteController {
         model.addAttribute("artistes", pageArtistes.getContent());
         model.addAttribute("page", pageArtistes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "HellMetz - Artistes");
-        model.addAttribute("activeMenu", "templates");
+        model.addAttribute("pageTitle", "Artistes");
+        model.addAttribute("activeMenu", "artiste");
         return "artiste/list";
     }
 
@@ -68,10 +68,10 @@ public class ArtisteController {
         if (id != null) {
             Artiste artiste = artisteService.findById(id);
             model.addAttribute("artiste", artiste);
-            model.addAttribute("pageTitle", "Modifier l'artiste - HellMetz");
+            model.addAttribute("pageTitle", "Modifier l'artiste");
         } else {
             model.addAttribute("artiste", new Artiste());
-            model.addAttribute("pageTitle", "Nouvel artiste - HellMetz");
+            model.addAttribute("pageTitle", "Nouvel artiste");
         }
 
         if (idGroupeParam != null) {

@@ -107,6 +107,7 @@ public class UtilisateurController {
     @GetMapping("/festival/utilisateurs/liste")
     public String liste(Model model) {
         model.addAttribute("utilisateurs", utilisateurDetailService.findAll());
+        model.addAttribute("activeMenu", "utilisateurs");
         return "utilisateur/list";
     }
 
@@ -117,10 +118,10 @@ public class UtilisateurController {
 
         if (id != null) {
             utilisateurExistant = utilisateurDetailService.findById(id);
-            model.addAttribute("pageTitle", "Modifier l'utilisateur - HellMetz");
+            model.addAttribute("pageTitle", "Modifier l'utilisateur");
         } else {
             utilisateurExistant = new Utilisateur();
-            model.addAttribute("pageTitle", "Nouvel utilisateur - HellMetz");
+            model.addAttribute("pageTitle", "Nouvel utilisateur");
         }
         model.addAttribute("utilisateur", utilisateurExistant);
 
