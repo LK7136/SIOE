@@ -2,7 +2,7 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="'Création d\'un compte - ' + ${appNom}">Création d'un compte</title>
+    <title>Création d'un compte - HellMetz</title>
     <meta name="_csrf"        th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
@@ -74,7 +74,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
     </div>
 
-    <form method="post" th:action="@{/register}">
+    <form method="post" th:action="@{/register}" th:object="${utilisateur}" novalidate>
         <div class="row g-4">
 
             <!-- ── SECTION 1 : Informations personnelles ── -->
@@ -86,20 +86,31 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <label class="form-label">Nom</label>
-                                <input type="text" class="form-control" name="nom" placeholder="Votre nom" required>
+                                <label class="form-label" for="nom">Nom</label>
+                                <input type="text" class="form-control" th:field="*{nom}"
+                                       placeholder="Votre nom"
+                                       th:classappend="${#fields.hasErrors('nom')} ? 'is-invalid'">
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
                             </div>
                             <div class="col-sm-6">
-                                <label class="form-label">Prénom</label>
-                                <input type="text" class="form-control" name="prenom" placeholder="Votre prénom" required>
+                                <label class="form-label" for="prenom">Prénom</label>
+                                <input type="text" class="form-control" th:field="*{prenom}"
+                                       placeholder="Votre prénom"
+                                       th:classappend="${#fields.hasErrors('prenom')} ? 'is-invalid'">
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"></div>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Adresse email</label>
+                                <label class="form-label" for="email">Adresse email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                    <input type="email" class="form-control" name="email"
-                                           placeholder="votre-email@email.fr" required>
+                                    <input type="email" class="form-control" th:field="*{email}"
+                                           placeholder="votre-email@email.fr"
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
                                 </div>
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
                         </div>
                     </div>
@@ -115,24 +126,31 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label">Identifiant</label>
+                                <label class="form-label" for="identifiant">Identifiant</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-at"></i></span>
-                                    <input type="text" class="form-control" name="identifiant"
-                                           placeholder="identifiant" required>
+                                    <input type="text" class="form-control" th:field="*{identifiant}"
+                                           placeholder="identifiant"
+                                           th:classappend="${#fields.hasErrors('identifiant')} ? 'is-invalid'">
                                 </div>
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('identifiant')}" th:errors="*{identifiant}"></div>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Mot de passe</label>
+                                <label class="form-label" for="motDePasse">Mot de passe</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" class="form-control" name="motDePasse"
-                                           id="motDePasse" placeholder="••••••••" required>
+                                    <input type="password" class="form-control" th:field="*{motDePasse}"
+                                           placeholder="••••••••"
+                                           th:classappend="${#fields.hasErrors('motDePasse')} ? 'is-invalid'">
                                     <button class="btn btn-outline-secondary" type="button"
                                             id="btnTogglePass" title="Afficher / masquer">
                                         <i class="bi bi-eye" id="iconTogglePass"></i>
                                     </button>
                                 </div>
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('motDePasse')}" th:errors="*{motDePasse}"></div>
+                                <div class="form-text">8 caractères minimum.</div>
                             </div>
                         </div>
                     </div>
@@ -150,18 +168,22 @@
 
                             <!-- Choix du rôle -->
                             <div class="col-lg-4">
-                                <label class="form-label">Rôle de l'utilisateur</label>
-                                <select class="form-select" name="idRole" id="selectRole" required>
+                                <label class="form-label" for="selectRole">Rôle de l'utilisateur</label>
+                                <select class="form-select" name="idRole" id="selectRole"
+                                        th:classappend="${erreurRole != null} ? 'is-invalid'">
                                     <option value="">-- Choisir un rôle --</option>
                                     <option th:each="r : ${roles}"
                                             th:value="${r.idRole}"
-                                            th:text="${r.libelle}">
+                                            th:text="${r.libelle}"
+                                            th:selected="${idRoleChoisi != null and idRoleChoisi == r.idRole}">
                                     </option>
                                     <!-- Option spéciale : ouvre la modale de création -->
                                     <option value="__new__" class="opt-new">
                                         ➕ Créer un nouveau rôle...
                                     </option>
                                 </select>
+                                <div class="invalid-feedback d-block"
+                                     th:if="${erreurRole != null}" th:text="${erreurRole}"></div>
                             </div>
 
                             <!-- Zone des permissions -->
@@ -414,7 +436,13 @@
     });
 
     /* ── Init ── */
-    updateUI();
+    // Après une erreur de validation, le rôle reste sélectionné : on réaffiche ses permissions
+    var selectRole = document.getElementById("selectRole");
+    if (selectRole.value) {
+        selectRole.dispatchEvent(new Event("change"));
+    } else {
+        updateUI();
+    }
     /*]]>*/
 </script>
 

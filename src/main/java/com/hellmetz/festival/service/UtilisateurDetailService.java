@@ -58,6 +58,16 @@ public class UtilisateurDetailService implements UserDetailsService {
         return utilisateurRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public boolean identifiantExiste(String identifiant) {
+        return utilisateurRepository.existsByIdentifiant(identifiant);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean emailExiste(String email) {
+        return utilisateurRepository.existsByEmail(email);
+    }
+
     /** Cree un nouvel utilisateur avec mot de passe encode. */
     public void creerUtilisateur(Utilisateur utilisateur) {
         utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));

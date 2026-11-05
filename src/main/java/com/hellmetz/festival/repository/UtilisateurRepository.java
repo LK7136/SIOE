@@ -15,4 +15,8 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
 
         Optional<Utilisateur> findByIdentifiant(String identifiant);
 
+        // Vérifications avant insertion : message clair plutôt qu'une erreur SQL
+        boolean existsByIdentifiant(String identifiant);
+
+        boolean existsByEmail(String email);
 }
