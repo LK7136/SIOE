@@ -232,3 +232,172 @@
 2026-11-05 15:57:31.869  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown completed.
 2026-11-05 15:57:31.869  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Pool HikariCP ferme : toutes les connexions a la base ont ete liberees.
 2026-11-05 15:57:31.869  INFO [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:08:07.928  INFO [main] c.h.festival.HellMetzApplication [user:] - Starting HellMetzApplication using Java 25-loom with PID 13824 (C:\Users\kasidis.owen\Desktop\projet\SIOE\target\classes started by KASIDIS.Owen in C:\Users\kasidis.owen\Desktop\projet\SIOE)
+2026-11-05 16:08:07.928 DEBUG [main] c.h.festival.HellMetzApplication [user:] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-11-05 16:08:07.929  INFO [main] c.h.festival.HellMetzApplication [user:] - The following 1 profile is active: "prod"
+2026-11-05 16:08:08.479  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-05 16:08:08.544  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Finished Spring Data repository scanning in 60 ms. Found 11 JPA repository interfaces.
+2026-11-05 16:08:09.011  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat initialized with port 8443 (https)
+2026-11-05 16:08:09.021  INFO [main] o.a.catalina.core.StandardService [user:] - Starting service [Tomcat]
+2026-11-05 16:08:09.021  INFO [main] o.a.catalina.core.StandardEngine [user:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-11-05 16:08:09.061  INFO [main] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring embedded WebApplicationContext
+2026-11-05 16:08:09.061  INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext [user:] - Root WebApplicationContext: initialization completed in 1103 ms
+2026-11-05 16:08:09.170  INFO [main] o.h.jpa.internal.util.LogHelper [user:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-05 16:08:09.215  INFO [main] org.hibernate.Version [user:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-11-05 16:08:09.244  INFO [main] o.h.c.i.RegionFactoryInitiator [user:] - HHH000026: Second-level cache disabled
+2026-11-05 16:08:09.326  INFO [main] c.h.festival.HellMetzApplication [user:] - Starting HellMetzApplication using Java 25-loom with PID 14852 (C:\Users\kasidis.owen\Desktop\projet\SIOE\target\classes started by KASIDIS.Owen in C:\Users\kasidis.owen\Desktop\projet\SIOE)
+2026-11-05 16:08:09.327 DEBUG [main] c.h.festival.HellMetzApplication [user:] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-11-05 16:08:09.328  INFO [main] c.h.festival.HellMetzApplication [user:] - The following 1 profile is active: "prod"
+2026-11-05 16:08:09.414  INFO [main] o.s.o.j.p.SpringPersistenceUnitInfo [user:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-05 16:08:09.434  WARN [main] com.zaxxer.hikari.HikariConfig [user:] - HikariPool-1 - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-11-05 16:08:09.435  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Starting...
+2026-11-05 16:08:09.543  INFO [main] com.zaxxer.hikari.pool.HikariPool [user:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2bdcfcf
+2026-11-05 16:08:09.546  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Start completed.
+2026-11-05 16:08:09.572  WARN [main] org.hibernate.orm.deprecation [user:] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-11-05 16:08:09.802  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-05 16:08:09.853  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Finished Spring Data repository scanning in 45 ms. Found 11 JPA repository interfaces.
+2026-11-05 16:08:10.256  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat initialized with port 8443 (https)
+2026-11-05 16:08:10.264  INFO [main] o.a.catalina.core.StandardService [user:] - Starting service [Tomcat]
+2026-11-05 16:08:10.265  INFO [main] o.a.catalina.core.StandardEngine [user:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-11-05 16:08:10.304  INFO [main] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring embedded WebApplicationContext
+2026-11-05 16:08:10.304  INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext [user:] - Root WebApplicationContext: initialization completed in 947 ms
+2026-11-05 16:08:10.348  INFO [main] o.h.e.t.j.p.i.JtaPlatformInitiator [user:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-05 16:08:10.405  INFO [main] o.h.jpa.internal.util.LogHelper [user:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-05 16:08:10.440  INFO [main] org.hibernate.Version [user:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-11-05 16:08:10.468  INFO [main] o.h.c.i.RegionFactoryInitiator [user:] - HHH000026: Second-level cache disabled
+2026-11-05 16:08:10.468  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:08:10.627  INFO [main] o.s.o.j.p.SpringPersistenceUnitInfo [user:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-05 16:08:10.644  WARN [main] com.zaxxer.hikari.HikariConfig [user:] - HikariPool-1 - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-11-05 16:08:10.644  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Starting...
+2026-11-05 16:08:10.727  INFO [main] com.zaxxer.hikari.pool.HikariPool [user:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@55638165
+2026-11-05 16:08:10.729  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Start completed.
+2026-11-05 16:08:10.744  INFO [main] o.s.d.j.r.query.QueryEnhancerFactory [user:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-05 16:08:10.749  WARN [main] org.hibernate.orm.deprecation [user:] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-11-05 16:08:11.425  INFO [main] o.s.s.web.DefaultSecurityFilterChain [user:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@25db5479, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7bf96c4e, org.springframework.security.web.context.SecurityContextHolderFilter@7316742f, org.springframework.security.web.header.HeaderWriterFilter@4ffa1019, org.springframework.web.filter.CorsFilter@5dd7f921, org.springframework.security.web.csrf.CsrfFilter@3b9bfa09, org.springframework.security.web.authentication.logout.LogoutFilter@46050be4, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@469c1292, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@70420c70, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7e36c60b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7773d139, org.springframework.security.web.access.ExceptionTranslationFilter@17a12fcd, org.springframework.security.web.access.intercept.AuthorizationFilter@bfab0dc]
+2026-11-05 16:08:11.515  INFO [main] o.h.e.t.j.p.i.JtaPlatformInitiator [user:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-05 16:08:11.646  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:08:11.734  INFO [main] o.a.t.u.net.NioEndpoint.certificate [user:] - Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [C:\Users\kasidis.owen\.keystore] using alias [tomcat] with trust store [null]
+2026-11-05 16:08:11.744  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat started on port 8443 (https) with context path ''
+2026-11-05 16:08:11.749  INFO [main] c.h.festival.HellMetzApplication [user:] - Started HellMetzApplication in 4.185 seconds (process running for 4.584)
+2026-11-05 16:08:11.911  INFO [main] o.s.d.j.r.query.QueryEnhancerFactory [user:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-05 16:08:12.558  INFO [main] o.s.s.web.DefaultSecurityFilterChain [user:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@5f45d7db, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1f0b2ffb, org.springframework.security.web.context.SecurityContextHolderFilter@3ed3bfcb, org.springframework.security.web.header.HeaderWriterFilter@2c45de6e, org.springframework.web.filter.CorsFilter@29e3c7fe, org.springframework.security.web.csrf.CsrfFilter@523c4a6d, org.springframework.security.web.authentication.logout.LogoutFilter@76ec6ae0, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@3330bdd1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2c9ecf5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1368a7d9, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1205d231, org.springframework.security.web.access.ExceptionTranslationFilter@3e4162ee, org.springframework.security.web.access.intercept.AuthorizationFilter@5aa345a5]
+2026-11-05 16:08:12.728  WARN [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [user:] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-11-05 16:08:12.730  INFO [main] c.h.f.c.DataSourceShutdownConfig [user:] - Arret de l'application : fermeture du pool 'HikariPool-1'...
+2026-11-05 16:08:12.730  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown initiated...
+2026-11-05 16:08:12.731  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown completed.
+2026-11-05 16:08:12.731  INFO [main] c.h.f.c.DataSourceShutdownConfig [user:] - Pool HikariCP ferme : toutes les connexions a la base ont ete liberees.
+2026-11-05 16:08:12.732  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:08:12.740  INFO [main] o.s.b.a.l.ConditionEvaluationReportLogger [user:] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-11-05 16:08:12.750 ERROR [main] o.s.b.d.LoggingFailureAnalysisReporter [user:] - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8443 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8443 or configure this application to listen on another port.
+
+2026-11-05 16:08:18.099  INFO [https-jsse-nio-8443-exec-5] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-05 16:18:47.223  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Arret de l'application : fermeture du pool 'HikariPool-1'...
+2026-11-05 16:18:47.223  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown initiated...
+2026-11-05 16:18:47.224  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown completed.
+2026-11-05 16:18:47.224  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Pool HikariCP ferme : toutes les connexions a la base ont ete liberees.
+2026-11-05 16:18:47.224  INFO [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:18:49.831  INFO [main] c.h.festival.HellMetzApplication [user:] - Starting HellMetzApplication using Java 25-loom with PID 16440 (C:\Users\kasidis.owen\Desktop\projet\SIOE\target\classes started by KASIDIS.Owen in C:\Users\kasidis.owen\Desktop\projet\SIOE)
+2026-11-05 16:18:49.832 DEBUG [main] c.h.festival.HellMetzApplication [user:] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-11-05 16:18:49.834  INFO [main] c.h.festival.HellMetzApplication [user:] - The following 1 profile is active: "prod"
+2026-11-05 16:18:50.576  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-05 16:18:50.631  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Finished Spring Data repository scanning in 49 ms. Found 11 JPA repository interfaces.
+2026-11-05 16:18:51.070  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat initialized with port 8443 (https)
+2026-11-05 16:18:51.079  INFO [main] o.a.catalina.core.StandardService [user:] - Starting service [Tomcat]
+2026-11-05 16:18:51.079  INFO [main] o.a.catalina.core.StandardEngine [user:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-11-05 16:18:51.118  INFO [main] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring embedded WebApplicationContext
+2026-11-05 16:18:51.119  INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext [user:] - Root WebApplicationContext: initialization completed in 1212 ms
+2026-11-05 16:18:51.220  INFO [main] o.h.jpa.internal.util.LogHelper [user:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-05 16:18:51.258  INFO [main] org.hibernate.Version [user:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-11-05 16:18:51.281  INFO [main] o.h.c.i.RegionFactoryInitiator [user:] - HHH000026: Second-level cache disabled
+2026-11-05 16:18:51.451  INFO [main] o.s.o.j.p.SpringPersistenceUnitInfo [user:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-05 16:18:51.470  WARN [main] com.zaxxer.hikari.HikariConfig [user:] - HikariPool-1 - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-11-05 16:18:51.470  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Starting...
+2026-11-05 16:18:51.558  INFO [main] com.zaxxer.hikari.pool.HikariPool [user:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@531a716c
+2026-11-05 16:18:51.559  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Start completed.
+2026-11-05 16:18:51.580  WARN [main] org.hibernate.orm.deprecation [user:] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-11-05 16:18:52.312  INFO [main] o.h.e.t.j.p.i.JtaPlatformInitiator [user:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-05 16:18:52.472  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:18:52.729  INFO [main] o.s.d.j.r.query.QueryEnhancerFactory [user:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-05 16:18:53.430  INFO [main] o.s.s.web.DefaultSecurityFilterChain [user:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@630f24a5, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@253dbbc8, org.springframework.security.web.context.SecurityContextHolderFilter@30e67f98, org.springframework.security.web.header.HeaderWriterFilter@3ce7a0d1, org.springframework.web.filter.CorsFilter@12d644a6, org.springframework.security.web.csrf.CsrfFilter@3b968111, org.springframework.security.web.authentication.logout.LogoutFilter@1355d2a0, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@29e3c7fe, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7c654cfc, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2ae56ac6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2e7e9897, org.springframework.security.web.access.ExceptionTranslationFilter@51680b0e, org.springframework.security.web.access.intercept.AuthorizationFilter@1f0b2ffb]
+2026-11-05 16:18:53.740  INFO [main] o.a.t.u.net.NioEndpoint.certificate [user:] - Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [C:\Users\kasidis.owen\.keystore] using alias [tomcat] with trust store [null]
+2026-11-05 16:18:53.754  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat started on port 8443 (https) with context path ''
+2026-11-05 16:18:53.758  INFO [main] c.h.festival.HellMetzApplication [user:] - Started HellMetzApplication in 4.45 seconds (process running for 5.035)
+2026-11-05 16:18:55.250  INFO [https-jsse-nio-8443-exec-7] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-05 16:23:10.595  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Arret de l'application : fermeture du pool 'HikariPool-1'...
+2026-11-05 16:23:10.596  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown initiated...
+2026-11-05 16:23:10.597  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown completed.
+2026-11-05 16:23:10.597  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Pool HikariCP ferme : toutes les connexions a la base ont ete liberees.
+2026-11-05 16:23:10.597  INFO [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:23:13.139  INFO [main] c.h.festival.HellMetzApplication [user:] - Starting HellMetzApplication using Java 25-loom with PID 17024 (C:\Users\kasidis.owen\Desktop\projet\SIOE\target\classes started by KASIDIS.Owen in C:\Users\kasidis.owen\Desktop\projet\SIOE)
+2026-11-05 16:23:13.140 DEBUG [main] c.h.festival.HellMetzApplication [user:] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-11-05 16:23:13.141  INFO [main] c.h.festival.HellMetzApplication [user:] - The following 1 profile is active: "prod"
+2026-11-05 16:23:13.603  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-05 16:23:13.655  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Finished Spring Data repository scanning in 47 ms. Found 11 JPA repository interfaces.
+2026-11-05 16:23:14.050  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat initialized with port 8443 (https)
+2026-11-05 16:23:14.058  INFO [main] o.a.catalina.core.StandardService [user:] - Starting service [Tomcat]
+2026-11-05 16:23:14.058  INFO [main] o.a.catalina.core.StandardEngine [user:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-11-05 16:23:14.096  INFO [main] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring embedded WebApplicationContext
+2026-11-05 16:23:14.096  INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext [user:] - Root WebApplicationContext: initialization completed in 927 ms
+2026-11-05 16:23:14.194  INFO [main] o.h.jpa.internal.util.LogHelper [user:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-05 16:23:14.229  INFO [main] org.hibernate.Version [user:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-11-05 16:23:14.257  INFO [main] o.h.c.i.RegionFactoryInitiator [user:] - HHH000026: Second-level cache disabled
+2026-11-05 16:23:14.408  INFO [main] o.s.o.j.p.SpringPersistenceUnitInfo [user:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-05 16:23:14.425  WARN [main] com.zaxxer.hikari.HikariConfig [user:] - HikariPool-1 - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-11-05 16:23:14.425  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Starting...
+2026-11-05 16:23:14.509  INFO [main] com.zaxxer.hikari.pool.HikariPool [user:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@531a716c
+2026-11-05 16:23:14.511  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Start completed.
+2026-11-05 16:23:14.531  WARN [main] org.hibernate.orm.deprecation [user:] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-11-05 16:23:15.257  INFO [main] o.h.e.t.j.p.i.JtaPlatformInitiator [user:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-05 16:23:15.430  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:23:15.697  INFO [main] o.s.d.j.r.query.QueryEnhancerFactory [user:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-05 16:23:16.348  INFO [main] o.s.s.web.DefaultSecurityFilterChain [user:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@12d644a6, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2e7e9897, org.springframework.security.web.context.SecurityContextHolderFilter@7c654cfc, org.springframework.security.web.header.HeaderWriterFilter@1368a7d9, org.springframework.web.filter.CorsFilter@34ceabf1, org.springframework.security.web.csrf.CsrfFilter@5d55e5bb, org.springframework.security.web.authentication.logout.LogoutFilter@469c1292, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@630f24a5, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@29fccabd, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2d7d92a7, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7c65b55b, org.springframework.security.web.access.ExceptionTranslationFilter@3ce7a0d1, org.springframework.security.web.access.intercept.AuthorizationFilter@1205d231]
+2026-11-05 16:23:16.655  INFO [main] o.a.t.u.net.NioEndpoint.certificate [user:] - Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [C:\Users\kasidis.owen\.keystore] using alias [tomcat] with trust store [null]
+2026-11-05 16:23:16.665  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat started on port 8443 (https) with context path ''
+2026-11-05 16:23:16.670  INFO [main] c.h.festival.HellMetzApplication [user:] - Started HellMetzApplication in 3.879 seconds (process running for 4.281)
+2026-11-05 16:23:38.285  INFO [https-jsse-nio-8443-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-05 16:25:23.392  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Arret de l'application : fermeture du pool 'HikariPool-1'...
+2026-11-05 16:25:23.392  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown initiated...
+2026-11-05 16:25:23.393  INFO [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Shutdown completed.
+2026-11-05 16:25:23.393  INFO [SpringApplicationShutdownHook] c.h.f.c.DataSourceShutdownConfig [user:] - Pool HikariCP ferme : toutes les connexions a la base ont ete liberees.
+2026-11-05 16:25:23.393  INFO [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:25:25.951  INFO [main] c.h.festival.HellMetzApplication [user:] - Starting HellMetzApplication using Java 25-loom with PID 8872 (C:\Users\kasidis.owen\Desktop\projet\SIOE\target\classes started by KASIDIS.Owen in C:\Users\kasidis.owen\Desktop\projet\SIOE)
+2026-11-05 16:25:25.952 DEBUG [main] c.h.festival.HellMetzApplication [user:] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-11-05 16:25:25.952  INFO [main] c.h.festival.HellMetzApplication [user:] - The following 1 profile is active: "prod"
+2026-11-05 16:25:26.408  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-05 16:25:26.459  INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate [user:] - Finished Spring Data repository scanning in 45 ms. Found 11 JPA repository interfaces.
+2026-11-05 16:25:26.867  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat initialized with port 8443 (https)
+2026-11-05 16:25:26.876  INFO [main] o.a.catalina.core.StandardService [user:] - Starting service [Tomcat]
+2026-11-05 16:25:26.876  INFO [main] o.a.catalina.core.StandardEngine [user:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-11-05 16:25:26.915  INFO [main] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring embedded WebApplicationContext
+2026-11-05 16:25:26.915  INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext [user:] - Root WebApplicationContext: initialization completed in 931 ms
+2026-11-05 16:25:27.018  INFO [main] o.h.jpa.internal.util.LogHelper [user:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-05 16:25:27.055  INFO [main] org.hibernate.Version [user:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-11-05 16:25:27.084  INFO [main] o.h.c.i.RegionFactoryInitiator [user:] - HHH000026: Second-level cache disabled
+2026-11-05 16:25:27.244  INFO [main] o.s.o.j.p.SpringPersistenceUnitInfo [user:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-05 16:25:27.262  WARN [main] com.zaxxer.hikari.HikariConfig [user:] - HikariPool-1 - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-11-05 16:25:27.262  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Starting...
+2026-11-05 16:25:27.355  INFO [main] com.zaxxer.hikari.pool.HikariPool [user:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@531ec2ca
+2026-11-05 16:25:27.357  INFO [main] com.zaxxer.hikari.HikariDataSource [user:] - HikariPool-1 - Start completed.
+2026-11-05 16:25:27.392  WARN [main] org.hibernate.orm.deprecation [user:] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-11-05 16:25:28.155  INFO [main] o.h.e.t.j.p.i.JtaPlatformInitiator [user:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-05 16:25:28.316  INFO [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [user:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05 16:25:28.576  INFO [main] o.s.d.j.r.query.QueryEnhancerFactory [user:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-05 16:25:29.261  INFO [main] o.s.s.web.DefaultSecurityFilterChain [user:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@253dbbc8, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@12d644a6, org.springframework.security.web.context.SecurityContextHolderFilter@3186b07d, org.springframework.security.web.header.HeaderWriterFilter@2c9ecf5, org.springframework.web.filter.CorsFilter@2e7e9897, org.springframework.security.web.csrf.CsrfFilter@75dbf41c, org.springframework.security.web.authentication.logout.LogoutFilter@bfab0dc, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@1205d231, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2ae56ac6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@29fccabd, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@34ceabf1, org.springframework.security.web.access.ExceptionTranslationFilter@3ed3bfcb, org.springframework.security.web.access.intercept.AuthorizationFilter@29e3c7fe]
+2026-11-05 16:25:29.560  INFO [main] o.a.t.u.net.NioEndpoint.certificate [user:] - Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [C:\Users\kasidis.owen\.keystore] using alias [tomcat] with trust store [null]
+2026-11-05 16:25:29.577  INFO [main] o.s.b.w.e.tomcat.TomcatWebServer [user:] - Tomcat started on port 8443 (https) with context path ''
+2026-11-05 16:25:29.577  INFO [main] c.h.festival.HellMetzApplication [user:] - Started HellMetzApplication in 3.977 seconds (process running for 4.388)
+2026-11-05 16:25:30.262  INFO [https-jsse-nio-8443-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/] [user:] - Initializing Spring DispatcherServlet 'dispatcherServlet'
