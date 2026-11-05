@@ -38,3 +38,4 @@ build/
 ### Config locale ###
 src/main/resources/application.properties.example
 src/main/resources/application.properties
+logs/sioe.log
