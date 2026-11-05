@@ -1,5 +1,6 @@
 package com.hellmetz.festival.controller;
 
+import com.hellmetz.festival.model.Parametre;
 import com.hellmetz.festival.model.Utilisateur;
 import com.hellmetz.festival.security.UtilisateurDetails;
 import com.hellmetz.festival.service.ParametreService;
@@ -37,18 +38,23 @@ public class GlobalControllerAdvice {
 
     @ModelAttribute
     public void ajouterTheme(Model model) {
-        model.addAttribute("theme",
-                parametreService.findByCode("affichage.theme").getValeurParametre()
-        );
-    }
+        String theme = "Sombre";
+        try {
+            Parametre themeParam = parametreService.findByCode("affichage.theme");
+            if (themeParam != null && themeParam.getValeurParametre() != null) {
+                theme = themeParam.getValeurParametre();
+            }
+        } catch (Exception ignored) {
+            // BDD KO → valeurs par défaut
+        }
+        model.addAttribute("theme", theme);
 
-    @ModelAttribute
-    public void ajouterNomApplication(Model model) {
-        Parametre p = parametreService.findByCode("app.nom");
-        String nom = (p != null && p.getValeurParametre() != null && !p.getValeurParametre().isBlank())
-                ? p.getValeurParametre()
-                : "Backoffice";
-        model.addAttribute("appNom", nom);
+        try {
+            model.addAttribute("appLogo", parametreService.getLogoUrl());
+            model.addAttribute("hasCustomLogo", parametreService.hasCustomLogo());
+        } catch (Exception e) {
+            model.addAttribute("appLogo", ParametreService.DEFAULT_LOGO_URL);
+            model.addAttribute("hasCustomLogo", false);
+        }
     }
-
 }

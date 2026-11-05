@@ -27,13 +27,16 @@ public class SecurityConfig {
                 // AJOUT : autorise l'affichage du PDF dans l'iframe (même domaine)
                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
-                        // Ressources publiques : CSS, JS, images
-                        .requestMatchers("/css/**", "/js/**").permitAll()
-                        // n'importe qui peut se login
+                        // Ressources publiques : CSS, JS, images, logo de base
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
+                        // nimporte qui peut se login
                         .requestMatchers("/login").permitAll()
 
                         // seuls l'admin et l'organisateur ont accès à la page de paramètres
                         .requestMatchers("/parametres/liste").hasAnyRole("ADMIN", "ORGANISATEUR")
+                        .requestMatchers(HttpMethod.POST, "/parametres").hasAnyRole("ADMIN", "ORGANISATEUR")
+                        // Logo lu depuis la BDD : visible par tous
+                        .requestMatchers("/parametres/logo", "/parametres/uploads/**").permitAll()
 
                         // suppression
                         .requestMatchers("/*/delete/**").hasRole("ADMIN")

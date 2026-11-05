@@ -5,15 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title th:text="${pageTitle != null ? appNom + ' - ' + pageTitle : appNom}">Backoffice</title>    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title th:text="${pageTitle != null ? pageTitle : 'HellMetz - Backoffice'}">HellMetz - Backoffice</title>
+    <link rel="icon" th:href="${appLogo}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700&display=swap" rel="stylesheet">
 
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
     <link th:href="@{/css/templatemo-festava-live.css}" rel="stylesheet">
-    <link th:href="@{/css/editUtilisateurStyle.css}" rel="stylesheet">
-
     <link th:href="@{/css/backoffice.css}" rel="stylesheet">
 
     <meta th:if="${rafraichissement != null and rafraichissement > 0}"
@@ -68,7 +69,7 @@
 <script th:src="@{/js/jquery.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/jquery.sticky.js}"></script>
-<script th:src="@{/js/click-scroll.js}"></script>
+<script th:src="${@mvcResourceUrlProvider.getForLookupPath('/js/click-scroll.js')}"></script>
 <script th:src="@{/js/custom.js}"></script>
 
 <script>
@@ -76,7 +77,6 @@
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleSidebarBtn');
 
-        // Écoute le clic pour ouvrir/fermer et enregistrer le choix
         if (toggleBtn && sidebar) {
             toggleBtn.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
