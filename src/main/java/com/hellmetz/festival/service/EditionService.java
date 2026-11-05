@@ -1,5 +1,6 @@
 package com.hellmetz.festival.service;
 
+import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Edition;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.repository.EditionRepository;
@@ -51,6 +52,10 @@ public class EditionService {
 
     public Edition save(Edition edition) {
         return editionRepository.save(edition);
+    }
+
+    public void delete(Edition edition) {
+        editionRepository.delete(edition);
     }
 
 
