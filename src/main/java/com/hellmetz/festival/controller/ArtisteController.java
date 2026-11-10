@@ -4,6 +4,7 @@ import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.validation.UploadValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -30,6 +31,8 @@ public class ArtisteController {
     private ArtisteService artisteService;
     @Autowired
     private StyleService styleService;
+    @Autowired
+    private UploadValidator uploadValidator;
 
     private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/artistes/";
 
@@ -47,8 +50,8 @@ public class ArtisteController {
         model.addAttribute("artistes", pageArtistes.getContent());
         model.addAttribute("page", pageArtistes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "Artistes");
-        model.addAttribute("activeMenu", "artiste");
+        model.addAttribute("pageTitle", "HellMetz - Artistes");
+        model.addAttribute("activeMenu", "templates");
         return "artiste/list";
     }
 
@@ -68,10 +71,10 @@ public class ArtisteController {
         if (id != null) {
             Artiste artiste = artisteService.findById(id);
             model.addAttribute("artiste", artiste);
-            model.addAttribute("pageTitle", "Modifier l'artiste");
+            model.addAttribute("pageTitle", "Modifier l'artiste - HellMetz");
         } else {
             model.addAttribute("artiste", new Artiste());
-            model.addAttribute("pageTitle", "Nouvel artiste");
+            model.addAttribute("pageTitle", "Nouvel artiste - HellMetz");
         }
 
         if (idGroupeParam != null) {
@@ -87,6 +90,9 @@ public class ArtisteController {
                        @RequestParam(required = false) Integer idGroupeParam,
                        @RequestParam(required = false) MultipartFile urlPhotoArtiste,
                        @RequestParam(required = false) String supprimerPhoto) {
+
+        // Taille + format vérifiés AVANT toute écriture sur le disque ou en base
+        uploadValidator.validerImage(urlPhotoArtiste);
 
         if ("true".equals(supprimerPhoto)) {
             artiste.setUrlPhoto(null);

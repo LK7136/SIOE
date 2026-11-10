@@ -8,6 +8,7 @@ import com.hellmetz.festival.service.ConcertService;
 import com.hellmetz.festival.service.GroupeService;
 import com.hellmetz.festival.service.ArtisteService;
 import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.validation.UploadValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.core.io.Resource;
@@ -41,6 +42,8 @@ public class GroupeController {
     private StyleService styleService;
     @Autowired
     private StyleRepository styleRepository;
+    @Autowired
+    private UploadValidator uploadValidator;
 
     private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/groupes/";
 
@@ -58,7 +61,7 @@ public class GroupeController {
         model.addAttribute("groupes", pageGroupes.getContent());
         model.addAttribute("page", pageGroupes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "Groupes");
+        model.addAttribute("pageTitle", "HellMetz - Groupes");
         model.addAttribute("activeMenu", "groupes");
         return "groupe/list";
     }
@@ -86,7 +89,7 @@ public class GroupeController {
         if (id != null) {
             Groupe groupe = groupeService.findByIdWithStyles(id);
             model.addAttribute("groupe", groupe);
-            model.addAttribute("pageTitle", "Modifier le groupe");
+            model.addAttribute("pageTitle", "Modifier le groupe - HellMetz");
             model.addAttribute("artistes", artisteService.findByGroupeId(id));
 
             Page<Concert> pageConcerts = tout
@@ -99,7 +102,7 @@ public class GroupeController {
 
         } else {
             model.addAttribute("groupe", new Groupe());
-            model.addAttribute("pageTitle", "Nouveau groupe");
+            model.addAttribute("pageTitle", "Nouveau groupe - HellMetz");
             model.addAttribute("artistes", java.util.Collections.emptyList());
 
             Page<Concert> pageConcerts = tout
@@ -165,6 +168,9 @@ public class GroupeController {
                        @RequestParam(value = "stylesId", required = false) List<Long> stylesId,
                        @RequestParam(required = false) MultipartFile urlLogoGroupe,
                        @RequestParam(required = false) String supprimerPhoto) {
+
+        // Taille + format vérifiés AVANT toute écriture sur le disque ou en base
+        uploadValidator.validerImage(urlLogoGroupe);
 
         if ("true".equals(supprimerPhoto)) {
             groupe.setUrlLogo(null);
