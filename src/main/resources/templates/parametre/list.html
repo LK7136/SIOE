@@ -121,17 +121,7 @@
 
                             <input type="hidden" name="ids" th:value="${p.idParametre}">
                             <label class="form-label fw-bold" th:text="${p.libelleParametre}"></label>
-
-                            <th:block th:if="${p.codeParametre == 'affichage.theme'}">
-                                <select class="form-select" name="valeurs">
-                                    <option value="Sombre" th:selected="${p.valeurParametre == 'Sombre'}">Sombre</option>
-                                    <option value="Claire" th:selected="${p.valeurParametre == 'Claire'}">Claire</option>
-                                </select>
-                            </th:block>
-
-                            <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
-                                <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                            </th:block>
+                            <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
 
                         </div>
                     </div>
