@@ -54,9 +54,14 @@ public class EditionService {
         return editionRepository.save(edition);
     }
 
+    public void deleteById(Long id) {
+        editionRepository.deleteById(id);
+    }
+
     public void delete(Edition edition) {
         editionRepository.delete(edition);
     }
+
 
 
 }

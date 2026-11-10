@@ -104,5 +104,17 @@ public class EditionController {
         return "redirect:/parametres/liste?tab=editions";
     }
 
+    @PostMapping("/{id}/supprimer")
+    public String delete(@PathVariable Long id, RedirectAttributes flash) {
+        Edition edition = editionService.findById(id);
 
+        if (edition.isActif()) {
+            flash.addFlashAttribute("erreur", "Impossible de supprimer l'édition active.");
+            return "redirect:/parametres/liste?tab=editions";
+        }
+
+        editionService.deleteById(id);
+        flash.addFlashAttribute("message", "Édition supprimée");
+        return "redirect:/parametres/liste?tab=editions";
+    }
 }

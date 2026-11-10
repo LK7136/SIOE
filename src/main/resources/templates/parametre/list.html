@@ -156,6 +156,15 @@
                                         ⭐ activer
                                     </button>
                                 </form>
+                                |&nbsp;
+                                <form th:action="@{/editions/{id}/supprimer(id=${e.id})}" method="post"
+                                      style="display:inline; margin:0;"
+                                      onsubmit="return confirm('Supprimer cette édition ?');">
+                                    <button type="submit" class="hm-link-site"
+                                            style="background:none; border:none; padding:0; cursor:pointer;">
+                                        🗑️ supprimer
+                                    </button>
+                                </form>
                             </th:block>
                         </td>
                     </tr>
