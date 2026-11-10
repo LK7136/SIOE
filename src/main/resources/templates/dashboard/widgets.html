@@ -3,7 +3,7 @@
 <body>
 
 <!-- ============ OCCUPATION_SCENES ============ -->
-<div th:fragment="occupationScenes" class="hm-card mb-4">
+<div th:fragment="occupationScenes" class="hm-card">
     <div class="hm-card-header"><div class="hm-card-title">🪩 Occupation des scènes</div></div>
     <div th:each="occ : ${vue.occupations}" style="margin:.6rem 0;">
         <div style="display:flex; justify-content:space-between; font-size:.85rem;">
@@ -20,7 +20,7 @@
 </div>
 
 <!-- ============ CONCERTS_EN_COURS ============ -->
-<div th:fragment="concertsEnCours" class="hm-card mb-4">
+<div th:fragment="concertsEnCours" class="hm-card">
     <div class="hm-card-title">🎵 En cours</div>
     <ul th:if="${not #lists.isEmpty(vue.concertsEnCours)}">
         <li th:each="c : ${vue.concertsEnCours}"
@@ -31,7 +31,7 @@
 </div>
 
 <!-- ============ CONCERTS_A_VENIR ============ -->
-<div th:fragment="concertsAVenir" class="hm-card mb-4">
+<div th:fragment="concertsAVenir" class="hm-card">
     <div class="hm-card-title">⏭️ Dans l'heure</div>
     <ul th:if="${not #lists.isEmpty(vue.concertsAVenir)}">
         <li th:each="c : ${vue.concertsAVenir}"
@@ -42,7 +42,7 @@
 </div>
 
 <!-- ============ ALERTES_CHANGEOVER ============ -->
-<div th:fragment="alertesChangeover" class="hm-card mb-4">
+<div th:fragment="alertesChangeover" class="hm-card">
     <div class="hm-card-title" style="color:#e57373;">⚠️ Changements de plateau serrés</div>
     <ul th:if="${not #lists.isEmpty(vue.alertes)}">
         <li th:each="a : ${vue.alertes}"
@@ -54,7 +54,7 @@
 </div>
 
 <!-- ============ COMPTE_A_REBOURS ============ -->
-<div th:fragment="compteARebours" class="hm-card mb-4">
+<div th:fragment="compteARebours" class="hm-card">
     <div class="hm-tag">Compte à rebours</div>
     <div th:if="${vue.edition != null}">
         <div class="hm-card-title" style="font-size:1.8rem;"
@@ -66,7 +66,7 @@
 </div>
 
 <!-- ============ PROGRESSION ============ -->
-<div th:fragment="progression" class="hm-card mb-4">
+<div th:fragment="progression" class="hm-card">
     <div class="hm-tag">Progression</div>
     <div th:if="${vue.edition != null}">
         <div class="hm-card-title" style="font-size:1.8rem;"
