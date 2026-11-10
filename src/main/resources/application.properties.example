@@ -60,3 +60,5 @@ logging.level.com.hellmetz.festival=DEBUG
 # Dossier de stockage des uploads
 storage.location=uploads
 
+
+
