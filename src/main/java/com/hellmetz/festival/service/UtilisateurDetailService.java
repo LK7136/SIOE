@@ -41,10 +41,7 @@ public class UtilisateurDetailService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(identifiant)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Utilisateur introuvable : " + identifiant));
-        // Initialise les roles (LAZY) tant que la transaction est ouverte
-        if (utilisateur.getRoles() != null) {
-            utilisateur.getRoles().size();
-        }
+        initialiserPermissions(utilisateur);
         return new UtilisateurDetails(utilisateur);
     }
 
@@ -55,7 +52,23 @@ public class UtilisateurDetailService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public Utilisateur findById(Long id) {
-        return utilisateurRepository.findById(id).orElse(null);
+        Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
+        if (utilisateur != null) {
+            initialiserPermissions(utilisateur);
+        }
+        return utilisateur;
+    }
+
+    /** Charge (LAZY) les permissions des roles tant que la transaction est ouverte. */
+    private void initialiserPermissions(Utilisateur utilisateur) {
+        if (utilisateur.getRoles() != null) {
+            utilisateur.getRoles().forEach(r -> {
+                if (r.getPermissions() != null) r.getPermissions().size();
+            });
+        }
+        if (utilisateur.getPermissions() != null) {
+            utilisateur.getPermissions().size();
+        }
     }
 
     /** Cree un nouvel utilisateur avec mot de passe encode. */

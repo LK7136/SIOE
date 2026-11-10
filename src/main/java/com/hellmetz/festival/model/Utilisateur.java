@@ -3,7 +3,9 @@ package com.hellmetz.festival.model;
 import jakarta.persistence.*;  // Importez les annotations JPA/Hibernate
 import jakarta.validation.constraints.*;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 
 
@@ -54,6 +56,19 @@ public class Utilisateur {
             inverseJoinColumns = @JoinColumn(name = "id_role")
     )
     private List<Role> roles;
+
+    /**
+     * Permissions individuelles, en plus de celles portees par les roles.
+     * Un Set (et non une List) : Hibernate refuse de charger deux List EAGER
+     * dans la meme entite (MultipleBagFetchException).
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "permission_utilisateur",
+            joinColumns = @JoinColumn(name = "id_utilisateur"),
+            inverseJoinColumns = @JoinColumn(name = "id_permission")
+    )
+    private Set<Permission> permissions = new LinkedHashSet<>();
 
 
 
@@ -143,6 +158,37 @@ public class Utilisateur {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    /** Permissions individuelles uniquement (hors roles). */
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
+    }
+
+    /**
+     * Permissions effectives = permissions des roles UNION permissions individuelles.
+     * Source unique de verite : utilisee a la fois pour les authorities Spring Security
+     * et pour l'affichage de la fiche utilisateur.
+     * Les permissions des roles (LAZY) doivent etre initialisees avant l'appel
+     * si l'entite est detachee.
+     */
+    public Set<Permission> getPermissionsEffectives() {
+        Set<Permission> effectives = new LinkedHashSet<>();
+        if (roles != null) {
+            for (Role role : roles) {
+                if (role.getPermissions() != null) {
+                    effectives.addAll(role.getPermissions());
+                }
+            }
+        }
+        if (permissions != null) {
+            effectives.addAll(permissions);
+        }
+        return effectives;
     }
 
 

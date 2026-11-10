@@ -6,8 +6,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Adaptateur entre l'entite metier {@link Utilisateur} et l'interface
@@ -21,8 +22,24 @@ public class UtilisateurDetails implements UserDetails {
 
     private final Utilisateur utilisateur;
 
+    /** Roles (ROLE_xxx) + permissions effectives, calcules une fois a la connexion. */
+    private final Set<GrantedAuthority> authorities;
+
     public UtilisateurDetails(Utilisateur utilisateur) {
         this.utilisateur = utilisateur;
+        // Calcule ici (transaction de loadUserByUsername encore ouverte) pour eviter
+        // toute LazyInitializationException plus tard.
+        Set<GrantedAuthority> auths = new LinkedHashSet<>();
+        if (utilisateur.getRoles() != null) {
+            utilisateur.getRoles().forEach(role ->
+                    auths.add(new SimpleGrantedAuthority("ROLE_" + role.getCodeRole())));
+        }
+        utilisateur.getPermissionsEffectives().forEach(p -> {
+            if (p.getCodePermission() != null) {
+                auths.add(new SimpleGrantedAuthority(p.getCodePermission()));
+            }
+        });
+        this.authorities = Set.copyOf(auths);
     }
 
     /** Donne acces a l'entite metier complete (utilise dans les templates). */
@@ -51,14 +68,9 @@ public class UtilisateurDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Construit les roles Spring Security a partir des roles metier.
-        // Convention Spring : prefixe "ROLE_".
-        if (utilisateur.getRoles() == null) {
-            return List.of();
-        }
-        return utilisateur.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getCodeRole()))
-                .collect(Collectors.toList());
+        // Roles : prefixe "ROLE_" (convention Spring) ; permissions : code brut (ex. ADD_GRP),
+        // a tester avec hasAuthority('ADD_GRP').
+        return authorities;
     }
 
     @Override

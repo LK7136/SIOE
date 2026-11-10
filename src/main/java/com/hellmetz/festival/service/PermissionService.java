@@ -22,4 +22,9 @@ public class PermissionService {
         return permissionRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<Permission> findAllById(Iterable<Long> ids) {
+        return permissionRepository.findAllById(ids);
+    }
+
 }

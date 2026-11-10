@@ -2,6 +2,7 @@ package com.hellmetz.festival.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "permission")
@@ -35,4 +36,16 @@ public class Permission {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
+    // Egalite sur l'identifiant : necessaire pour dedupliquer (Set) role + individuelles
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Permission other)) return false;
+        return idPermission != null && idPermission.equals(other.idPermission);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idPermission);
+    }
 }

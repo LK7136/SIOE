@@ -13,7 +13,7 @@
                 <div class="hm-tag">Gestion</div>
                 <div class="hm-card-title" th:text="'Groupes du ' + ${appNom} + ' Festival'">Groupes</div>
             </div>
-            <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
+            <a sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_ORGANISATEUR', 'ADD_GRP')"
                th:href="@{/groupes/ajouter}" class="hm-btn-primary">
                 <span>＋</span>
                 <span>Nouveau groupe</span>
@@ -51,7 +51,7 @@
                     <th>Année Création</th>
                     <th>Pays</th>
                     <th>Site web</th>
-                    <th sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">Actions</th>
+                    <th sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_ORGANISATEUR', 'UPD_GRP', 'DEL_GRP')">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -86,13 +86,15 @@
                             ouvrir
                         </a>
                     </td>
-                    <td sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')">
+                    <td sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_ORGANISATEUR', 'UPD_GRP', 'DEL_GRP')">
                         <a class="hm-link-site"
+                           sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_ORGANISATEUR', 'UPD_GRP')"
                            th:href="@{/groupes/ajouter(id=${g.id})}">
                             ✏️ éditer
                         </a>
-                        &nbsp;|&nbsp;
+                        <span sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_ORGANISATEUR', 'UPD_GRP') and hasAnyAuthority('ROLE_ADMIN', 'DEL_GRP')">&nbsp;|&nbsp;</span>
                         <a class="hm-link-site"
+                           sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'DEL_GRP')"
                            th:href="@{/groupes/delete/{id}(id=${g.id})}"
                            onclick="return confirm('Supprimer ce groupe ?');">
                             🗑️ supprimer

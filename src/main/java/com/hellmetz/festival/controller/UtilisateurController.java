@@ -15,9 +15,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class UtilisateurController {
@@ -80,25 +84,26 @@ public class UtilisateurController {
     @PostMapping("/register")
     public String register(@ModelAttribute Utilisateur utilisateur,
                            @RequestParam Long idRole,
+                           @RequestParam(required = false) List<Long> idsPermissions,
                            Model model) {
 
-        Role roleChoisi = roleService.findById(idRole);
+        Role roleChoisi = roleService.findByIdAvecPermissions(idRole);
 
         if (roleChoisi == null) {
             model.addAttribute("erreur", "Rôle invalide.");
-            model.addAttribute("roles", roleService.findAll());
+            alimenterPermissions(model, utilisateur);
             return "register";
         }
 
         utilisateur.setRoles(java.util.List.of(roleChoisi));
-
+        utilisateur.setPermissions(permissionsIndividuelles(roleChoisi, idsPermissions));
 
         try {
             utilisateurDetailService.creerUtilisateur(utilisateur);
             return "redirect:/login?success=created";
         } catch (Exception e) {
             model.addAttribute("erreur", "Erreur : " + e.getMessage());
-            model.addAttribute("roles", roleService.findAll());
+            alimenterPermissions(model, utilisateur);
             return "register";
         }
     }
@@ -133,16 +138,24 @@ public class UtilisateurController {
     @PostMapping("/festival/utilisateurs/edit")
     public String save(@ModelAttribute Utilisateur utilisateur,
                        @RequestParam Long idRole,
-                       @RequestParam(required = false) Boolean actif) {
-        Role role = roleService.findById(idRole);
+                       @RequestParam(required = false) Boolean actif,
+                       @RequestParam(required = false) List<Long> idsPermissions) {
+        Role role = roleService.findByIdAvecPermissions(idRole);
+        if (role == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rôle invalide.");
+        }
+        Set<Permission> individuelles = permissionsIndividuelles(role, idsPermissions);
+
         if (utilisateur.getId() != null) {
             Utilisateur existing = utilisateurDetailService.findById(utilisateur.getId());
             existing.setRoles(java.util.List.of(role));
+            existing.setPermissions(individuelles);
             existing.setActif(actif != null && actif);
             utilisateurDetailService.save(existing);
         } else {
             // Création
             utilisateur.setRoles(java.util.List.of(role));
+            utilisateur.setPermissions(individuelles);
             utilisateurDetailService.creerUtilisateur(utilisateur);
         }
         return "redirect:/festival/utilisateurs/liste";
@@ -169,24 +182,32 @@ public class UtilisateurController {
         model.addAttribute("roles", roles);
         model.addAttribute("permissionsParRole", permissionsParRole);
 
-        List<Long> utilisateurPermissionsIds = new java.util.ArrayList<>();
-
-        if (utilisateur != null && utilisateur.getRoles() != null){
-            for (Role roleUtilisateur : utilisateur.getRoles()) {
-                List<Long> ids = permissionsParRole.get(roleUtilisateur.getIdRole());
-                if (ids != null) {
-                    for (Long id : ids) {
-                        if (!utilisateurPermissionsIds.contains(id)) {
-                            utilisateurPermissionsIds.add(id);
-                        }
-                    }
-                }
-            }
-        }
+        // Permissions effectives (role + individuelles) : meme calcul que getAuthorities()
+        List<Long> utilisateurPermissionsIds = utilisateur == null
+                ? new java.util.ArrayList<>()
+                : utilisateur.getPermissionsEffectives().stream()
+                        .map(Permission::getIdPermission)
+                        .collect(Collectors.toList());
         model.addAttribute("utilisateurPermissionsIds", utilisateurPermissionsIds);
     }
 
-
+    /**
+     * Permissions cochees dans le formulaire, moins celles deja portees par le role :
+     * seules les permissions supplementaires sont stockees en base, ce qui permet
+     * a une evolution future du role de se repercuter sur l'utilisateur.
+     * Les ids inconnus sont ignores (findAllById).
+     */
+    private Set<Permission> permissionsIndividuelles(Role role, List<Long> idsPermissions) {
+        if (idsPermissions == null || idsPermissions.isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<Long> idsDuRole = role.getPermissions() == null ? Set.of()
+                : role.getPermissions().stream()
+                        .map(Permission::getIdPermission)
+                        .collect(Collectors.toSet());
+        return permissionService.findAllById(idsPermissions).stream()
+                .filter(p -> !idsDuRole.contains(p.getIdPermission()))
+                .collect(Collectors.toCollection(HashSet::new));
+    }
 
 }
-

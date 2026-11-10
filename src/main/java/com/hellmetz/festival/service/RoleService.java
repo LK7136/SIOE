@@ -31,6 +31,9 @@ public class RoleService {
     @Transactional(readOnly = true)
     public List<Role> findAllAvecPermissions() {return roleRepository.findAllAvecPermissions();}
 
+    @Transactional(readOnly = true)
+    public Role findByIdAvecPermissions(Long id) { return roleRepository.findByIdAvecPermissions(id).orElse(null); }
+
     public Role save(Role role) { return roleRepository.save(role);}
 
 }

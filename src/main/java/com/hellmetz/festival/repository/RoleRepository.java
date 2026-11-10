@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 // JpaRepository<T, ID> : T = votre entité, ID = type de sa clé primaire
 public interface RoleRepository extends JpaRepository<Role, Long> {
     @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.permissions")
     List<Role> findAllAvecPermissions();
+
+    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.permissions WHERE r.idRole = :id")
+    Optional<Role> findByIdAvecPermissions(@org.springframework.data.repository.query.Param("id") Long id);
 }
 

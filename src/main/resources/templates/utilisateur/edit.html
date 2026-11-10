@@ -165,7 +165,7 @@
                 </div>
 
                 <p class="mt-1 mb-0 text-muted titrecard" style="font-size: 0.8rem;">
-                  Cliquez sur les cases pour personnaliser les accès.
+                  Les permissions du rôle (verrouillées) sont toujours accordées ; cochez des cases pour ajouter des permissions individuelles.
                 </p>
               </div>
 
@@ -207,23 +207,26 @@
     document.getElementById("badgeCount").textContent = count;
   }
 
+  /* ── Permissions héritées du rôle : cochées et verrouillées ; les autres sont
+        des permissions individuelles, libres et seules envoyées au serveur ── */
+  function appliquerRole(idRole) {
+    var duRole = (idRole && permissionsParRole[idRole]) ? permissionsParRole[idRole] : [];
+    document.querySelectorAll(".chkPermission").forEach(function(cb) {
+      var herite = duRole.includes(parseInt(cb.value));
+      if (cb.disabled && !herite) { cb.checked = false; }   /* était héritée de l'ancien rôle */
+      cb.disabled = herite;
+      if (herite) { cb.checked = true; }
+      var item = document.getElementById("item_" + cb.value);
+      item.classList.toggle("heritee", herite);
+      item.title = herite ? "Héritée du rôle" : "";
+    });
+    updateUI();
+  }
+
   /* ── Changement de rôle dans le select ── */
   document.getElementById("selectRole").addEventListener("change", function () {
     var idRole = this.value;
-
-    /* Réinitialise et pré-coche selon le rôle */
-    document.querySelectorAll(".chkPermission").forEach(function(cb) {
-      cb.checked = false;
-    });
-
-    if (idRole && permissionsParRole[idRole]) {
-      var permisAutorisees = permissionsParRole[idRole];
-      document.querySelectorAll(".chkPermission").forEach(function(cb) {
-        cb.checked = permisAutorisees.includes(parseInt(cb.value));
-      });
-    }
-
-    updateUI();
+    appliquerRole(idRole);
   });
 
   /* ── Clic manuel sur une permission ── */
@@ -246,7 +249,7 @@
 
   /* ── Init ── */
   // Exécuter l'UI une fois au chargement pour s'assurer que le compteur et les couleurs sont corrects
-  updateUI();
+  appliquerRole(document.getElementById("selectRole").value);
   /*]]>*/
 </script>
 </div>

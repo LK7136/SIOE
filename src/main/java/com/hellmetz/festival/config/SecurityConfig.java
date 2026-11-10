@@ -38,6 +38,15 @@ public class SecurityConfig {
                         // Logo lu depuis la BDD : visible par tous
                         .requestMatchers("/parametres/logo", "/parametres/uploads/**").permitAll()
 
+                        // Groupes : les permissions individuelles (ou du role) ADD_GRP / UPD_GRP / DEL_GRP
+                        // donnent acces en plus des roles. A placer AVANT les regles generiques.
+                        .requestMatchers("/groupes/delete/**")
+                                .hasAnyAuthority("ROLE_ADMIN", "DEL_GRP")
+                        .requestMatchers("/groupes/ajouter")
+                                .hasAnyAuthority("ROLE_ADMIN", "ROLE_ORGANISATEUR", "ADD_GRP", "UPD_GRP")
+                        .requestMatchers(HttpMethod.POST, "/groupes/edit")
+                                .hasAnyAuthority("ROLE_ADMIN", "ROLE_ORGANISATEUR", "ADD_GRP", "UPD_GRP")
+
                         // suppression
                         .requestMatchers("/*/delete/**").hasRole("ADMIN")
 
