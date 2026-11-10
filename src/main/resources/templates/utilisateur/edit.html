@@ -30,9 +30,10 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
   </div>
 
-  <form method="post" th:action="@{/festival/utilisateurs/edit}">
+  <form method="post" th:action="@{/festival/utilisateurs/edit}" enctype="multipart/form-data">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     <input type="hidden" name="id" th:value="${utilisateur.id}">
+    <input type="hidden" name="supprimerPhoto" id="supprimer_photo" value="false">
 
     <div class="row g-4">
 
@@ -42,29 +43,49 @@
             <i class="bi bi-person-fill me-2"></i>Informations personnelles
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-sm-6">
-                <label class="form-label titrecard">Nom</label>
-                <input type="text" class="form-control" name="nom" th:value="${utilisateur.nom}" required>
-              </div>
-              <div class="col-sm-6">
-                <label class="form-label titrecard">Prénom</label>
-                <input type="text" class="form-control" name="prenom" th:value="${utilisateur.prenom}" required>
-              </div>
-              <div class="col-12">
-                <label class="form-label titrecard">Adresse email</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                  <input type="email" class="form-control" name="email" th:value="${utilisateur.email}" required>
+            <div class="row g-3 align-items-start">
+              <div class="col-auto text-center">
+                <label for="photoFile" class="mb-0" style="cursor:pointer; display:inline-block;">
+                  <img id="preview"
+                       th:src="${not #strings.isEmpty(utilisateur.urlPhoto)} ? @{/festival/utilisateurs/photo/{id}(id=${utilisateur.id})} : @{/images/artistes/defaultAvatar.png}"
+                       alt="Photo de profil"
+                       style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:2px solid #dee2e6;">
+                </label>
+                <input type="file" id="photoFile" name="photoFile" accept="image/*" style="display:none;">
+                <div id="containerBtnSupprimer"
+                     th:style="${not #strings.isEmpty(utilisateur.urlPhoto)} ? 'margin-top:6px; display:block;' : 'margin-top:6px; display:none;'">
+                  <button type="button" id="btnSupprimerPhoto" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-trash me-1"></i>Supprimer
+                  </button>
                 </div>
+                <div class="form-text mt-1">Photo optionnelle</div>
               </div>
-              <div class="col-sm-6 mt-4">
-                <small class="text-muted d-block mb-1">Date de création :</small>
-                <strong th:text="${utilisateur.dateCreation != null ? #dates.format(utilisateur.dateCreation, 'dd/MM/yyyy') : '-'}"></strong>
-              </div>
-              <div class="col-sm-6 mt-4">
-                <small class="text-muted d-block mb-1">Dernière connexion :</small>
-                <strong th:text="${utilisateur.derniereConnexion != null ? #dates.format(utilisateur.derniereConnexion, 'dd/MM/yyyy') : 'Jamais'}"></strong>
+              <div class="col">
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <label class="form-label titrecard">Nom</label>
+                    <input type="text" class="form-control" name="nom" th:value="${utilisateur.nom}" required>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label titrecard">Prénom</label>
+                    <input type="text" class="form-control" name="prenom" th:value="${utilisateur.prenom}" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label titrecard">Adresse email</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" name="email" th:value="${utilisateur.email}" required>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 mt-4">
+                    <small class="text-muted d-block mb-1">Date de création :</small>
+                    <strong th:text="${utilisateur.dateCreation != null ? #dates.format(utilisateur.dateCreation, 'dd/MM/yyyy') : '-'}"></strong>
+                  </div>
+                  <div class="col-sm-6 mt-4">
+                    <small class="text-muted d-block mb-1">Dernière connexion :</small>
+                    <strong th:text="${utilisateur.derniereConnexion != null ? #dates.format(utilisateur.derniereConnexion, 'dd/MM/yyyy') : 'Jamais'}"></strong>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -244,8 +265,31 @@
     }
   });
 
+  /* ── Aperçu photo de profil ── */
+  var defaultAvatarUrl = /*[[@{/images/artistes/defaultAvatar.png}]]*/ '';
+  var containerBtn = document.getElementById('containerBtnSupprimer');
+  var inputPhoto = document.getElementById('photoFile');
+  if (inputPhoto) {
+    inputPhoto.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) {
+        document.getElementById('preview').src = URL.createObjectURL(file);
+        document.getElementById('supprimer_photo').value = 'false';
+        if (containerBtn) containerBtn.style.display = 'block';
+      }
+    });
+  }
+  var btnSuppr = document.getElementById('btnSupprimerPhoto');
+  if (btnSuppr) {
+    btnSuppr.addEventListener('click', function() {
+      document.getElementById('preview').src = defaultAvatarUrl;
+      inputPhoto.value = '';
+      document.getElementById('supprimer_photo').value = 'true';
+      if (containerBtn) containerBtn.style.display = 'none';
+    });
+  }
+
   /* ── Init ── */
-  // Exécuter l'UI une fois au chargement pour s'assurer que le compteur et les couleurs sont corrects
   updateUI();
   /*]]>*/
 </script>
