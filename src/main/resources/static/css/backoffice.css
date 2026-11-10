@@ -435,21 +435,6 @@ erreurCnx p {
 }
 
 
-.theme-clair {
-    --hm-bg: #f8fafc;
-    --hm-bg-soft: #ffffff;
-    --hm-border: #cbd5e1;
-    --hm-text: #1e293b;
-    --hm-text-muted: #64748b;
-
-    --hm-accent: #2563eb;
-    --hm-accent-light: #0ea5e9;
-    --hm-accent-dark: #1e40af;
-
-    --hm-glow: rgba(37, 99, 235, 0.25);
-}
-
-
 /* Option 1 : Si vous souhaitez centrer toute la ligne contenant l'input Général */
 .parametres-general-row, /* Remplacez par votre classe spécifique si besoin */
 .bm-card-body .row:has(#nom_application) {
