@@ -13,9 +13,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.csrf.CsrfException;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     @Lazy
@@ -58,7 +69,11 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
+                .logout(logout -> logout.logoutSuccessUrl("/login?logout").deleteCookies("JSESSIONID").permitAll())
+                // session expirée : retour au login avec un message explicite
+                .sessionManagement(s -> s.invalidSessionUrl("/login?expired"))
+                // accès refusé : journalisation puis page 403
+                .exceptionHandling(e -> e.accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
     }
@@ -74,5 +89,33 @@ public class SecurityConfig {
         provider.setUserDetailsService(utilisateurDetailService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, exception) -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean connecte = auth != null && auth.isAuthenticated()
+                    && !(auth instanceof AnonymousAuthenticationToken);
+
+            if (exception instanceof CsrfException) {
+                if (!connecte) {
+                    // jeton CSRF perdu avec la session : l'utilisateur doit se reconnecter
+                    log.warn("Jeton CSRF invalide, session expirée : {} {}",
+                            request.getMethod(), request.getRequestURI());
+                    response.sendRedirect(request.getContextPath() + "/login?expired");
+                    return;
+                }
+                log.warn("Jeton CSRF invalide ou expiré : utilisateur {}, {} {}",
+                        auth.getName(), request.getMethod(), request.getRequestURI());
+                request.setAttribute("motifRefus", "csrf");
+            } else {
+                log.warn("Accès refusé : utilisateur {}, rôles {}, {} {}",
+                        connecte ? auth.getName() : "anonyme",
+                        connecte ? auth.getAuthorities() : "[]",
+                        request.getMethod(), request.getRequestURI());
+            }
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        };
     }
 }
