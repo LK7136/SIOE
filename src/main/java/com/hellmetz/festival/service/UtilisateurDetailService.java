@@ -70,8 +70,17 @@ public class UtilisateurDetailService implements UserDetailsService {
         utilisateurRepository.save(utilisateur);
     }
 
+    public void changerMotDePasse(Utilisateur utilisateur, String motDePasseClair) {
+        utilisateur.setMotDePasse(passwordEncoder.encode(motDePasseClair));
+    }
+
     public void deleteById(Long id) {
         utilisateurRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public long countAdmins() {
+        return utilisateurRepository.countAdmins();
     }
 
     @Transactional(readOnly = true)

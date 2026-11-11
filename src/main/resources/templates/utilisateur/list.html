@@ -63,12 +63,14 @@
               ✏️ éditer
             </a>
             &nbsp;|&nbsp;
-            <a class="hm-link-site"
-               th:href="@{/festival/utilisateurs/delete/{id}(id=${u.id})}"
-               onclick="return confirm('Supprimer cet utilisateur ?')"
-               style="color: #e74c3c;">
-              🗑️ supprimer
-            </a>
+            <form th:action="@{/festival/utilisateurs/delete/{id}(id=${u.id})}" method="post" style="display:inline;"
+                  onsubmit="return confirm('Supprimer cet utilisateur ?');">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <button type="submit" class="hm-link-site"
+                      style="background:none;border:none;padding:0;color:#e74c3c;cursor:pointer;">
+                🗑️ supprimer
+              </button>
+            </form>
           </td>
         </tr>
         </tbody>
