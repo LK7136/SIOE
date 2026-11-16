@@ -41,7 +41,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+        // Logo de base livré dans classpath:/assets/
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("classpath:/assets/");
+
+        //chemin du dossier d'upload
         Path rootUploadDir = Paths.get(storageProperties.getLocation()).toAbsolutePath().normalize();
 
         // expose tout le dossier uploads/
@@ -50,12 +55,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
 
-    @Override
-    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
-        // Logo de base livré dans classpath:/assets/
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations("classpath:/assets/");
-    }
+
 
     @Override
     public void addFormatters(@NonNull FormatterRegistry registry) {
