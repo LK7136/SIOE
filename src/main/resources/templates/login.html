@@ -2,11 +2,13 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Identification - HellMetz Backoffice</title>
+  <title th:text="'Identification - ' + ${appNom}">Identification</title>
   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
   <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
   <link th:href="@{/css/templatemo-festava-live.css}" rel="stylesheet">
   <link th:href="@{/css/backoffice.css}" rel="stylesheet">
+  <link rel="icon" th:href="${appLogo}">
+
 </head>
 <body class="bg-light">
 

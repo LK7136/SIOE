@@ -1,0 +1,100 @@
+/* ==========================================
+   PAGINATION - THÈME SIOE
+========================================== */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    margin-top: 15px;
+}
+
+/* Boutons de pagination */
+.pagination .page-item .page-link {
+    min-width: 40px;
+    height: 39px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(145deg, #10213c, #0b1730);
+    color: #65cfff !important;
+
+    border: 1px solid #24466d !important;
+    border-radius: 8px !important;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow: 0 0 8px rgba(39, 139, 255, 0.12);
+
+    transition: all 0.2s ease;
+}
+
+/* Survol */
+.pagination .page-item:not(.disabled):not(.active) .page-link:hover {
+    background: linear-gradient(135deg, #269bdc, #1764d9);
+    color: #ffffff !important;
+
+    border-color: #55c9ff !important;
+
+    box-shadow: 0 0 12px rgba(49, 174, 255, 0.45);
+
+    transform: translateY(-2px);
+}
+
+/* Page active */
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #36bdf4, #1764d9) !important;
+
+    color: #ffffff !important;
+
+    border: 1px solid #65d5ff !important;
+
+    font-weight: 700;
+
+    box-shadow:
+            0 0 10px rgba(41, 168, 255, 0.55),
+            inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+/* Flèches désactivées */
+.pagination .page-item.disabled .page-link {
+    background: linear-gradient(145deg, #172233, #101a2a) !important;
+
+    color: #68788e !important;
+
+    border: 1px solid #26364b !important;
+
+    box-shadow: none;
+
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Focus */
+.pagination .page-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(48, 171, 255, 0.2);
+}
+
+/* Suppression du soulignement */
+.pagination .page-link {
+    text-decoration: none !important;
+}
+
+/* Adaptation mobile */
+@media (max-width: 576px) {
+    .pagination {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .pagination .page-item .page-link {
+        min-width: 34px;
+        height: 35px;
+        font-size: 12px;
+    }
+}

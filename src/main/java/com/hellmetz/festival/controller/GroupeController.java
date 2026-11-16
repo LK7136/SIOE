@@ -58,7 +58,7 @@ public class GroupeController {
         model.addAttribute("groupes", pageGroupes.getContent());
         model.addAttribute("page", pageGroupes);
         model.addAttribute("taille", taille);
-        model.addAttribute("pageTitle", "HellMetz - Groupes");
+        model.addAttribute("pageTitle", "Groupes");
         model.addAttribute("activeMenu", "groupes");
         return "groupe/list";
     }
@@ -86,7 +86,7 @@ public class GroupeController {
         if (id != null) {
             Groupe groupe = groupeService.findByIdWithStyles(id);
             model.addAttribute("groupe", groupe);
-            model.addAttribute("pageTitle", "Modifier le groupe - HellMetz");
+            model.addAttribute("pageTitle", "Modifier le groupe");
             model.addAttribute("artistes", artisteService.findByGroupeId(id));
 
             Page<Concert> pageConcerts = tout
@@ -99,7 +99,7 @@ public class GroupeController {
 
         } else {
             model.addAttribute("groupe", new Groupe());
-            model.addAttribute("pageTitle", "Nouveau groupe - HellMetz");
+            model.addAttribute("pageTitle", "Nouveau groupe");
             model.addAttribute("artistes", java.util.Collections.emptyList());
 
             Page<Concert> pageConcerts = tout
