@@ -182,21 +182,50 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 ### Structure du projet
 
 ```text
-hellmetz/
-├── frontoffice/                 → Site vitrine statique (à compléter)
-│   └── index.html
-├── backoffice/                  → Interfaces JSP et pages du backoffice
-│   └── (jsp)
-├── WEB-INF/
-│   ├── web.xml
-│   └── (config serveur)
-└── src/main/java/
-    └── com.hellmetz.festival/
-        ├── backoffice/
-        │   ├── dao/            → Accès base de données (JDBC)
-        │   ├── model/          → Classes métiers (POJO)
-        │   └── servlet/        → Contrôleurs Java
-        └── frontoffice/        → (non utilisé pour l’instant)
+src/
+├── main/
+│   ├── java/
+│   │   └── com.hellmetz.festival/
+│   │       ├── config/              → Configuration Spring
+│   │       ├── controller/          → Contrôleurs web
+│   │       ├── dashboard/           → Logique dashboard
+│   │       ├── model/               → Entités / classes métiers
+│   │       ├── parametre/           → Gestion des paramètres
+│   │       ├── repository/          → Accès base de données (JPA)
+│   │       ├── security/            → Sécurité (Spring Security)
+│   │       ├── service/             → Couche métier
+│   │       └── HellMetzApplication  → Point d’entrée Spring Boot
+│   ├── META-INF/
+│   └── resources/
+│       ├── assets/
+│       ├── db/
+│       │   └── migration/           → Scripts de migration SQL
+│       ├── static/                  → Fichiers statiques (CSS, JS, images…)
+│       │   ├── css/
+│       │   ├── documents/
+│       │   │   └── plans/
+│       │   ├── fonts/
+│       │   ├── images/
+│       │   ├── js/
+│       │   └── video/
+│       ├── templates/               → Vues Thymeleaf
+│       │   ├── artiste/
+│       │   ├── concert/
+│       │   ├── dashboard/
+│       │   ├── error/
+│       │   ├── groupe/
+│       │   ├── parametre/
+│       │   ├── scene/
+│       │   ├── utilisateur/
+│       │   ├── dashboard.html
+│       │   ├── layout.html
+│       │   ├── login.html
+│       │   ├── menu.html
+│       │   └── register.html
+│       ├── application.properties
+│       ├── hellmetz-keystore.p12
+│       └── logback-spring.xml
+└── WEB-INF/
 ```
 
 <a id="travail-demande"></a>
@@ -334,9 +363,7 @@ Ne modifiez pas ces valeurs : elles sont définies par l’enseignant.
 | Fonction | URL |
 |----------|-----|
 | Portail | `/hellmetz/` |
-| Frontoffice | `/hellmetz/frontoffice/index.html` |
 | Backoffice (groupes) | `/hellmetz/backoffice/groupes` |
-| Test connexion DB | `/hellmetz/backoffice/test-db` |
 
 <a id="bonus"></a>
 
