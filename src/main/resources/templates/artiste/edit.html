@@ -10,13 +10,14 @@
   <div class="hm-card">
     <div class="hm-card-header">
       <div>
-        <div class="hm-tag">Édition</div>
+        <div class="hm-tag">Artiste</div>
         <div class="hm-card-title">
-          <span th:if="${artiste.id != null}" th:text="'Modifier artiste #' + ${artiste.nom}"></span>
+          <span th:if="${artiste.id != null}" th:text="'Modifier artiste : ' + ${artiste.nom}"></span>
           <span th:unless="${artiste.id != null}">Nouvel artiste</span>
         </div>
       </div>
-      <a th:href="@{/artistes/liste}" class="hm-btn-primary" style="background-color:#6c757d; color:white;">
+      <a th:href="${idGroupeParam != null} ? @{/groupes/ajouter(id=${idGroupeParam})} : @{/artistes/liste}"
+         class="hm-btn-primary" style="background-color:#6c757d; color:white;">
         <span>←</span><span>Retour à la liste</span>
       </a>
     </div>
@@ -24,19 +25,23 @@
     <div class="p-4">
       <form th:action="@{/artistes/edit}" method="post" enctype="multipart/form-data">
 
-        <input type="hidden" name="id" th:value="${artiste.id}">
+        <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+        <input th:if="${artiste.id != null}" type="hidden" name="id" th:value="${artiste.id}">
+        <input th:if="${idGroupeParam != null}" type="hidden" name="idGroupeParam" th:value="${idGroupeParam}">
         <input type="hidden" name="supprimerPhoto" id="supprimer_photo" value="false">
+        <input type="hidden" name="urlPhoto" id="urlPhoto" th:value="${artiste.urlPhoto}">
 
         <div class="row mb-3">
           <div class="col-auto" style="text-align:center">
-            <label for="urlPhotoArtiste" style="cursor:pointer; display:inline-block;">
+            <label for="artistePhoto" style="cursor:pointer; display:inline-block;">
               <img id="preview"
-                   th:src="${not #strings.isEmpty(artiste.urlPhoto)} ? @{/artistes/uploads/{p}(p=${artiste.urlPhoto})} : @{/images/artistes/defaultAvatar.png}"
+                   th:src="${not #strings.isEmpty(artiste.urlPhoto)} ? @{/uploads/artiste_image/{p}(p=${artiste.urlPhoto})} : @{/images/artistes/defaultAvatar.png}"
                    style="width:180px; height:180px; border-radius:5%; object-fit:cover;">
             </label>
-            <input type="file" id="urlPhotoArtiste" name="urlPhotoArtiste" accept="image/*" style="display:none;">
-            <div id="containerBtnSupprimer" style="margin-top:6px;"
-                 th:style="${not #strings.isEmpty(artiste.urlPhoto)} ? 'margin-top:6px; display:block;' : 'margin-top:6px; display:none;'">
+            <input type="file" id="artistePhoto" name="artistePhoto" accept="image/png, image/jpeg, image/gif, image/webp, image/svg+xml" style="display:none;">
+            <div id="containerBtnSupprimer"
+                 th:style="${#strings.isEmpty(artiste.urlPhoto)} ? 'display:none; margin-top:6px;' : 'display:block; margin-top:6px;'">
               <button type="button" id="btnSupprimerPhoto" class="hm-btn-primary"
                       style="background-color:#6c757d; color:white;">
                 🗑️ Supprimer la photo
@@ -47,12 +52,12 @@
           <div class="col mb-3" style="display:flex; flex-direction:column; justify-content:space-between; height:180px;">
             <div class="row mb-3">
               <div class="col-md-6">
-                <label for="nom" class="form-label fw-bold">Nom<span class="text-danger">*</span></label>
+                <label for="nom" class="form-label fw-bold">Nom <span class="text-danger">*</span></label>
                 <input type="text" id="nom" name="nom" class="form-control"
                        th:value="${artiste.nom}" required>
               </div>
               <div class="col-md-6">
-                <label for="prenom" class="form-label fw-bold">Prénom<span class="text-danger">*</span></label>
+                <label for="prenom" class="form-label fw-bold">Prénom <span class="text-danger">*</span></label>
                 <input type="text" id="prenom" name="prenom" class="form-control"
                        th:value="${artiste.prenom}" required>
               </div>
@@ -112,7 +117,7 @@
     const defaultAvatarUrl = /*[[@{/images/artistes/defaultAvatar.png}]]*/ '';
 
     const containerBtn = document.getElementById('containerBtnSupprimer');
-    const inputPhoto = document.getElementById('urlPhotoArtiste');
+    const inputPhoto = document.getElementById('artistePhoto');
 
     inputPhoto.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -120,22 +125,20 @@
         document.getElementById('preview').src = URL.createObjectURL(file);
         document.getElementById('supprimer_photo').value = "false";
 
-        // 🌟 CORRECTION : On force le bouton à apparaître dès qu'un fichier est choisi !
         if (containerBtn) {
           containerBtn.style.display = "block";
         }
       }
     });
 
-
     const btnSuppr = document.getElementById('btnSupprimerPhoto');
     if (btnSuppr) {
       btnSuppr.addEventListener('click', function() {
         document.getElementById('preview').src = defaultAvatarUrl;
-        inputPhoto.value = ""; // Vide le fichier sélectionné
+        document.getElementById('urlPhoto').value = "";
+        inputPhoto.value = "";
         document.getElementById('supprimer_photo').value = "true";
 
-        // On masque le container à nouveau
         if (containerBtn) {
           containerBtn.style.display = "none";
         }
