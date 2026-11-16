@@ -62,6 +62,18 @@ public class EditionService {
         editionRepository.delete(edition);
     }
 
-
+    public void valider(Edition edition) {
+        if (edition.getDateDebut() == null || edition.getDateFin() == null) {
+            throw new IllegalArgumentException("Les dates de début et de fin sont obligatoires.");
+        }
+        if (edition.getDateFin().isBefore(edition.getDateDebut())) {
+            throw new IllegalArgumentException("La date de fin ne peut pas être antérieure à la date de début.");
+        }
+        int annee = edition.getAnnee();
+        if (edition.getDateDebut().getYear() != annee || edition.getDateFin().getYear() != annee) {
+            throw new IllegalArgumentException(
+                    "Les dates doivent être comprises entre le 01/01/" + annee + " et le 31/12/" + annee + ".");
+        }
+    }
 
 }

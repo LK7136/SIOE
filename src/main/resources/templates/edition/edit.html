@@ -195,7 +195,68 @@
                 }
             });
         }
+
+        //Dates
+        (function () {
+            const annee = document.getElementById('annee');
+            const debut = document.getElementById('dateDebut');
+            const fin   = document.getElementById('dateFin');
+
+            // Année valide = 4 chiffres dans la plage autorisée par le champ
+            function anneeValide() {
+                const y = parseInt(annee.value, 10);
+                return (y >= 1900 && y <= 2100) ? y : null;
+            }
+
+            function appliquerLimites() {
+                const y = anneeValide();
+                [debut, fin].forEach(champ => {
+                    if (!y) {
+                        champ.removeAttribute('min');
+                        champ.removeAttribute('max');
+                    } else {
+                        champ.min = y + '-01-01';
+                        champ.max = y + '-12-31';
+                    }
+                });
+                // La fin ne peut pas précéder le début
+                if (y && debut.value) fin.min = debut.value;
+            }
+
+            // Vide la date si elle sort de l'année choisie
+            function verifier(champ) {
+                const y = anneeValide();
+                if (!y || !champ.value) return;
+                if (champ.value < y + '-01-01' || champ.value > y + '-12-31') {
+                    champ.value = '';
+                    alert('La date doit être comprise entre le 01/01/' + y + ' et le 31/12/' + y + '.');
+                }
+            }
+
+            annee.addEventListener('input', function () {
+                appliquerLimites();
+                // Efface les dates qui ne correspondent plus à la nouvelle année
+                const y = anneeValide();
+                if (!y) return;
+                [debut, fin].forEach(c => {
+                    if (c.value && (c.value < y + '-01-01' || c.value > y + '-12-31')) c.value = '';
+                });
+            });
+
+            debut.addEventListener('change', function () {
+                verifier(debut);
+                appliquerLimites();
+                if (fin.value && debut.value && fin.value < debut.value) fin.value = '';
+            });
+
+            fin.addEventListener('change', function () {
+                verifier(fin);
+            });
+
+            appliquerLimites(); // au chargement (mode modification)
+        })();
     </script>
+
 </div>
 </body>
 </html>

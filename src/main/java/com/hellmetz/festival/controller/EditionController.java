@@ -72,6 +72,8 @@ public class EditionController {
         }
 
         try {
+            editionService.valider(edition);
+
             // suppression de l'affiche
             if (supprimerAffiche && edition.getUrlAfficheOfficielle() != null) {
                 storageService.delete(edition.getUrlAfficheOfficielle(), SUB_DIR);
@@ -107,6 +109,11 @@ public class EditionController {
     @PostMapping("/{id}/supprimer")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
         Edition edition = editionService.findById(id);
+
+        if (edition == null) {
+            flash.addFlashAttribute("erreur", "Édition introuvable.");
+            return "redirect:/parametres/liste?tab=editions";
+        }
 
         if (edition.isActif()) {
             flash.addFlashAttribute("erreur", "Impossible de supprimer l'édition active.");
