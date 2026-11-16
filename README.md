@@ -257,29 +257,6 @@ Travail à réaliser :
 
 <a id="etape-2"></a>
 
-#### Étape 2 — Backoffice : gestion des groupes
-
-URL du backoffice :
-
-```text
-/hellmetz/backoffice/groupes
-```
-
-Cette partie utilise :
-
-- les servlets ;
-- le DAO JDBC ;
-- les JSP (Jakarta EE) ;
-- Bootstrap (à intégrer ensuite).
-
-Travail à réaliser : étudier le code existant.
-
-- `Groupe` (POJO)
-- `GroupeDao` (accès BDD)
-- `GroupeListServlet` (affichage de la liste)
-- `groupes.jsp` (affichage du tableau)
-
-<a id="crud"></a>
 
 #### Compléter le CRUD (à rendre)
 
@@ -325,7 +302,7 @@ Elle supprime un groupe via son ID, puis redirige vers `/backoffice/groupes`.
 La configuration se trouve dans :
 
 ```text
-src/main/resources/db.properties
+src/main/resources/application.properties
 ```
 
 Elle contient :
@@ -355,15 +332,6 @@ Ne modifiez pas ces valeurs : elles sont définies par l’enseignant.
 2. Déployer l’artifact `web-hellmetz:war exploded`.
 3. Définir le context path : `/hellmetz`.
 4. Lancer avec **Run**.
-
-<a id="urls-utiles"></a>
-
-### URLs utiles
-
-| Fonction | URL |
-|----------|-----|
-| Portail | `/hellmetz/` |
-| Backoffice (groupes) | `/hellmetz/backoffice/groupes` |
 
 <a id="bonus"></a>
 
