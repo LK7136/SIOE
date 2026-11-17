@@ -60,11 +60,11 @@
               </div>
               <div class="col-sm-6 mt-4">
                 <small class="text-muted d-block mb-1">Date de création :</small>
-                <strong th:text="${utilisateur.dateCreation != null ? #temporals.format(utilisateur.dateCreation, 'dd/MM/yyyy') : '-'}"></strong>
+                <strong th:text="${utilisateur.dateCreation != null ? #dates.format(utilisateur.dateCreation, 'dd/MM/yyyy') : '-'}"></strong>
               </div>
               <div class="col-sm-6 mt-4">
                 <small class="text-muted d-block mb-1">Dernière connexion :</small>
-                <strong th:text="${utilisateur.derniereConnexion != null ? #temporals.format(utilisateur.derniereConnexion, 'dd/MM/yyyy') : 'Jamais'}"></strong>
+                <strong th:text="${utilisateur.derniereConnexion != null ? #dates.format(utilisateur.derniereConnexion, 'dd/MM/yyyy') : 'Jamais'}"></strong>
               </div>
             </div>
           </div>

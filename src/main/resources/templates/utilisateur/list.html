@@ -56,7 +56,7 @@
             <span th:if="${u.actif != null and u.actif}" class="hm-pill">Actif</span>
             <span th:unless="${u.actif != null and u.actif}" class="hm-pill" style="opacity:0.5;">Inactif</span>
           </td>
-          <td th:text="${u.dateCreation != null ? #temporals.format(u.dateCreation, 'dd/MM/yyyy') : '-'}"></td>
+          <td th:text="${u.dateCreation != null ? #dates.format(u.dateCreation, 'dd/MM/yyyy') : '-'}"></td>
           <td>
             <a class="hm-link-site"
                th:href="@{/festival/utilisateurs/ajouter(id=${u.id})}">
