@@ -10,9 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +76,34 @@ public class UtilisateurDetailService implements UserDetailsService {
 
     public void deleteById(Long id) {
         utilisateurRepository.deleteById(id);
+    }
+
+    public void enregistrerPhoto(Utilisateur utilisateur, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return;
+        }
+        try {
+            String original = file.getOriginalFilename();
+            String extension = ".png";
+            if (original != null && original.contains(".")) {
+                extension = original.substring(original.lastIndexOf('.')).toLowerCase(Locale.ROOT);
+            }
+            utilisateur.setUrlPhoto("user_" + UUID.randomUUID().toString().substring(0, 8) + extension);
+            String contentType = file.getContentType();
+            if (contentType == null || contentType.isBlank()) {
+                contentType = "image/png";
+            }
+            utilisateur.setPhotoContentType(contentType);
+            utilisateur.setContenuPhoto(file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de l'enregistrement de la photo", e);
+        }
+    }
+
+    public void supprimerPhoto(Utilisateur utilisateur) {
+        utilisateur.setUrlPhoto(null);
+        utilisateur.setPhotoContentType(null);
+        utilisateur.setContenuPhoto(null);
     }
 
     @Transactional(readOnly = true)

@@ -47,6 +47,15 @@ public class Utilisateur {
     @Temporal(TemporalType.TIMESTAMP)
     private Date derniereConnexion;
 
+    @Column(name = "url_photo", length = 255)
+    private String urlPhoto;
+
+    @Column(name = "contenu_photo")
+    private byte[] contenuPhoto;
+
+    @Column(name = "photo_content_type", length = 100)
+    private String photoContentType;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_utilisateur",
@@ -145,7 +154,33 @@ public class Utilisateur {
         this.roles = roles;
     }
 
+    public String getUrlPhoto() {
+        return urlPhoto;
+    }
 
+    public void setUrlPhoto(String urlPhoto) {
+        this.urlPhoto = urlPhoto;
+    }
+
+    public byte[] getContenuPhoto() {
+        return contenuPhoto;
+    }
+
+    public void setContenuPhoto(byte[] contenuPhoto) {
+        this.contenuPhoto = contenuPhoto;
+    }
+
+    public String getPhotoContentType() {
+        return photoContentType;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
+    }
+
+    public boolean hasPhoto() {
+        return contenuPhoto != null && contenuPhoto.length > 0;
+    }
 }
 
 

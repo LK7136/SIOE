@@ -41,7 +41,19 @@
         </thead>
         <tbody>
         <tr th:each="u : ${utilisateurs}">
-          <td><strong th:text="${u.nom + ' ' + u.prenom}"></strong></td>
+          <td>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img th:if="${not #strings.isEmpty(u.urlPhoto)}"
+                   th:src="@{/festival/utilisateurs/photo/{id}(id=${u.id})}"
+                   th:alt="${'Photo de ' + u.prenom + ' ' + u.nom}"
+                   style="width:40px; height:40px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+              <img th:unless="${not #strings.isEmpty(u.urlPhoto)}"
+                   th:src="@{/images/artistes/defaultAvatar.png}"
+                   alt="Photo par défaut"
+                   style="width:40px; height:40px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+              <strong th:text="${u.nom + ' ' + u.prenom}"></strong>
+            </div>
+          </td>
           <td th:text="${u.identifiant}"></td>
           <td th:text="${u.email}"></td>
           <td>
