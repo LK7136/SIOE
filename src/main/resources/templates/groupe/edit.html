@@ -10,7 +10,7 @@
   <div class="hm-card">
     <div class="hm-card-header">
       <div>
-        <div class="hm-tag">Édition</div>
+        <div class="hm-tag">Groupe</div>
         <div class="hm-card-title">
           <span th:if="${groupe.id != null}" th:text="'Modifier le groupe : ' + ${groupe.nomGroupe}"></span>
           <span th:unless="${groupe.id != null}">Nouveau groupe</span>
@@ -25,19 +25,22 @@
 
       <form th:action="@{/groupes/edit}" method="post" enctype="multipart/form-data">
 
+        <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
         <input th:if="${groupe.id != null}" type="hidden" name="id" th:value="${groupe.id}">
         <input type="hidden" name="supprimerPhoto" id="supprimer_photo" value="false">
-        <input type="hidden" name="urlLogo"        th:value="${groupe.urlLogo}">
+        <input type="hidden" name="urlLogo" id="urlLogo" th:value="${groupe.urlLogo}">
 
         <div class="row mb-3">
           <div class="col-auto" style="text-align:center">
-            <label for="urlLogoGroupe" style="cursor:pointer; display:inline-block;">
+            <label for="groupePhoto" style="cursor:pointer; display:inline-block;">
               <img id="preview"
-                   th:src="${not #strings.isEmpty(groupe.urlLogo)} ? @{/groupes/uploads/{p}(p=${groupe.urlLogo})} : @{/images/groupes/defaultGroupeAvatar.png}"
+                   th:src="${not #strings.isEmpty(groupe.urlLogo)} ? @{/uploads/groupe_image/{p}(p=${groupe.urlLogo})} : @{/images/groupes/defaultGroupeAvatar.png}"
                    style="width:180px; height:180px; border-radius:5%; object-fit:cover;">
             </label>
-            <input type="file" id="urlLogoGroupe" name="urlLogoGroupe" accept="image/*" style="display:none;">
-            <div th:if="${not #strings.isEmpty(groupe.urlLogo)}" style="margin-top:6px;">
+            <input type="file" id="groupePhoto" name="groupePhoto" accept="image/png, image/jpeg, image/gif, image/webp, image/svg+xml" style="display:none;">
+            <div id="containerBtnSupprimer"
+                 th:style="${#strings.isEmpty(groupe.urlLogo)} ? 'display:none; margin-top:6px;' : 'display:block; margin-top:6px;'">
               <button type="button" id="btnSupprimerPhoto" class="hm-btn-primary"
                       style="background-color:#6c757d; color:white;">
                 🗑️ Supprimer la photo
@@ -81,7 +84,6 @@
           </div>
         </div>
 
-
         <div class="row mb-3">
 
           <div class="col-md-4">
@@ -116,7 +118,8 @@
                   </label>
                 </div>
 
-              </div> </div>
+              </div>
+            </div>
           </div>
 
           <div class="col-md-4">
@@ -333,11 +336,17 @@
   <script th:inline="javascript">
     const defaultGroupeAvatarUrl = /*[[@{/images/groupes/defaultGroupeAvatar.png}]]*/ '';
 
-    document.getElementById('urlLogoGroupe').addEventListener('change', function(e) {
+    const containerBtn = document.getElementById('containerBtnSupprimer');
+    const inputPhoto = document.getElementById('groupePhoto');
+
+    inputPhoto.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
         document.getElementById('preview').src = URL.createObjectURL(file);
         document.getElementById('supprimer_photo').value = "false";
+        if (containerBtn) {
+          containerBtn.style.display = "block";
+        }
       }
     });
 
@@ -345,9 +354,13 @@
     if (btnSuppr) {
       btnSuppr.addEventListener('click', function() {
         document.getElementById('preview').src = defaultGroupeAvatarUrl;
-        document.getElementById('urlLogoGroupe').value = "";
+        document.getElementById('urlLogo').value = "";
         document.getElementById('supprimer_photo').value = "true";
-        this.style.display = "none";
+        inputPhoto.value = "";
+
+        if (containerBtn) {
+          containerBtn.style.display = "none";
+        }
       });
     }
 
