@@ -66,6 +66,30 @@ public class UtilisateurDetailService implements UserDetailsService {
         utilisateurRepository.save(utilisateur);
     }
 
+
+    /** Modifie un utilisateur existant si mot de passe vide aloors on garde l'ancien */
+    public void modifierUtilisateur(Utilisateur utilisateur) {
+        Utilisateur existing = utilisateurRepository.findById(utilisateur.getId()).orElse(null);
+        if (existing == null) {
+            return;
+        }
+
+        existing.setNom(utilisateur.getNom());
+        existing.setPrenom(utilisateur.getPrenom());
+        existing.setEmail(utilisateur.getEmail());
+        existing.setIdentifiant(utilisateur.getIdentifiant());
+        existing.setActif(utilisateur.getActif());
+        existing.setRoles(utilisateur.getRoles());
+
+        // mot de passe  seulement s'il a ete saisi et toujours encode
+        if (utilisateur.getMotDePasse() != null && !utilisateur.getMotDePasse().isBlank()) {
+            existing.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+        }
+
+        // dateCreation n'est pas recopiee  elle n'est jamais ecrasee
+        utilisateurRepository.save(existing);
+    }
+
     public void save(Utilisateur utilisateur) {
         utilisateurRepository.save(utilisateur);
     }
