@@ -41,6 +41,24 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </thead>
 <tbody>
 <tr>
+<td>v2.3.1</td>
+<td>24/11/2026</td>
+<td>
+<ul>
+<li>Enregistre tous les champs à la modification d’un utilisateur (<a href="https://github.com/LK7136/SIOE/pull/42">#16</a>)</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>v2.3</td>
+<td>17/11/2026</td>
+<td>
+<ul>
+<li>Changement de la manière dont les images des artistes et groupes sont gérées - #118</li>
+</ul>
+</td>
+</tr>
+<tr>
 <td>v2.2.1</td>
 <td>05/11/2026</td>
 <td>
@@ -78,7 +96,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </tr>
 <tr>
 <td>v2.2</td>
-<td>à compléter</td>
+<td></td>
 <td>
 <ul>
 <li>Update edit.html</li>
