@@ -398,8 +398,10 @@ erreurCnx p {
     margin: 0;
 }
 
-.grid-stack-item-content { overflow: auto; }
-.grid-stack-item-content > .hm-card { height: 100%; margin: 0; }
+/* Le scroll n'apparaît que si le contenu dépasse réellement la case du module */
+.grid-stack-item-content { overflow-x: hidden; overflow-y: auto; }
+.grid-stack-item-content > .hm-card { height: 100%; margin: 0 !important; }
+.grid-stack-item-content > .hm-card > :last-child { margin-bottom: 0; }
 
 /* ================================
    ADAPTATION AUTOMATIQUE (Responsive)
@@ -445,4 +447,60 @@ erreurCnx p {
     --hm-accent-dark: #1e40af;
 
     --hm-glow: rgba(37, 99, 235, 0.25);
+}
+
+
+/* Option 1 : Si vous souhaitez centrer toute la ligne contenant l'input Général */
+.parametres-general-row, /* Remplacez par votre classe spécifique si besoin */
+.bm-card-body .row:has(#nom_application) {
+    justify-content: center;
+}
+
+
+
+/* From Uiverse.io by boryanakrasteva */
+.btndel {
+    background-color: transparent;
+    position: relative;
+    border: none;
+    color: red;
+}
+
+.btndel::after {
+    content: 'delete';
+    position: absolute;
+    top: -130%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+    height: fit-content;
+    background-color: rgb(168, 7, 7);
+    padding: 4px 8px;
+    border-radius: 5px;
+    transition: .2s linear;
+    transition-delay: .2s;
+    color: white;
+    text-transform: uppercase;
+    font-size: 12px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.icon {
+    transform: scale(1.2);
+    transition: .2s linear;
+}
+
+.btndel:hover > .icon {
+    transform: scale(1.5);
+}
+
+.btndel:hover > .icon path {
+    fill: rgb(168, 7, 8);
+}
+
+.btndel:hover::after {
+    visibility: visible;
+    opacity: 1;
+    top: -160%;
 }

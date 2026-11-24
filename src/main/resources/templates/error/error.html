@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Une erreur est survenue</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/errorStyle.css">
+
+
+</head>
+<body>
+
+<div class="container error-page d-flex align-items-center">
+
+    <div class="row align-items-center w-100 g-5">
+        <h1 class="error-code" id="error-title">Erreur</h1>
+        <div class="col-lg-6 text-center text-lg-start">
+            <div class="error-title mb-3">Oups ! Cette page n’existe pas.</div>
+            <p class="error-text fs-5 mb-4">
+                La page que vous cherchez a été déplacée ou supprimée.
+            </p>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorCode = urlParams.get('code');
+
+    // 2. Si un code est trouvé, on l'affiche dans le H1
+    if (errorCode) {
+        document.getElementById('error-title').textContent = "Erreur " + errorCode;
+    } else {
+        document.getElementById('error-title').textContent = "Erreur Inconnue";
+    }
+</script>
+</body>
+</html>

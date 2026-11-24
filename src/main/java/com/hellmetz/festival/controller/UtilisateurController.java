@@ -32,6 +32,9 @@ public class UtilisateurController {
     @Autowired
     private PermissionService permissionService;
 
+
+
+
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String success,
                             HttpServletRequest request,
@@ -66,32 +69,13 @@ public class UtilisateurController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
+        Utilisateur nouvelUtilisateur = new Utilisateur();
+        model.addAttribute("utilisateur", nouvelUtilisateur);
 
-        //ajouter
-        List<Role> roles = roleService.findAllAvecPermissions();
-
-        model.addAttribute("utilisateur", new Utilisateur());
-        model.addAttribute("roles", roleService.findAll());
-
-        //ajouter pour recup les perm
-        model.addAttribute("permissions", permissionService.findAll());
-
-        //ajouter pour recup les perm
-        Map<Long, List<Long>> permissionsParRole = new HashMap<>();
-        for (Role role : roles) {
-            List<Long> ids = role.getPermissions().stream()
-                    .map(Permission::getIdPermission)
-                    .collect(Collectors.toList());
-            permissionsParRole.put(role.getIdRole(), ids);
-        }
-        model.addAttribute("permissionsParRole", permissionsParRole);
-
+        alimenterPermissions(model, nouvelUtilisateur);
 
         return "register";
     }
-
-
-
 
 
     @PostMapping("/register")
@@ -121,25 +105,29 @@ public class UtilisateurController {
     }
 
 
-
-
     @GetMapping("/festival/utilisateurs/liste")
     public String liste(Model model) {
         model.addAttribute("utilisateurs", utilisateurDetailService.findAll());
+        model.addAttribute("activeMenu", "utilisateurs");
         return "utilisateur/list";
     }
 
 
     @GetMapping("/festival/utilisateurs/ajouter")
     public String edit(@RequestParam(required = false) Long id, Model model) {
+        Utilisateur utilisateurExistant;
+
         if (id != null) {
-            model.addAttribute("utilisateur", utilisateurDetailService.findById(id));
-            model.addAttribute("pageTitle", "Modifier l'utilisateur - HellMetz");
+            utilisateurExistant = utilisateurDetailService.findById(id);
+            model.addAttribute("pageTitle", "Modifier l'utilisateur");
         } else {
-            model.addAttribute("utilisateur", new Utilisateur());
-            model.addAttribute("pageTitle", "Nouvel utilisateur - HellMetz");
+            utilisateurExistant = new Utilisateur();
+            model.addAttribute("pageTitle", "Nouvel utilisateur");
         }
-        model.addAttribute("roles", roleService.findAll());
+        model.addAttribute("utilisateur", utilisateurExistant);
+
+        alimenterPermissions(model, utilisateurExistant);
+
         return "utilisateur/edit";
     }
 
@@ -168,6 +156,39 @@ public class UtilisateurController {
         utilisateurDetailService.deleteById(id);
         return "redirect:/festival/utilisateurs/liste";
     }
+
+    private void alimenterPermissions(Model model, Utilisateur utilisateur){
+        List<Role> roles = roleService.findAllAvecPermissions();
+        Map<Long, List<Long>> permissionsParRole = new HashMap<>();
+
+        for (Role role : roles) {
+            List<Long> ids = role.getPermissions().stream()
+                    .map(Permission::getIdPermission)
+                    .collect(Collectors.toList());
+            permissionsParRole.put(role.getIdRole(), ids);
+        }
+
+        model.addAttribute("permissions", permissionService.findAll());
+        model.addAttribute("roles", roles);
+        model.addAttribute("permissionsParRole", permissionsParRole);
+
+        List<Long> utilisateurPermissionsIds = new java.util.ArrayList<>();
+
+        if (utilisateur != null && utilisateur.getRoles() != null){
+            for (Role roleUtilisateur : utilisateur.getRoles()) {
+                List<Long> ids = permissionsParRole.get(roleUtilisateur.getIdRole());
+                if (ids != null) {
+                    for (Long id : ids) {
+                        if (!utilisateurPermissionsIds.contains(id)) {
+                            utilisateurPermissionsIds.add(id);
+                        }
+                    }
+                }
+            }
+        }
+        model.addAttribute("utilisateurPermissionsIds", utilisateurPermissionsIds);
+    }
+
 
 
 }

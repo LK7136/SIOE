@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout :: layout(~{::content})}">
 <head>
-    <title>Artistes - HellMetz</title>
+    <title>Artistes</title>
 </head>
 <body>
 <div th:fragment="content">
@@ -11,7 +11,7 @@
         <div class="hm-card-header">
             <div>
                 <div class="hm-tag">Programmation</div>
-                <div class="hm-card-title">Artistes du HellMetz Festival</div>
+                <div class="hm-card-title" th:text="'Artistes du ' + ${appNom} + ' Festival'">Artistes</div>
             </div>
 
             <a sec:authorize="hasAnyRole('ADMIN', 'ORGANISATEUR')"
@@ -23,7 +23,6 @@
         <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
             <form th:action="@{/artistes/liste}" method="get"
                   style="display:flex; align-items:center; gap:.5rem; margin:0;">
-                <!-- on revient en page 1 quand on change la taille -->
                 <input type="hidden" name="page" value="0">
                 <label for="taille" style="font-size:.9rem;">Afficher</label>
                 <select id="taille" name="taille" class="form-select" style="width:auto;"
@@ -57,15 +56,9 @@
 
                 <tr th:each="a : ${artistes}">
                     <td>
-                        <img th:if="${not #strings.isEmpty(a.urlPhoto)}"
-                             th:src="@{/artistes/uploads/{photo}(photo=${a.urlPhoto})}"
+                        <img th:src="${#strings.isEmpty(a.urlPhoto)} ? @{/images/artistes/defaultAvatar.png} : (${#strings.startsWith(a.urlPhoto, 'http')} ? ${a.urlPhoto} : @{/uploads/artiste_image/{photo}(photo=${a.urlPhoto})})"
                              th:alt="${'Photo de ' + a.nom}"
-                             style="width: 50px; height: 50px; border-radius: 4px;">
-
-                        <img th:unless="${not #strings.isEmpty(a.urlPhoto)}"
-                             th:src="@{/images/artistes/defaultAvatar.png}"
-                             alt="Photo par défaut"
-                             style="width: 50px; height: 50px; border-radius: 4px;">
+                             style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover;">
                     </td>
 
                     <td>
@@ -101,17 +94,15 @@
             <nav th:if="${taille != 'tout' and page.totalPages > 1}"
                  style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
 
-    <span style="font-size:.85rem; color:var(--hm-text-muted);"
-          th:text="${page.totalElements} + ' artistes au total'">0 artistes</span>
+                <span style="font-size:.85rem; color:var(--hm-text-muted);"
+                      th:text="${page.totalElements} + ' artistes au total'">0 artistes</span>
 
                 <ul class="pagination mb-0">
-                    <!-- Précédent -->
                     <li class="page-item" th:classappend="${page.first} ? 'disabled'">
                         <a class="page-link"
                            th:href="@{/artistes/liste(page=${page.number - 1}, taille=${taille})}">‹</a>
                     </li>
 
-                    <!-- Numéros de page (affichage 1-based) -->
                     <li class="page-item"
                         th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
                         th:classappend="${i == page.number} ? 'active'">
@@ -120,7 +111,6 @@
                            th:text="${i + 1}">1</a>
                     </li>
 
-                    <!-- Suivant -->
                     <li class="page-item" th:classappend="${page.last} ? 'disabled'">
                         <a class="page-link"
                            th:href="@{/artistes/liste(page=${page.number + 1}, taille=${taille})}">›</a>
