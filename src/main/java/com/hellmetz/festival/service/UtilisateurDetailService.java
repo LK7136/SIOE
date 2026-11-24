@@ -79,7 +79,11 @@ public class UtilisateurDetailService implements UserDetailsService {
         existing.setEmail(utilisateur.getEmail());
         existing.setIdentifiant(utilisateur.getIdentifiant());
         existing.setActif(utilisateur.getActif());
-        existing.setRoles(utilisateur.getRoles());
+
+        existing.getRoles().clear();
+        if (utilisateur.getRoles() != null) {
+            existing.getRoles().addAll(utilisateur.getRoles());
+        }
 
         // mot de passe  seulement s'il a ete saisi et toujours encode
         if (utilisateur.getMotDePasse() != null && !utilisateur.getMotDePasse().isBlank()) {
