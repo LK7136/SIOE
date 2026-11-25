@@ -23,6 +23,7 @@
     </div>
 
     <div class="p-4">
+      <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
       <form th:action="@{/scenes/edit}" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="id" th:value="${scene.id}">
@@ -60,11 +61,13 @@
           </div>
           <div class="col-md-6">
             <label for="planTechnique" class="form-label fw-bold">Changer le Plan Technique (PDF)</label>
-            <input type="file" id="planTechnique" name="planTechnique" class="form-control" accept="application/pdf">
+            <input type="file" id="planTechnique" name="planTechnique" class="form-control"
+                   accept="application/pdf,.pdf">
             <small th:if="${not #strings.isEmpty(scene.urlPlanTechnique)}"
-                   class="text-muted"
+                   class="text-muted d-block"
                    th:text="'Fichier actuel : ' + ${scene.urlPlanTechnique}">
             </small>
+            <div id="planTechniqueError" class="text-danger small fw-bold mt-1" style="display:none;"></div>
           </div>
         </div>
 
@@ -74,11 +77,14 @@
           <label class="form-check-label fw-bold text-success" for="actif">Scène active</label>
         </div>
 
-        <div th:if="${not #strings.isEmpty(scene.urlPlanTechnique)}"
+        <div id="planPreviewContainer"
+             th:style="${#strings.isEmpty(scene.urlPlanTechnique)} ? 'display:none;' : ''"
              class="mt-4 border-top pt-3">
-          <label class="fw-bold mb-2">Aperçu du Plan Technique actuel</label>
+          <label id="planPreviewLabel" class="fw-bold mb-2">Aperçu du Plan Technique actuel</label>
           <div style="background:#f8f9fa; border-radius:8px; padding:10px; border:1px solid #dee2e6;">
-            <iframe th:src="@{/documents/plans/{f}(f=${scene.urlPlanTechnique})}"
+            <iframe id="planPreviewFrame"
+                    th:src="${not #strings.isEmpty(scene.urlPlanTechnique)} ? @{/scenes/uploads/{f}(f=${scene.urlPlanTechnique})} : 'about:blank'"
+                    th:attr="data-initial-src=${not #strings.isEmpty(scene.urlPlanTechnique)} ? @{/scenes/uploads/{f}(f=${scene.urlPlanTechnique})} : ''"
                     width="100%" height="500px"
                     style="border:none; border-radius:4px;">
             </iframe>
@@ -94,6 +100,65 @@
       </form>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const fileInput = document.getElementById('planTechnique');
+      const errorDiv = document.getElementById('planTechniqueError');
+      const previewContainer = document.getElementById('planPreviewContainer');
+      const previewLabel = document.getElementById('planPreviewLabel');
+      const previewFrame = document.getElementById('planPreviewFrame');
+
+      if (!fileInput || !previewFrame) return;
+
+      const initialSrc = previewFrame.dataset.initialSrc || '';
+
+      function resetToInitialPreview() {
+        if (previewFrame.dataset.blobUrl) {
+          URL.revokeObjectURL(previewFrame.dataset.blobUrl);
+          delete previewFrame.dataset.blobUrl;
+        }
+        if (initialSrc) {
+          previewFrame.src = initialSrc;
+          previewLabel.textContent = 'Aperçu du Plan Technique actuel';
+          previewContainer.style.display = 'block';
+        } else {
+          previewFrame.src = 'about:blank';
+          previewContainer.style.display = 'none';
+        }
+      }
+
+      fileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+
+        if (!file) {
+          resetToInitialPreview();
+          return;
+        }
+
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        if (!isPdf) {
+          errorDiv.textContent = 'Format invalide : seuls les fichiers PDF sont acceptés pour le plan technique.';
+          errorDiv.style.display = 'block';
+          e.target.value = '';
+          resetToInitialPreview();
+          return;
+        }
+
+        if (previewFrame.dataset.blobUrl) {
+          URL.revokeObjectURL(previewFrame.dataset.blobUrl);
+        }
+
+        const blobUrl = URL.createObjectURL(file);
+        previewFrame.src = blobUrl;
+        previewFrame.dataset.blobUrl = blobUrl;
+        previewLabel.textContent = 'Aperçu du nouveau Plan Technique sélectionné (non enregistré)';
+        previewContainer.style.display = 'block';
+      });
+    });
+  </script>
 </div>
 </body>
 </html>
