@@ -73,7 +73,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </td>
 </tr>
 <tr>
-<td>v2.1</td>
+<td>v2.1.0</td>
 <td>13/10/2026</td>
 <td>
 <ul>
