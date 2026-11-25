@@ -1,5 +1,6 @@
 package com.hellmetz.festival.controller;
 
+import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Concert;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.model.Style;
@@ -82,9 +83,13 @@ public class GroupeController {
     public String edit(@RequestParam(required = false) Long id,
                        @RequestParam(defaultValue = "0") int concertPage,
                        @RequestParam(defaultValue = "10") String concertTaille,
+                       @RequestParam(defaultValue = "0") int artistePage,
+                       @RequestParam(defaultValue = "10") String artisteTaille,
                        Model model) {
 
         boolean tout = "tout".equalsIgnoreCase(concertTaille);
+        boolean toutArtistes = "tout".equalsIgnoreCase(artisteTaille);
+
 
         List<Style> tousLesStyles = styleService.findAll();
         model.addAttribute("tousLesStyles", tousLesStyles);
@@ -93,7 +98,13 @@ public class GroupeController {
             Groupe groupe = groupeService.findByIdWithStyles(id);
             model.addAttribute("groupe", groupe);
             model.addAttribute("pageTitle", "Modifier le groupe");
-            model.addAttribute("artistes", artisteService.findByGroupeId(id));
+
+            Page<Artiste> pageArtistes = toutArtistes
+                    ? artisteService.findDisponiblesOuGroupeTout(id)
+                    : artisteService.findDisponiblesOuGroupe(id, artistePage, parseTaille(artisteTaille));
+            model.addAttribute("artistes", pageArtistes.getContent());
+            model.addAttribute("pageArtistes", pageArtistes);
+            model.addAttribute("artisteTaille", artisteTaille);
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesOuGroupeTout(id)
@@ -106,7 +117,14 @@ public class GroupeController {
         } else {
             model.addAttribute("groupe", new Groupe());
             model.addAttribute("pageTitle", "Nouveau groupe");
-            model.addAttribute("artistes", java.util.Collections.emptyList());
+
+            Page<Artiste> pageArtistes = toutArtistes
+                    ? artisteService.findDisponiblesTout()
+                    : artisteService.findDisponibles(artistePage, parseTaille(artisteTaille));
+
+            model.addAttribute("artistes", pageArtistes.getContent());
+            model.addAttribute("pageArtistes", pageArtistes);
+            model.addAttribute("artisteTaille", artisteTaille);
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesTout()
@@ -162,6 +180,36 @@ public class GroupeController {
         return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=concerts";
     }
 
+    @PostMapping("/{groupeId}/artistes")
+    public String saveArtistes(@PathVariable Long groupeId,
+                               @RequestParam(required = false) List<Long> artisteIds,
+                               @RequestParam(required = false) List<Long> visibleArtisteIds) {
+
+        if (artisteIds == null) {
+            artisteIds = java.util.Collections.emptyList();
+        }
+
+        if (visibleArtisteIds != null) {
+            Groupe groupe = groupeService.findById(groupeId);
+
+            for (Long idArtiste : visibleArtisteIds) {
+                Artiste artiste = artisteService.findById(idArtiste);
+                if (artiste == null) continue;
+
+                if (artisteIds.contains(idArtiste)) {
+                    // Case cochée : on rattache l'artiste au groupe
+                    artiste.setGroupe(groupe);
+                } else if (artiste.getGroupe() != null && artiste.getGroupe().getId().equals(groupeId)) {
+                    // Case décochée : on libère l'artiste (groupe_id = NULL)
+                    artiste.setGroupe(null);
+                }
+
+                artisteService.save(artiste);
+            }
+        }
+
+        return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=artistes";
+    }
 
     @PostMapping("/edit")
     public String save(@ModelAttribute Groupe groupe,
