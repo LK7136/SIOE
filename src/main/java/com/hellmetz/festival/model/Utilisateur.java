@@ -47,6 +47,10 @@ public class Utilisateur {
     @Temporal(TemporalType.TIMESTAMP)
     private Date derniereConnexion;
 
+
+    @Column(name = "elements_par_page", nullable = false, columnDefinition = "integer default 10")
+    private Integer elementsParPage = 10;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_utilisateur",
@@ -145,7 +149,13 @@ public class Utilisateur {
         this.roles = roles;
     }
 
+    public Integer getElementsParPage() {
+        return elementsParPage;
+    }
 
+    public void setElementsParPage(Integer elementsParPage) {
+        this.elementsParPage = elementsParPage;
+    }
 }
 
 
