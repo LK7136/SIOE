@@ -168,61 +168,130 @@
       </div>
 
       <div id="panel-artistes" class="table-responsive mt-0">
-        <table class="hm-table">
-          <thead>
-          <tr>
-            <th>Photo</th>
-            <th>Artiste</th>
-            <th>Style</th>
-            <th>Nationalité</th>
-            <th>Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="a : ${artistes}">
-            <td>
-              <img th:if="${not #strings.isEmpty(a.urlPhoto)}"
-                   th:src="@{/artistes/uploads/{p}(p=${a.urlPhoto})}"
-                   th:alt="${'Photo de ' + a.nom}"
-                   style="width:50px; height:50px; border-radius:4px; object-fit:cover;">
-              <img th:unless="${not #strings.isEmpty(a.urlPhoto)}"
-                   th:src="@{/images/artistes/defaultAvatar.png}"
-                   alt="Photo par défaut"
-                   style="width:50px; height:50px; border-radius:4px;">
-            </td>
-            <td>
-              <strong th:text="${a.nomScene}"></strong><br>
-              <small style="color:#666;">
-                <span th:text="${a.prenom}"></span>
-                <span th:text="${a.nom}"></span>
-              </small>
-            </td>
-            <td>
-              <span class="hm-pill" th:text="${a.style != null ? a.style.libelle : ''}"></span>
-            </td>
-            <td th:text="${a.nationalite}"></td>
-            <td>
-              <a class="hm-link-site"
-                 th:href="@{/artistes/ajouter(id=${a.id}, idGroupeParam=${groupe.id})}">
-                ✏️ éditer
-              </a>
-              &nbsp;|&nbsp;
-              <a class="hm-link-site"
-                 th:href="@{/artistes/delete/{id}(id=${a.id})}"
-                 th:onclick="'return confirm(\'Supprimer l\'artiste ' + ${a.id} + ' ?\')'"
-                 style="color:#e74c3c;">
-                🗑️ supprimer
-              </a>
-            </td>
-          </tr>
-          <tr th:if="${#lists.isEmpty(artistes)}">
-            <td colspan="5" style="text-align:center; color:#999; padding:20px;">
-              Aucun artiste dans ce groupe
-            </td>
-          </tr>
-          </tbody>
-        </table>
+
+        <form th:action="@{/groupes/ajouter}" method="get"
+              style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0; margin:0;">
+          <input th:if="${groupe.id != null}" type="hidden" name="id" th:value="${groupe.id}">
+          <input type="hidden" name="artistePage"   value="0">
+          <input type="hidden" name="concertPage"   th:value="${pageConcerts.number}">
+          <input type="hidden" name="concertTaille" th:value="${concertTaille}">
+          <input type="hidden" name="tab"           value="artistes">
+          <label style="font-size:.9rem;">Afficher</label>
+          <select name="artisteTaille" class="form-select" style="width:auto;"
+                  onchange="this.form.submit()">
+            <option value="5"    th:selected="${artisteTaille == '5'}">5</option>
+            <option value="10"   th:selected="${artisteTaille == '10'}">10</option>
+            <option value="20"   th:selected="${artisteTaille == '20'}">20</option>
+            <option value="50"   th:selected="${artisteTaille == '50'}">50</option>
+            <option value="tout" th:selected="${artisteTaille == 'tout'}">Tout</option>
+          </select>
+          <span style="font-size:.9rem;">par page</span>
+        </form>
+
+        <form th:if="${groupe.id != null}" th:action="@{/groupes/{id}/artistes(id=${groupe.id})}" method="post">
+          <table class="hm-table">
+            <thead>
+            <tr>
+              <th style="width:40px;">✔</th>
+              <th>Photo</th>
+              <th>Artiste</th>
+              <th>Style</th>
+              <th>Nationalité</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${artistes}">
+              <td>
+                <input type="hidden" name="visibleArtisteIds" th:value="${a.id}">
+                <input type="checkbox"
+                       name="artisteIds"
+                       th:value="${a.id}"
+                       th:checked="${a.groupe != null && a.groupe.id == groupe.id}"
+                       style="width:18px; height:18px; cursor:pointer;">
+              </td>
+              <td>
+                <img th:if="${not #strings.isEmpty(a.urlPhoto)}"
+                     th:src="@{/artistes/uploads/{p}(p=${a.urlPhoto})}"
+                     th:alt="${'Photo de ' + a.nom}"
+                     style="width:50px; height:50px; border-radius:4px; object-fit:cover;">
+                <img th:unless="${not #strings.isEmpty(a.urlPhoto)}"
+                     th:src="@{/images/artistes/defaultAvatar.png}"
+                     alt="Photo par défaut"
+                     style="width:50px; height:50px; border-radius:4px;">
+              </td>
+              <td>
+                <strong th:text="${a.nomScene}"></strong><br>
+                <small style="color:#666;">
+                  <span th:text="${a.prenom}"></span>
+                  <span th:text="${a.nom}"></span>
+                </small>
+              </td>
+              <td>
+                <span class="hm-pill" th:text="${a.style != null ? a.style.libelle : ''}"></span>
+              </td>
+              <td th:text="${a.nationalite}"></td>
+              <td>
+                <a class="hm-link-site"
+                   th:href="@{/artistes/ajouter(id=${a.id}, idGroupeParam=${groupe.id})}">
+                  ✏️ éditer
+                </a>
+                &nbsp;|&nbsp;
+                <a class="hm-link-site"
+                   th:href="@{/artistes/delete/{id}(id=${a.id})}"
+                   th:onclick="'return confirm(\'Supprimer l\'artiste ' + ${a.id} + ' ?\')'"
+                   style="color:#e74c3c;">
+                  🗑️ supprimer
+                </a>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(artistes)}">
+              <td colspan="6" style="text-align:center; color:#999; padding:20px;">
+                Aucun artiste disponible
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <nav th:if="${artisteTaille != 'tout' and pageArtistes.totalPages > 1}"
+               style="display:flex; justify-content:space-between; align-items:center; padding:1rem 0;">
+      <span style="font-size:.85rem; color:var(--hm-text-muted);"
+            th:text="${pageArtistes.totalElements} + ' artistes au total'"></span>
+            <ul class="pagination mb-0">
+              <li class="page-item" th:classappend="${pageArtistes.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},artistePage=${pageArtistes.number - 1},artisteTaille=${artisteTaille},concertPage=${pageConcerts.number},concertTaille=${concertTaille},tab='artistes')}">‹</a>
+              </li>
+              <li class="page-item"
+                  th:each="i : ${#numbers.sequence(0, pageArtistes.totalPages - 1)}"
+                  th:classappend="${i == pageArtistes.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},artistePage=${i},artisteTaille=${artisteTaille},concertPage=${pageConcerts.number},concertTaille=${concertTaille},tab='artistes')}"
+                   th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${pageArtistes.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/groupes/ajouter(id=${groupe.id},artistePage=${pageArtistes.number + 1},artisteTaille=${artisteTaille},concertPage=${pageConcerts.number},concertTaille=${concertTaille},tab='artistes')}">›</a>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="text-end mt-3">
+            <button type="submit" class="hm-btn-primary" style="border:none;">
+              💾 Enregistrer les artistes
+            </button>
+          </div>
+        </form>
+
+        <div th:unless="${groupe.id != null}" class="text-end mt-3">
+    <span style="color:#999; font-style:italic;">
+      Sauvegardez d'abord le groupe pour assigner des artistes
+    </span>
+        </div>
+
       </div>
+
+
 
       <div id="panel-concerts" class="table-responsive mt-0" style="display:none;">
 
