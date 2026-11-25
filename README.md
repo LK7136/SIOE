@@ -38,7 +38,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </thead>
 <tbody>
 <tr>
-<td>v2.3.1</td>
+<td>v2.3.0</td>
 <td>24/11/2026</td>
 <td>
 <ul>
@@ -47,7 +47,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </td>
 </tr>
 <tr>
-<td>v2.3.0</td>
+<td>v2.2.1</td>
 <td>05/11/2026</td>
 <td>
 <ul>
@@ -59,7 +59,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </td>
 </tr>
 <tr>
-<td>v2.2.1</td>
+<td>v2.2.0</td>
 <td>04/11/2026</td>
 <td>
 <ul>
@@ -73,17 +73,6 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 </td>
 </tr>
 <tr>
-<td>v2.2</td>
-<td>13/10/2026</td>
-<td>
-<ul>
-<li>Onglets Paramètres et Utilisateurs remontés en haut de la sidebar (<a href="https://github.com/LK7136/SIOE/issues/59">#59</a>)</li>
-<li>Page Paramètres : ajustements d’affichage et centrage du champ « Nom de l’application »</li>
-<li>Journalisation Logback (<code>logback-spring.xml</code>) : console en dev, fichiers <code>logs/sioe.log</code> / audit en prod avec rotation et exclusion du dépôt via <code>.gitignore</code>(<a href="https://github.com/LK7136/SIOE/issues/23">#23</a>)</li>
-</ul>
-</td>
-</tr>
-<tr>
 <td>v2.1</td>
 <td>13/10/2026</td>
 <td>
@@ -92,6 +81,9 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <li>Nettoyage sécurité du dépôt : secrets, <code>.gitignore</code>, keystore SSL retiré du dépôt et documenté pour génération locale (<a href="https://github.com/LK7136/SIOE/issues/31">#31</a>)</li>
 <li>Formulaire utilisateurs : grille des permissions affichée et pré-cochée selon le rôle (<a href="https://github.com/LK7136/SIOE/issues/15">#15</a>)</li>
 <li>Enregistrement des paramètres fiabilisé : validation par type, messages flash, plus de décalage des valeurs (<a href="https://github.com/LK7136/SIOE/issues/10">#10</a>)</li>
+<li>Onglets Paramètres et Utilisateurs remontés en haut de la sidebar (<a href="https://github.com/LK7136/SIOE/issues/59">#59</a>)</li>
+<li>Page Paramètres : ajustements d’affichage et centrage du champ « Nom de l’application »</li>
+<li>Journalisation Logback (<code>logback-spring.xml</code>) : console en dev, fichiers <code>logs/sioe.log</code> / audit en prod avec rotation et exclusion du dépôt via <code>.gitignore</code>(<a href="https://github.com/LK7136/SIOE/issues/23">#23</a>)</li>
 </ul>
 </td>
 </tr>
