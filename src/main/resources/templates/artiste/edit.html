@@ -83,7 +83,7 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="idStyle" class="form-label fw-bold">Style</label>
-            <select id="idStyle" name="style.id" class="form-control">
+            <select id="idStyle" name="style.id" class="form-control" required>
               <option value="">-- Sélectionner un style --</option>
               <option th:each="style : ${styles}"
                       th:value="${style.id}"
