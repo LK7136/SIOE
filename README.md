@@ -45,7 +45,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>24/11/2026</td>
 <td>
 <ul>
-<li>Enregistre tous les champs à la modification d’un utilisateur (<a href="https://github.com/LK7136/SIOE/pull/42">#16</a>)</li>
+<li>À la modification d’un utilisateur, enregistre tous les champs (nom, prénom, e-mail, identifiant, rôle, actif) ; mot de passe conservé si le champ est vide, sinon ré-encodé (<a href="https://github.com/LK7136/SIOE/issues/16">#16</a>, <a href="https://github.com/LK7136/SIOE/pull/42">PR #42</a>)</li>
 </ul>
 </td>
 </tr>
@@ -54,7 +54,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>17/11/2026</td>
 <td>
 <ul>
-<li>Changement de la manière dont les images des artistes et groupes sont gérées - #118</li>
+<li>Photos artistes et groupes gérées via <code>StorageService</code> dans <code>uploads/artiste_image</code> et <code>uploads/groupe_image</code> (plus de chemin local fixe) (<a href="https://github.com/LK7136/SIOE/pull/118">#118</a>)</li>
 </ul>
 </td>
 </tr>
@@ -63,34 +63,9 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>05/11/2026</td>
 <td>
 <ul>
-<li>Afficher le scroll des modules uniquement quand il est nécessaire</li>
-<li>Pagination adapter au couleur du site</li>
-<li>Nettoyage du dépôt : secrets, <code>.gitignore</code> et fichiers générés</li>
-<li>Correctif de nomage sql</li>
-<li>Ajout keystore</li>
-<li>Qualité dépôt sécurité</li>
-<li>Erreur feature 20</li>
-<li>Keystore</li>
-<li>Page erreur</li>
-<li>Qualité dépôt sécurité</li>
-<li>Bug utilisateurs (permissions selon le rôle)</li>
-<li>Onglets Paramètres et Utilisateurs remontés dans la sidebar</li>
-<li>Aperçu du plan technique</li>
-<li>Dynamisation du nom de l’application</li>
-<li>ActiveMenu sur Scènes, Artistes et Utilisateurs</li>
-<li>Log tech</li>
-<li>Modification paramètres + centrage du champ nom de l’application</li>
-<li>Correction vue et sauvegarde du logo</li>
-<li>Feature concert</li>
-<li>Mise à jour du menu</li>
-<li>Refonte complète de la page d’édition des utilisateurs</li>
-<li>Refonte complète de la page de création des utilisateurs</li>
-<li>Ajout de <code>editUtilisateurStyle.css</code> au layout</li>
-<li>Refonte complète de la page d’édition des utilisateurs</li>
-<li>Mise à jour du menu</li>
-<li>Pagination adaptée aux couleurs du site</li>
-<li>Afficher le scroll des modules uniquement quand nécessaire</li>
-<li>Ajout du <code>sioe.log</code> dans le <code>.gitignore</code></li>
+<li>Sur le tableau de bord, barre de défilement des modules affichée seulement si le contenu déborde</li>
+<li>Pagination des listes adaptée aux couleurs de la charte du site</li>
+<li>Correction de l’affichage et de la sauvegarde du logo (logo par défaut si aucun n’est en base)</li>
 </ul>
 </td>
 </tr>
@@ -99,13 +74,8 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td></td>
 <td>
 <ul>
-<li>Update edit.html</li>
-<li>maj menu</li>
-<li>Refonte complète de la page d’édition des utilisateurs</li>
-<li>Add editUtilisateurStyle.css to layout.html</li>
-<li>refonte complète de la page de création des utilisateurs</li>
-<li>Paramètre 8</li>
-<li>Ajout de sioe.log dans le gitignore</li>
+<li>Refonte des pages de création et d’édition des utilisateurs (<code>utilisateur/edit.html</code>)</li>
+<li>Ajout de <code>editUtilisateurStyle.css</code> au layout et mise à jour du menu associé</li>
 </ul>
 </td>
 </tr>
@@ -114,16 +84,12 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>04/11/2026</td>
 <td>
 <ul>
-<li>Ajout du ActiveMenu sur Scènes, Artistes &amp; Utilisateur</li>
-<li>Ajout du logo et de la personnalisation de ce dernier dans les paramètres</li>
-<li>Fix dynamisation nom appli 65</li>
-<li>Aperçu du plan technique</li>
-<li>Fix du ticket numéro #12 des issues</li>
-<li>refonte complète de la page d’édition des utilisateurs</li>
-<li>maj menu</li>
-<li>Feature concert 12</li>
-<li>Ajout de la sauvegarde de l’image dans la DB</li>
-<li>Correction vue et sauvegarde du logo</li>
+<li>Surbrillance de l’onglet actif (ActiveMenu) pour Scènes, Artistes et Utilisateurs dans la sidebar (<a href="https://github.com/LK7136/SIOE/issues/73">#73</a>)</li>
+<li>Upload et personnalisation du logo dans Paramètres (sidebar + favicon) (<a href="https://github.com/LK7136/SIOE/issues/71">#71</a>)</li>
+<li>Nom de l’application lu depuis les paramètres et affiché dans le titre navigateur, la sidebar et l’en-tête (<a href="https://github.com/LK7136/SIOE/issues/65">#65</a>)</li>
+<li>Aperçu du plan technique réparé dans l’édition des scènes (URL fichier correcte, plus d’image cassée) (<a href="https://github.com/LK7136/SIOE/issues/67">#67</a>)</li>
+<li>Dates de concert limitées à la fenêtre du festival, avec contrôles HTML et serveur (<a href="https://github.com/LK7136/SIOE/issues/12">#12</a>)</li>
+<li>Persistance du logo applicatif en base et affichage cohérent dans les vues</li>
 </ul>
 </td>
 </tr>
@@ -132,10 +98,10 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>13/10/2026</td>
 <td>
 <ul>
-<li>Onglet parametres &amp; utilisateurs à remonter dans la side bar #59</li>
-<li>correction de nomage des fichiers sql présent dans db\migration</li>
-<li>Modification parametres + centrage du champ nom de l’application</li>
-<li>Log tech 23 v2</li>
+<li>Onglets Paramètres et Utilisateurs remontés en haut de la sidebar (<a href="https://github.com/LK7136/SIOE/issues/59">#59</a>)</li>
+<li>Page Paramètres : ajustements d’affichage et centrage du champ « Nom de l’application »</li>
+<li>Journalisation Logback (<code>logback-spring.xml</code>) : console en dev, fichiers <code>logs/sioe.log</code> / audit en prod avec rotation (<a href="https://github.com/LK7136/SIOE/issues/23">#23</a>)</li>
+<li>Fichiers de log (<code>sioe.log</code>, dossier <code>logs/</code>) exclus du dépôt via <code>.gitignore</code></li>
 </ul>
 </td>
 </tr>
@@ -144,19 +110,10 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>13/10/2026</td>
 <td>
 <ul>
-<li>Erreur feature 20</li>
-<li>Qualité dépôt sécurité 31</li>
-<li>Ajout keystore</li>
-<li>gitignore</li>
-<li>Revert "gitignore"</li>
-<li>Bug utilisateurs 15</li>
-<li>Page erreur</li>
-<li>keystore</li>
-<li>Fiabiliser l’enregistrement du formulaire</li>
-<li>Onglet parametres &amp; utilisateurs à remonter dans la side bar #59</li>
-<li>correction de nomage des fichiers sql présent dans db\migration</li>
-<li>Modification parametres + centrage du champ nom de l’application</li>
-<li>Log tech 23 v2</li>
+<li>Pages d’erreur HTTP 403, 405 et 500 stylées sur le modèle de la 404 (<a href="https://github.com/LK7136/SIOE/issues/20">#20</a>)</li>
+<li>Nettoyage sécurité du dépôt : secrets, <code>.gitignore</code>, keystore SSL retiré du dépôt et documenté pour génération locale (<a href="https://github.com/LK7136/SIOE/issues/31">#31</a>)</li>
+<li>Formulaire utilisateurs : grille des permissions affichée et pré-cochée selon le rôle (<a href="https://github.com/LK7136/SIOE/issues/15">#15</a>)</li>
+<li>Enregistrement des paramètres fiabilisé : validation par type, messages flash, plus de décalage des valeurs (<a href="https://github.com/LK7136/SIOE/issues/10">#10</a>)</li>
 </ul>
 </td>
 </tr>
@@ -165,8 +122,7 @@ Tableau à compléter au fil du projet. Indiquez la version, la date et ce que l
 <td>06/10/2026</td>
 <td>
 <ul>
-<li>Nettoyage du dépôt : secrets, .gitignore et fichiers générés</li>
-<li>Correctif de nomage sql</li>
+<li>Correction du nommage des scripts SQL dans <code>db/migration</code> et alignement avec l’entité <code>Edition</code></li>
 </ul>
 </td>
 </tr>
