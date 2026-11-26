@@ -31,7 +31,8 @@ public class SceneController {
     @Autowired
     private SceneService sceneService;
 
-    private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/";
+    // Dossier relatif à la racine du projet (portable entre tous les postes de l'équipe)
+    private static final String UPLOAD_DIR = "uploads/scenes_plans/";
 
     @GetMapping("/liste")
     public String liste(Model model) {
@@ -43,15 +44,25 @@ public class SceneController {
 
     @GetMapping("/ajouter")
     public String edit(@RequestParam(required = false) Long id, Model model) {
+        Scene scene;
         if (id != null) {
-            Scene scene = sceneService.findById(id);
-            model.addAttribute("scene", scene);
+            scene = sceneService.findById(id);
             model.addAttribute("pageTitle", "Modifier la scene");
         } else {
-            model.addAttribute("scene", new Scene());
+            scene = new Scene();
             model.addAttribute("pageTitle", "Nouvelle scene");
         }
 
+        // Vérifie si le fichier référencé en base existe physiquement sur le poste courant
+        boolean planExiste = false;
+        if (scene != null && scene.getUrlPlanTechnique() != null && !scene.getUrlPlanTechnique().isBlank()) {
+            Path chemin = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize()
+                    .resolve(scene.getUrlPlanTechnique()).normalize();
+            planExiste = Files.exists(chemin) && Files.isReadable(chemin);
+        }
+
+        model.addAttribute("scene", scene);
+        model.addAttribute("planExiste", planExiste);
         model.addAttribute("scenes", sceneService.findAll());
         model.addAttribute("activeMenu", "scenes");
         return "scene/edit";
@@ -67,7 +78,7 @@ public class SceneController {
                 : "redirect:/scenes/ajouter";
 
         if (file != null && !file.isEmpty()) {
-            // 1. Validation stricte du format PDF (MIME + extension + en-tête binaire %PDF-)
+            // 1. Validation stricte du format PDF
             if (!isValidPdf(file)) {
                 redirectAttributes.addFlashAttribute("error",
                         "Format invalide : seuls les fichiers PDF sont acceptés pour le plan technique.");
@@ -75,7 +86,7 @@ public class SceneController {
             }
 
             try {
-                // 2. Créer le dossier s'il n'existe pas
+                // 2. Créer le dossier relatif s'il n'existe pas
                 Path uploadPath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
@@ -161,7 +172,6 @@ public class SceneController {
             return false;
         }
 
-        // Vérification des 5 premiers octets (%PDF-) pour bloquer un fichier renommé en .pdf
         try (InputStream is = file.getInputStream()) {
             byte[] header = new byte[5];
             if (is.read(header) < 5) {
