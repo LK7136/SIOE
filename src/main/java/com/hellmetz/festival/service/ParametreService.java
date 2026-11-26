@@ -1,23 +1,31 @@
 package com.hellmetz.festival.service;
 
 import com.hellmetz.festival.model.Parametre;
+import com.hellmetz.festival.parametre.CodesParametres;
 import com.hellmetz.festival.repository.ParametreRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
 public class ParametreService {
 
-    /** Logo de secours (1re visite / BDD indisponible ou incorrecte). */
+    private static final Logger log = LoggerFactory.getLogger(ParametreService.class);
+
     public static final String DEFAULT_LOGO_URL = "/assets/752692.png";
 
     private static final Set<String> EXTENSIONS_AUTORISEES = Set.of(".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg");
@@ -27,36 +35,137 @@ public class ParametreService {
     );
 
     private final ParametreRepository parametreRepository;
+    private final ConcurrentHashMap<String, Optional<String>> cacheValeurs = new ConcurrentHashMap<>();
+    private volatile String cachedLogoUrl;
+    private volatile Boolean cachedHasCustomLogo;
 
-    public ParametreService(ParametreRepository parametreRepository) {this.parametreRepository = parametreRepository;}
-
-    @Transactional(readOnly = true)
-    public List<Parametre> findAll() {return parametreRepository.findAll();}
-
-    @Transactional(readOnly = true)
-    public Parametre findByCode(String code) {return parametreRepository.findByCodeParametre(code);}
-
-    @Transactional(readOnly = true)
-    public Parametre findById(Long id) {return parametreRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Parametre introuvable : " + id));
+    public ParametreService(ParametreRepository parametreRepository) {
+        this.parametreRepository = parametreRepository;
     }
 
-    public Parametre save(Parametre parametre) {return parametreRepository.save(parametre);}
+    @Transactional(readOnly = true)
+    public List<Parametre> findAll() {
+        return parametreRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Parametre findByCode(String code) {
+        return parametreRepository.findByCodeParametre(code);
+    }
+
+    @Transactional(readOnly = true)
+    public Parametre findById(Long id) {
+        return parametreRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Parametre introuvable : " + id));
+    }
+
+    public Parametre save(Parametre parametre) {
+        Parametre saved = parametreRepository.save(parametre);
+        viderCache();
+        return saved;
+    }
+
+    public void viderCache() {
+        cacheValeurs.clear();
+        cachedLogoUrl = null;
+        cachedHasCustomLogo = null;
+    }
+
+    @Transactional(readOnly = true)
+    public String getString(String code, String defaut) {
+        return lireValeur(code).orElse(defaut);
+    }
+
+    @Transactional(readOnly = true)
+    public int getInt(String code, int defaut) {
+        Optional<String> valeur = lireValeur(code);
+        if (valeur.isEmpty()) {
+            return defaut;
+        }
+        try {
+            return Integer.parseInt(valeur.get().trim());
+        } catch (NumberFormatException e) {
+            log.warn("Paramètre '{}' invalide ('{}') — valeur par défaut utilisée : {}", code, valeur.get(), defaut);
+            return defaut;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public LocalDate getDate(String code, LocalDate defaut) {
+        Optional<String> valeur = lireValeur(code);
+        if (valeur.isEmpty()) {
+            return defaut;
+        }
+        try {
+            return LocalDate.parse(valeur.get().trim());
+        } catch (DateTimeParseException e) {
+            log.warn("Paramètre '{}' invalide ('{}') — valeur par défaut utilisée : {}", code, valeur.get(), defaut);
+            return defaut;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean getBoolean(String code, boolean defaut) {
+        Optional<String> valeur = lireValeur(code);
+        if (valeur.isEmpty()) {
+            return defaut;
+        }
+        String raw = valeur.get().trim().toLowerCase(Locale.ROOT);
+        if (Set.of("true", "1", "oui", "yes", "o", "y").contains(raw)) {
+            return true;
+        }
+        if (Set.of("false", "0", "non", "no", "n").contains(raw)) {
+            return false;
+        }
+        log.warn("Paramètre '{}' invalide ('{}') — valeur par défaut utilisée : {}", code, valeur.get(), defaut);
+        return defaut;
+    }
+
+    private Optional<String> lireValeur(String code) {
+        return cacheValeurs.computeIfAbsent(code, this::chargerValeur);
+    }
+
+    private Optional<String> chargerValeur(String code) {
+        try {
+            Parametre p = parametreRepository.findByCodeParametre(code);
+            if (p == null || p.getValeurParametre() == null || p.getValeurParametre().isBlank()) {
+                log.warn("Paramètre '{}' absent ou vide — valeur par défaut utilisée", code);
+                return Optional.empty();
+            }
+            return Optional.of(p.getValeurParametre());
+        } catch (Exception e) {
+            log.warn("Impossible de lire le paramètre '{}' : {} — valeur par défaut utilisée", code, e.getMessage());
+            return Optional.empty();
+        }
+    }
 
     @Transactional(readOnly = true)
     public boolean hasCustomLogo() {
-        return resolveCustomLogoUrl() != null;
+        Boolean cached = cachedHasCustomLogo;
+        if (cached != null) {
+            return cached;
+        }
+        boolean has = resolveCustomLogoUrl() != null;
+        cachedHasCustomLogo = has;
+        return has;
     }
 
     @Transactional(readOnly = true)
     public String getLogoUrl() {
+        String cached = cachedLogoUrl;
+        if (cached != null) {
+            return cached;
+        }
         String custom = resolveCustomLogoUrl();
-        return custom != null ? custom : DEFAULT_LOGO_URL;
+        String url = custom != null ? custom : DEFAULT_LOGO_URL;
+        cachedLogoUrl = url;
+        cachedHasCustomLogo = custom != null;
+        return url;
     }
 
     private String resolveCustomLogoUrl() {
         try {
-            ParametreRepository.LogoMeta meta = parametreRepository.findLogoMeta("app.logo");
+            ParametreRepository.LogoMeta meta = parametreRepository.findLogoMeta(CodesParametres.APP_LOGO);
             if (meta == null || meta.getContentType() == null || meta.getContentType().isBlank()) {
                 return null;
             }
@@ -66,14 +175,13 @@ public class ParametreService {
             }
             return "/parametres/logo?v=" + version;
         } catch (Exception e) {
-            // Mauvaise BDD / table absente / connexion KO → logo de base
             return null;
         }
     }
 
     @Transactional(readOnly = true)
     public LogoData getLogoData() {
-        Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
+        Parametre logoParam = parametreRepository.findByCodeParametre(CodesParametres.APP_LOGO);
         if (logoParam == null
                 || logoParam.getContenuBinaire() == null
                 || logoParam.getContenuBinaire().length == 0) {
@@ -99,23 +207,24 @@ public class ParametreService {
             String contentType = normaliserContentType(file.getContentType(), extension);
             String fileName = "logo_" + UUID.randomUUID().toString().substring(0, 8) + extension;
 
-            Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
+            Parametre logoParam = parametreRepository.findByCodeParametre(CodesParametres.APP_LOGO);
             if (logoParam == null) {
                 logoParam = new Parametre();
-                logoParam.setCodeParametre("app.logo");
+                logoParam.setCodeParametre(CodesParametres.APP_LOGO);
                 logoParam.setLibelleParametre("Logo de l'application");
             }
             logoParam.setValeurParametre(fileName);
             logoParam.setContentType(contentType);
             logoParam.setContenuBinaire(file.getBytes());
             parametreRepository.save(logoParam);
+            viderCache();
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de l'enregistrement du logo", e);
         }
     }
 
     public void deleteLogo() {
-        Parametre logoParam = parametreRepository.findByCodeParametre("app.logo");
+        Parametre logoParam = parametreRepository.findByCodeParametre(CodesParametres.APP_LOGO);
         if (logoParam == null) {
             return;
         }
@@ -123,6 +232,7 @@ public class ParametreService {
         logoParam.setContentType(null);
         logoParam.setContenuBinaire(null);
         parametreRepository.save(logoParam);
+        viderCache();
     }
 
     private String normaliserContentType(String contentType, String extension) {

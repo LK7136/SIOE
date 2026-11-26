@@ -3,7 +3,7 @@ package com.hellmetz.festival.service;
 import com.hellmetz.festival.model.Concert;
 import com.hellmetz.festival.model.Edition;
 import com.hellmetz.festival.model.Groupe;
-import com.hellmetz.festival.model.Parametre;
+import com.hellmetz.festival.parametre.CodesParametres;
 import com.hellmetz.festival.repository.ConcertRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -144,8 +143,8 @@ public class ConcertService {
             fin = toLocalDate(edition.getDateFin());
         }
         if (debut == null || fin == null) {
-            debut = lireDateParametre("festival.date_debut");
-            fin = lireDateParametre("festival.date_fin");
+            debut = parametreService.getDate(CodesParametres.FESTIVAL_DATE_DEBUT, null);
+            fin = parametreService.getDate(CodesParametres.FESTIVAL_DATE_FIN, null);
         }
         if (debut == null || fin == null) {
             return Optional.empty();
@@ -212,18 +211,6 @@ public class ConcertService {
                                String libelleDebut, LocalDateTime debut, LocalDateTime fin) {
         if (debut != null && fin != null && !fin.isAfter(debut)) {
             erreurs.putIfAbsent(champFin, libelleFin + " doit être postérieure à " + libelleDebut + ".");
-        }
-    }
-
-    private LocalDate lireDateParametre(String code) {
-        Parametre p = parametreService.findByCode(code);
-        if (p == null || p.getValeurParametre() == null || p.getValeurParametre().isBlank()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(p.getValeurParametre().trim());
-        } catch (DateTimeParseException e) {
-            return null;
         }
     }
 

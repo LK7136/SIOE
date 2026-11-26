@@ -56,6 +56,9 @@ public class Utilisateur {
     @Column(name = "photo_content_type", length = 100)
     private String photoContentType;
 
+    @Column(name = "elements_par_page", nullable = false, columnDefinition = "integer default 10")
+    private Integer elementsParPage = 10;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_utilisateur",
@@ -180,6 +183,14 @@ public class Utilisateur {
 
     public boolean hasPhoto() {
         return contenuPhoto != null && contenuPhoto.length > 0;
+    }
+
+    public Integer getElementsParPage() {
+        return elementsParPage;
+    }
+
+    public void setElementsParPage(Integer elementsParPage) {
+        this.elementsParPage = elementsParPage;
     }
 }
 
