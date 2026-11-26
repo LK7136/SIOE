@@ -1,0 +1,1 @@
+DELETE FROM hellmetz.parametre WHERE code_parametre = 'affichage.theme';
