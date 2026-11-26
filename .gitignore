@@ -37,4 +37,4 @@ build/
 
 ### Config locale ###
 src/main/resources/application.properties
-logs/sioe.log
+.logs/
