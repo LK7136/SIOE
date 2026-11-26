@@ -1,34 +1,31 @@
 package com.hellmetz.festival.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hellmetz.festival.dashboard.*;
 import com.hellmetz.festival.model.DashboardProperties;
 import com.hellmetz.festival.service.DashboardPreferenceService;
 import com.hellmetz.festival.service.DashboardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
 public class DashboardController {
-
 
     private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 
@@ -155,6 +152,21 @@ public class DashboardController {
             return true;
         }
         return valeur.isInt() && valeur.intValue() >= min && valeur.intValue() <= max;
+    }
+
+    @GetMapping("/dashboard/parametres")
+    public String parametres(Model model, Principal principal) {
+        List<WidgetDashboard> visibles = preferenceService.widgetsVisibles(principal.getName());
+        List<WidgetDashboard> reste = preferenceService.parDefaut().stream()
+                .filter(w -> !visibles.contains(w)).toList();
+        List<WidgetDashboard> affichage = new ArrayList<>(visibles);
+        affichage.addAll(reste);
+
+        model.addAttribute("affichage", affichage);
+        model.addAttribute("visibles", visibles);
+        model.addAttribute("pageTitle", "Personnaliser le tableau de bord");
+        model.addAttribute("activeMenu", "dashboard");
+        return "dashboard/parametres";
     }
 
     @PostMapping("/dashboard/parametres")
