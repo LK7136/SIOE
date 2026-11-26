@@ -26,6 +26,10 @@
           Vous avez été déconnecté avec succès.
         </div>
 
+        <div class="alert alert-warning text-center" role="alert" th:if="${param.expired}">
+          Votre session a expiré, merci de vous reconnecter.
+        </div>
+
         <div class="alert alert-success text-center" role="alert" th:if="${successMessage}" th:text="${successMessage}"></div>
 
         <div th:if="${param.error != null}">
