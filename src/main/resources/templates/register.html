@@ -214,7 +214,7 @@
 
 <!-- ═══════════════════════════════════════════════════════
      MODALE — Créer un nouveau rôle
-     Nécessite côté Spring Boot : POST /roles → { idRole, libelle }
+          Nécessite côté Spring Boot : POST /interne/roles → { idRole, libelle }
 ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalCreerRole" tabindex="-1"
      aria-labelledby="modalCreerRoleLabel" aria-hidden="true"
@@ -257,7 +257,7 @@
     </div>
 </div>
 
-
+<script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
     var permissionsParRole = /*[[${permissionsParRole}]]*/ {};
@@ -372,17 +372,22 @@
 
         /* Endpoint attendu → POST /roles, corps : { libelle: "..." }
            Réponse attendue  → { idRole: 42, libelle: "Organisateur" }       */
-        fetch(/*[[@{/roles}]]*/ '/roles', {
+
+        fetch(/*[[@{/interne/roles}]]*/ '/interne/roles', {
             method : 'POST',
             headers: headers,
             body   : JSON.stringify({ libelle: libelle })
         })
             .then(function(resp) {
-                if (!resp.ok) return resp.text().then(function(t) {
-                    throw new Error(t || 'Erreur serveur ' + resp.status);
+                if (resp.ok) return resp.json();
+                if (resp.status === 403) throw new Error('Action réservée aux administrateurs.');
+                return resp.json().then(function(j) {
+                    throw new Error(j.erreur || 'Erreur serveur ' + resp.status);
+                }, function() {
+                    throw new Error('Erreur serveur ' + resp.status);
                 });
-                return resp.json();
             })
+
             .then(function(role) {
                 /* Insérer la nouvelle option juste avant "➕ Créer un nouveau rôle..." */
                 var select  = document.getElementById('selectRole');
