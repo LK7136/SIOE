@@ -55,8 +55,8 @@
                 <option th:each="edition : ${editions}"
                         th:value="${edition.id}"
                         th:text="${edition.nomEdition}"
-                        th:attr="data-debut=${edition.dateDebut != null ? #dates.format(edition.dateDebut, 'yyyy-MM-dd') : ''},
-                                 data-fin=${edition.dateFin != null ? #dates.format(edition.dateFin, 'yyyy-MM-dd') : ''}"
+                        th:attr="data-debut=${edition.dateDebut != null ? #temporals.format(edition.dateDebut, 'yyyy-MM-dd') : ''},
+                                 data-fin=${edition.dateFin != null ? #temporals.format(edition.dateFin, 'yyyy-MM-dd') : ''}"
                         th:selected="${concert.edition != null and concert.edition.id == edition.id}">
                 </option>
               </select>

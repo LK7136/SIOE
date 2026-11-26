@@ -23,6 +23,8 @@
     </div>
 
     <div class="p-4">
+      <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
       <form th:action="@{/scenes/edit}" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="id" th:value="${scene.id}">
@@ -60,11 +62,16 @@
           </div>
           <div class="col-md-6">
             <label for="planTechnique" class="form-label fw-bold">Changer le Plan Technique (PDF)</label>
-            <input type="file" id="planTechnique" name="planTechnique" class="form-control" accept="application/pdf">
+            <input type="file" id="planTechnique" name="planTechnique" class="form-control"
+                   accept="application/pdf,.pdf">
             <small th:if="${not #strings.isEmpty(scene.urlPlanTechnique)}"
-                   class="text-muted"
-                   th:text="'Fichier actuel : ' + ${scene.urlPlanTechnique}">
+                   class="text-muted d-block mt-1">
+              Fichier actuel : <span th:text="${scene.urlPlanTechnique}"></span>
+              <span th:if="${planExiste != null and !planExiste}" class="text-warning fw-bold d-block">
+                ⚠️ Fichier non présent dans le dossier local uploads/scenes_plans/ (sélectionnez un PDF pour l'aperçu).
+              </span>
             </small>
+            <div id="planTechniqueError" class="text-danger small fw-bold mt-1" style="display:none;"></div>
           </div>
         </div>
 
@@ -74,11 +81,14 @@
           <label class="form-check-label fw-bold text-success" for="actif">Scène active</label>
         </div>
 
-        <div th:if="${not #strings.isEmpty(scene.urlPlanTechnique)}"
+        <div id="planPreviewContainer"
+             th:style="${planExiste == null or !planExiste} ? 'display:none;' : ''"
              class="mt-4 border-top pt-3">
-          <label class="fw-bold mb-2">Aperçu du Plan Technique actuel</label>
+          <label id="planPreviewLabel" class="fw-bold mb-2">Aperçu du Plan Technique actuel</label>
           <div style="background:#f8f9fa; border-radius:8px; padding:10px; border:1px solid #dee2e6;">
-            <iframe th:src="@{/documents/plans/{f}(f=${scene.urlPlanTechnique})}"
+            <iframe id="planPreviewFrame"
+                    th:src="${planExiste != null and planExiste} ? @{/scenes/uploads/{f}(f=${scene.urlPlanTechnique})} : 'about:blank'"
+                    th:attr="data-initial-src=${planExiste != null and planExiste} ? @{/scenes/uploads/{f}(f=${scene.urlPlanTechnique})} : ''"
                     width="100%" height="500px"
                     style="border:none; border-radius:4px;">
             </iframe>
@@ -94,6 +104,8 @@
       </form>
     </div>
   </div>
+
+  <script th:src="@{/js/editScene.js}"></script>
 </div>
 </body>
 </html>
