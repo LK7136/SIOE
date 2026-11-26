@@ -3,6 +3,8 @@ package com.hellmetz.festival.model;
 import jakarta.persistence.*;  // Importez les annotations JPA/Hibernate
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "artiste")
@@ -50,10 +52,14 @@ public class Artiste {
     private String exigencesCatering;
 
 
-    // Relation vers style
-    @ManyToOne
-    @JoinColumn(name = "id_style") // clé étrangère en BDD
-    private Style style;
+    // Relation vers styles (plusieurs styles possibles par artiste)
+    @ManyToMany
+    @JoinTable(
+            name = "artiste_style",
+            joinColumns = @JoinColumn(name = "id_artiste"),
+            inverseJoinColumns = @JoinColumn(name = "id_style")
+    )
+    private List<Style> styles = new ArrayList<>();
 
     // Relation avec Groupe
     @ManyToOne
@@ -118,8 +124,8 @@ public class Artiste {
 
     public void setGroupe(Groupe groupe) { this.groupe = groupe; }
 
-    public Style getStyle() { return style; }
+    public List<Style> getStyles() { return styles; }
 
-    public void setStyle(Style style) { this.style = style; }
+    public void setStyles(List<Style> styles) { this.styles = styles; }
 
 }

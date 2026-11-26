@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,8 +23,8 @@ public class Style {
     @Column(name = "description")
     private String description;
 
-
-
+    @ManyToMany(mappedBy = "styles")
+    private List<Artiste> artistes;
 
 
 
@@ -50,6 +51,20 @@ public class Style {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
+    }
+    // Garde getStyles() et setStyles(...) pour ton formulaire multi-sélection
+    public List<Style> getStyles() { return styles; }
+    public void setStyles(List<Style> styles) { this.styles = styles; }
+
+    // Compatibilité pour le reste de l'application (liste des artistes, etc.)
+    public Style getStyle() {
+        return (styles != null && !styles.isEmpty()) ? styles.get(0) : null;
+    }
+
+    public void setStyle(Style style) {
+        if (this.styles == null) this.styles = new ArrayList<>();
+        this.styles.clear();
+        if (style != null) this.styles.add(style);
     }
 
 }

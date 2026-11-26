@@ -87,16 +87,41 @@
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="idStyle" class="form-label fw-bold">Style</label>
-            <select id="idStyle" name="style.id" class="form-control">
-              <option value="">-- Sélectionner un style --</option>
-              <option th:each="style : ${styles}"
-                      th:value="${style.id}"
-                      th:text="${style.libelle}"
-                      th:selected="${artiste.style != null && artiste.style.id == style.id}">
-              </option>
-            </select>
+            <label class="form-label fw-bold">Styles du groupe :</label>
+            <div style="position: relative; width: 100%;">
+
+              <div class="form-control" id="dropdownTrigger"
+                   style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; color: #212529; min-height: 38px;">
+                <span id="dropdownLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%;">Choisir le(s) style(s)</span>
+                <span style="font-size: 0.7rem; color: #6c757d;">▼</span>
+              </div>
+
+              <div id="dropdownMenu"
+                   style="display: none; position: absolute; top: 100%; left: 0; right: 0;
+                          background: #1a1a2e; border: 1px solid #454d55; border-radius: 4px;
+                          max-height: 200px; overflow-y: auto; z-index: 1000; padding: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.5);">
+
+                <div class="form-check mb-2" th:each="style : ${styles}">
+                  <input class="form-check-input style-checkbox"
+                         type="checkbox"
+                         name="stylesId"
+                         th:value="${style.id}"
+                         th:data-nom="${style.libelle}"
+                         th:id="${'style_' + style.id}"
+                         th:checked="${artiste != null and artiste.styles != null and #lists.contains(artiste.styles, style)}">
+
+                  <label class="form-check-label text-white"
+                         th:for="${'style_' + style.id}"
+                         th:text="${style.libelle}"
+                         style="cursor: pointer;">
+                    Nom du Style
+                  </label>
+                </div>
+
+              </div>
+            </div>
           </div>
+
           <div class="col-md-6">
             <label for="exigencesCatering" class="form-label fw-bold">Exigences</label>
             <textarea id="exigencesCatering" name="exigencesCatering"
@@ -144,6 +169,37 @@
         }
       });
     }
+    // Gestion du dropdown des styles
+    const dropdownTrigger = document.getElementById('dropdownTrigger');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const dropdownLabel = document.getElementById('dropdownLabel');
+    const styleCheckboxes = document.querySelectorAll('.style-checkbox');
+
+    if (dropdownTrigger && dropdownMenu) {
+      dropdownTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+      });
+
+      // Fermer le menu si on clique ailleurs sur la page
+      document.addEventListener('click', function(e) {
+        if (!dropdownMenu.contains(e.target) && !dropdownTrigger.contains(e.target)) {
+          dropdownMenu.style.display = 'none';
+        }
+      });
+    }
+
+    function updateDropdownLabel() {
+      const checked = Array.from(styleCheckboxes).filter(cb => cb.checked);
+      if (checked.length === 0) {
+        dropdownLabel.textContent = "Choisir le(s) style(s)";
+      } else {
+        dropdownLabel.textContent = checked.map(cb => cb.getAttribute('data-nom')).join(', ');
+      }
+    }
+
+    styleCheckboxes.forEach(cb => cb.addEventListener('change', updateDropdownLabel));
+    updateDropdownLabel(); // Initialise le texte au chargement (en mode édition)
   </script>
 </div>
 </body>
