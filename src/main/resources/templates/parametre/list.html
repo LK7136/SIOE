@@ -146,18 +146,7 @@
                                 <!-- Cas 2 : Les autres paramètres affichage.* restent communs -->
                                 <th:block th:unless="${#strings.containsIgnoreCase(p.codeParametre, 'page') or #strings.containsIgnoreCase(p.codeParametre, 'pagination')}">
                                     <input type="hidden" name="ids" th:value="${p.idParametre}">
-
-                                    <th:block th:if="${p.codeParametre == 'affichage.theme'}">
-                                        <select class="form-select" name="valeurs">
-                                            <option value="Sombre" th:selected="${p.valeurParametre == 'Sombre'}">Sombre</option>
-                                            <option value="Claire" th:selected="${p.valeurParametre == 'Claire'}">Claire</option>
-                                        </select>
-                                    </th:block>
-
-                                    <th:block th:unless="${p.codeParametre == 'affichage.theme'}">
-                                        <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
-                                    </th:block>
-                                </th:block>
+                                    <input type="text" class="form-control" name="valeurs" th:value="${p.valeurParametre}">
 
                             </div>
                         </div>
