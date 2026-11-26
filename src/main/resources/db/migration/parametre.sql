@@ -14,5 +14,4 @@ INSERT INTO parametre (code_parametre, libelle_parametre, valeur_parametre) VALU
                                                                                 ('programmation.temps_balance',      'Temps de balance',              '45'),
                                                                                 ('contact.email',                    'E-mail de contact',             'contact@hellmetz.fr'),
                                                                                 ('contact.telephone',                'Téléphone',                     '+33387000000'),
-                                                                                ('affichage.elements_par_page',      'Éléments par page',             '10'),
-                                                                                ('affichage.theme',                  'Thème par défaut',              'Sombre');
+                                                                                ('affichage.elements_par_page',      'Éléments par page',             '10');
