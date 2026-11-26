@@ -1,34 +1,31 @@
 package com.hellmetz.festival.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hellmetz.festival.dashboard.*;
 import com.hellmetz.festival.model.DashboardProperties;
 import com.hellmetz.festival.service.DashboardPreferenceService;
 import com.hellmetz.festival.service.DashboardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
 public class DashboardController {
-
 
     private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 
@@ -148,9 +145,7 @@ public class DashboardController {
         return null;
     }
 
-    /**
-     * Gridstack n'envoie pas les valeurs par défaut (par exemple w=1) : un champ absent est accepté.
-     */
+    /** Gridstack n'envoie pas les valeurs par défaut (par exemple w=1) : un champ absent est accepté. */
     private static boolean entierValide(JsonNode noeud, String champ, int min, int max) {
         JsonNode valeur = noeud.get(champ);
         if (valeur == null) {
@@ -172,5 +167,12 @@ public class DashboardController {
         model.addAttribute("pageTitle", "Personnaliser le tableau de bord");
         model.addAttribute("activeMenu", "dashboard");
         return "dashboard/parametres";
+    }
+
+    @PostMapping("/dashboard/parametres")
+    public String enregistrer(@RequestParam(name = "widgets", required = false) List<String> widgets,
+                              Principal principal) {
+        preferenceService.enregistrer(principal.getName(), widgets == null ? List.of() : widgets);
+        return "redirect:/dashboard";
     }
 }
