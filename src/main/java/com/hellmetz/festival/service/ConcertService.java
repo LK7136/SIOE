@@ -140,8 +140,8 @@ public class ConcertService {
         LocalDate fin = null;
 
         if (edition != null) {
-            debut = toLocalDate(edition.getDateDebut());
-            fin = toLocalDate(edition.getDateFin());
+            debut = edition.getDateDebut();
+            fin = edition.getDateFin();
         }
         if (debut == null || fin == null) {
             debut = lireDateParametre("festival.date_debut");

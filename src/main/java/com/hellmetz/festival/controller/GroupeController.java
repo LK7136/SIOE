@@ -1,13 +1,11 @@
 package com.hellmetz.festival.controller;
 
+import com.hellmetz.festival.model.Artiste;
 import com.hellmetz.festival.model.Concert;
 import com.hellmetz.festival.model.Groupe;
 import com.hellmetz.festival.model.Style;
 import com.hellmetz.festival.repository.StyleRepository;
-import com.hellmetz.festival.service.ConcertService;
-import com.hellmetz.festival.service.GroupeService;
-import com.hellmetz.festival.service.ArtisteService;
-import com.hellmetz.festival.service.StyleService;
+import com.hellmetz.festival.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.core.io.Resource;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +41,15 @@ public class GroupeController {
     @Autowired
     private StyleRepository styleRepository;
 
-    private static final String UPLOAD_DIR = System.getProperty("user.home") + "/Desktop/StageHellMetz/uploads/groupes/";
+    private final StorageService storageService;
+
+
+    private static final String SUB_DIR = "groupe_image";
+
+    public GroupeController(GroupeService groupeService, StorageService storageService) {
+        this.groupeService = groupeService;
+        this.storageService = storageService;
+    }
 
     @GetMapping("/liste")
     public String listGroupes(
@@ -76,9 +83,13 @@ public class GroupeController {
     public String edit(@RequestParam(required = false) Long id,
                        @RequestParam(defaultValue = "0") int concertPage,
                        @RequestParam(defaultValue = "10") String concertTaille,
+                       @RequestParam(defaultValue = "0") int artistePage,
+                       @RequestParam(defaultValue = "10") String artisteTaille,
                        Model model) {
 
         boolean tout = "tout".equalsIgnoreCase(concertTaille);
+        boolean toutArtistes = "tout".equalsIgnoreCase(artisteTaille);
+
 
         List<Style> tousLesStyles = styleService.findAll();
         model.addAttribute("tousLesStyles", tousLesStyles);
@@ -87,7 +98,13 @@ public class GroupeController {
             Groupe groupe = groupeService.findByIdWithStyles(id);
             model.addAttribute("groupe", groupe);
             model.addAttribute("pageTitle", "Modifier le groupe");
-            model.addAttribute("artistes", artisteService.findByGroupeId(id));
+
+            Page<Artiste> pageArtistes = toutArtistes
+                    ? artisteService.findDisponiblesOuGroupeTout(id)
+                    : artisteService.findDisponiblesOuGroupe(id, artistePage, parseTaille(artisteTaille));
+            model.addAttribute("artistes", pageArtistes.getContent());
+            model.addAttribute("pageArtistes", pageArtistes);
+            model.addAttribute("artisteTaille", artisteTaille);
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesOuGroupeTout(id)
@@ -100,7 +117,14 @@ public class GroupeController {
         } else {
             model.addAttribute("groupe", new Groupe());
             model.addAttribute("pageTitle", "Nouveau groupe");
-            model.addAttribute("artistes", java.util.Collections.emptyList());
+
+            Page<Artiste> pageArtistes = toutArtistes
+                    ? artisteService.findDisponiblesTout()
+                    : artisteService.findDisponibles(artistePage, parseTaille(artisteTaille));
+
+            model.addAttribute("artistes", pageArtistes.getContent());
+            model.addAttribute("pageArtistes", pageArtistes);
+            model.addAttribute("artisteTaille", artisteTaille);
 
             Page<Concert> pageConcerts = tout
                     ? concertService.findDisponiblesOuAnnulesTout()
@@ -156,78 +180,111 @@ public class GroupeController {
         return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=concerts";
     }
 
+    @PostMapping("/{groupeId}/artistes")
+    public String saveArtistes(@PathVariable Long groupeId,
+                               @RequestParam(required = false) List<Long> artisteIds,
+                               @RequestParam(required = false) List<Long> visibleArtisteIds) {
 
+        if (artisteIds == null) {
+            artisteIds = java.util.Collections.emptyList();
+        }
 
+        if (visibleArtisteIds != null) {
+            Groupe groupe = groupeService.findById(groupeId);
 
+            for (Long idArtiste : visibleArtisteIds) {
+                Artiste artiste = artisteService.findById(idArtiste);
+                if (artiste == null) continue;
+
+                if (artisteIds.contains(idArtiste)) {
+                    // Case cochée : on rattache l'artiste au groupe
+                    artiste.setGroupe(groupe);
+                } else if (artiste.getGroupe() != null && artiste.getGroupe().getId().equals(groupeId)) {
+                    // Case décochée : on libère l'artiste (groupe_id = NULL)
+                    artiste.setGroupe(null);
+                }
+
+                artisteService.save(artiste);
+            }
+        }
+
+        return "redirect:/groupes/ajouter?id=" + groupeId + "&tab=artistes";
+    }
 
     @PostMapping("/edit")
     public String save(@ModelAttribute Groupe groupe,
+                       @RequestParam(value = "groupePhoto", required = false) MultipartFile file,
+                       @RequestParam(value = "supprimerPhoto", defaultValue = "false") boolean supprimerPhoto,
                        @RequestParam(value = "stylesId", required = false) List<Long> stylesId,
-                       @RequestParam(required = false) MultipartFile urlLogoGroupe,
-                       @RequestParam(required = false) String supprimerPhoto) {
+                       RedirectAttributes redirectAttributes) {
 
-        if ("true".equals(supprimerPhoto)) {
-            groupe.setUrlLogo(null);
+
+        if (groupe.getId() != null) {
+            Groupe existant = groupeService.findById(groupe.getId());
+            if (existant != null) {
+                groupe.setUrlLogo(existant.getUrlLogo());
+            }
         }
 
-        if (urlLogoGroupe != null && !urlLogoGroupe.isEmpty()) {
-            try {
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
+        try {
+
+            // suppression de la photo
+            if (supprimerPhoto && groupe.getUrlLogo() != null) {
+                storageService.delete(groupe.getUrlLogo(), SUB_DIR);
+                groupe.setUrlLogo(null);
+            }
+
+            // upload et remplacement de la photo
+            if (file != null && !file.isEmpty()) {
+                // nettoy de l'ancien fichier
+                if (groupe.getUrlLogo() != null) {
+                    storageService.delete(groupe.getUrlLogo(), SUB_DIR);
                 }
-
-                String fileName = urlLogoGroupe.getOriginalFilename();
-                Path targetLocation = uploadPath.resolve(fileName);
-                Files.copy(urlLogoGroupe.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-                groupe.setUrlLogo(fileName);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "groupe/edit";
+                // Enregistrement du nouveau fichier dans "groupe_image"
+                String newFilename = storageService.store(file, SUB_DIR);
+                groupe.setUrlLogo(newFilename);
             }
-        }
 
-        // 1. On nettoie proprement les anciens styles associés en mémoire
-        if (groupe.getStylesDuGroupe() != null) {
-            groupe.getStylesDuGroupe().clear();
-        } else {
-            groupe.setStylesDuGroupe(new HashSet<>());
-        }
-
-        // 2. On va chercher et on ajoute les nouveaux styles cochés
-        if (stylesId != null) {
-            for (Long idStyle : stylesId) {
-                Style style = styleRepository.findById(idStyle)
-                        .orElseThrow(() -> new IllegalArgumentException("Style introuvable : " + idStyle));
-
-                groupe.addStyles(style);
+            // Gestion des styles
+            if (groupe.getStylesDuGroupe() != null) {
+                groupe.getStylesDuGroupe().clear();
+            } else {
+                groupe.setStylesDuGroupe(new HashSet<>());
             }
+
+            if (stylesId != null) {
+                for (Long idStyle : stylesId) {
+                    Style style = styleRepository.findById(idStyle)
+                            .orElseThrow(() -> new IllegalArgumentException("Style introuvable : " + idStyle));
+                    groupe.addStyles(style);
+                }
+            }
+
+            groupeService.save(groupe);
+            return "redirect:/groupes/liste";
+
+        } catch (IllegalArgumentException e) {
+            // Récupère les erreurs de validation (mauvais format, style introuvable, etc.)
+            redirectAttributes.addFlashAttribute("erreur", e.getMessage());
+            return "redirect:/groupes/ajouter" + (groupe.getId() != null ? "?id=" + groupe.getId() : "");
         }
-
-        groupeService.save(groupe);
-
-        return "redirect:/groupes/liste";
     }
 
-    @GetMapping("/uploads/{nomFichier:.+}")
-    public ResponseEntity<Resource> voirPhoto(@PathVariable String nomFichier) throws IOException {
-        Path cheminFichier = Paths.get(UPLOAD_DIR).resolve(nomFichier).normalize();
-        Resource resource = new UrlResource(cheminFichier.toUri());
-
-        if (!resource.exists() || !resource.isReadable()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + nomFichier + "\"")
-                .body(resource);
-    }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, RedirectAttributes flash) {
+        Groupe groupe = groupeService.findById(id);
+        if (groupe == null) {
+            flash.addFlashAttribute("erreur", "Groupe introuvable.");
+            return "redirect:/groupes/liste";
+        }
+
+        if (groupe.getUrlLogo() != null) {
+            storageService.delete(groupe.getUrlLogo(), SUB_DIR);
+        }
+
         groupeService.deleteById(id);
+        flash.addFlashAttribute("message", "Groupe supprimé.");
         return "redirect:/groupes/liste";
     }
 }

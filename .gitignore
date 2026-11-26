@@ -36,5 +36,6 @@ build/
 .DS_Store
 
 ### Config locale ###
-src/main/resources/application.properties.example
 src/main/resources/application.properties
+.logs/
+ 

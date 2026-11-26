@@ -11,15 +11,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.hellmetz.festival.model.Parametre;
-
 /**
- * Rend la variable {@code utilisateurConnecte} (entite metier Utilisateur)
- * disponible automatiquement dans tous les templates Thymeleaf.
- * Aucune requete BDD : l'utilisateur vit deja en session via Spring Security.
+ * Rend les variables communes disponibles automatiquement
+ * dans tous les templates Thymeleaf :
+ * - utilisateurConnecte : entité métier Utilisateur (aucune requête BDD,
+ *   l'utilisateur vit déjà en session via Spring Security)
+ * - theme, appNom, appLogo, hasCustomLogo : paramètres de l'application
  */
 @ControllerAdvice
 public class GlobalControllerAdvice {
+
+    private static final String DEFAULT_APP_NOM = "SIOE";
 
     @Autowired
     private ParametreService parametreService;
@@ -37,7 +39,8 @@ public class GlobalControllerAdvice {
     }
 
     @ModelAttribute
-    public void ajouterTheme(Model model) {
+    public void ajouterParametresGlobaux(Model model) {
+        // Thème
         String theme = "Sombre";
         try {
             Parametre themeParam = parametreService.findByCode("affichage.theme");
@@ -45,10 +48,25 @@ public class GlobalControllerAdvice {
                 theme = themeParam.getValeurParametre();
             }
         } catch (Exception ignored) {
-            // BDD KO → valeurs par défaut
+            // BDD KO → valeur par défaut
         }
         model.addAttribute("theme", theme);
 
+        // Nom de l'application
+        String appNom = DEFAULT_APP_NOM;
+        try {
+            Parametre nomParam = parametreService.findByCode("app.nom");
+            if (nomParam != null
+                    && nomParam.getValeurParametre() != null
+                    && !nomParam.getValeurParametre().isBlank()) {
+                appNom = nomParam.getValeurParametre();
+            }
+        } catch (Exception ignored) {
+            // BDD KO → valeur par défaut
+        }
+        model.addAttribute("appNom", appNom);
+
+        // Logo
         try {
             model.addAttribute("appLogo", parametreService.getLogoUrl());
             model.addAttribute("hasCustomLogo", parametreService.hasCustomLogo());

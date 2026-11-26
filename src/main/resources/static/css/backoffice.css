@@ -398,8 +398,10 @@ erreurCnx p {
     margin: 0;
 }
 
-.grid-stack-item-content { overflow: auto; }
-.grid-stack-item-content > .hm-card { height: 100%; margin: 0; }
+/* Le scroll n'apparaît que si le contenu dépasse réellement la case du module */
+.grid-stack-item-content { overflow-x: hidden; overflow-y: auto; }
+.grid-stack-item-content > .hm-card { height: 100%; margin: 0 !important; }
+.grid-stack-item-content > .hm-card > :last-child { margin-bottom: 0; }
 
 /* ================================
    ADAPTATION AUTOMATIQUE (Responsive)
