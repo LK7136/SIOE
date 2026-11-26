@@ -17,11 +17,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Controller
 @RequestMapping("/parametres")
 public class ParametreController {
+
+    private static final String CODE_LOGO = "app.logo";
+
+    // Codes des paramètres qui deviennent personnels (pour ne plus les afficher dans les réglages communs)
+    private static final Set<String> CODES_PREFERENCES_USER = Set.of(
+            "app.elements_par_page", "elements_par_page", "elementsParPage"
+    );
 
     @Autowired
     private ParametreService parametreService;
@@ -32,19 +41,10 @@ public class ParametreController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    // Codes des paramètres qui deviennent personnels (pour ne plus les afficher dans les réglages communs)
-    private static final Set<String> CODES_PREFERENCES_USER = Set.of(
-            "app.theme", "app.elements_par_page", "theme", "elements_par_page", "elementsParPage"
-    );
-
     @GetMapping("/liste")
     public String edit(Model model, Principal principal) {
-        Utilisateur utilisateur = (principal != null)
-                ? utilisateurRepository.findByIdentifiant(principal.getName()).orElse(null)
-                : null;
-
         model.addAttribute("parametres", parametreService.findAll());
-        model.addAttribute("utilisateur", utilisateur);
+        model.addAttribute("utilisateur", getUtilisateurConnecte(principal).orElse(null));
         model.addAttribute("editions", editionService.findAll());
         model.addAttribute("pageTitle", "Paramètres");
         model.addAttribute("activeMenu", "parametres");
@@ -53,14 +53,8 @@ public class ParametreController {
     }
 
     @PostMapping("/preferences")
-    public String savePreferences(@RequestParam String theme,
-                                  @RequestParam Integer elementsParPage,
-                                  Principal principal) {
-        Utilisateur utilisateur = getUtilisateurConnecte(principal);
-        if (utilisateur != null) {
-            utilisateur.setElementsParPage(elementsParPage);
-            utilisateurRepository.save(utilisateur);
-        }
+    public String savePreferences(@RequestParam Integer elementsParPage, Principal principal) {
+        enregistrerElementsParPage(principal, elementsParPage);
         return "redirect:/parametres/liste";
     }
 
@@ -72,43 +66,62 @@ public class ParametreController {
                        @RequestParam(value = "deleteLogo", required = false) String deleteLogo,
                        Principal principal) {
 
-        // 1. Sauvegarde des réglages communs (le paramètre éléments par page n'est plus dans ids/valeurs)
-        if (ids != null && valeurs != null) {
-            int taille = Math.min(ids.size(), valeurs.size());
-            for (int i = 0; i < taille; i++) {
-                Parametre p = parametreService.findById(ids.get(i));
-                if ("app.logo".equals(p.getCodeParametre())) {
-                    continue;
-                }
-                p.setValeurParametre(valeurs.get(i));
-                parametreService.save(p);
-            }
-        }
-
-        // 2. Sauvegarde de elementsParPage uniquement pour l'utilisateur connecté
-        if (elementsParPage != null && principal != null) {
-            utilisateurRepository.findByIdentifiant(principal.getName()).ifPresent(utilisateur -> {
-                utilisateur.setElementsParPage(elementsParPage);
-                utilisateurRepository.save(utilisateur);
-            });
-        }
-
-        if (logoFile != null && !logoFile.isEmpty()) {
-            parametreService.updateLogo(logoFile);
-        } else if ("true".equals(deleteLogo)) {
-            parametreService.deleteLogo();
-        }
+        enregistrerParametresCommuns(ids, valeurs);
+        Optional.ofNullable(elementsParPage)
+                .ifPresent(nombre -> enregistrerElementsParPage(principal, nombre));
+        traiterLogo(logoFile, deleteLogo);
 
         return "redirect:/parametres/liste";
     }
 
     @GetMapping({"/logo", "/uploads/{nomFichier:.+}"})
     public ResponseEntity<Resource> voirLogo(@PathVariable(required = false) String nomFichier) {
-        ParametreService.LogoData logo = parametreService.getLogoData();
-        if (logo == null) {
-            return ResponseEntity.notFound().build();
-        }
+        return Optional.ofNullable(parametreService.getLogoData())
+                .map(this::construireReponseLogo)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
+    private void enregistrerParametresCommuns(List<Long> ids, List<String> valeurs) {
+        List<Long> idsRecus = Objects.requireNonNullElse(ids, List.of());
+        List<String> valeursRecues = Objects.requireNonNullElse(valeurs, List.of());
+        int nombre = Math.min(idsRecus.size(), valeursRecues.size());
+
+        for (int i = 0; i < nombre; i++) {
+            enregistrerParametre(idsRecus.get(i), valeursRecues.get(i));
+        }
+    }
+
+    private void enregistrerParametre(Long id, String valeur) {
+        Parametre parametre = parametreService.findById(id);
+        if (CODE_LOGO.equals(parametre.getCodeParametre())) {
+            return;
+        }
+        parametre.setValeurParametre(valeur);
+        parametreService.save(parametre);
+    }
+
+    private void enregistrerElementsParPage(Principal principal, Integer elementsParPage) {
+        getUtilisateurConnecte(principal).ifPresent(utilisateur -> {
+            utilisateur.setElementsParPage(elementsParPage);
+            utilisateurRepository.save(utilisateur);
+        });
+    }
+
+    private void traiterLogo(MultipartFile logoFile, String deleteLogo) {
+        Optional.ofNullable(logoFile)
+                .filter(fichier -> !fichier.isEmpty())
+                .ifPresentOrElse(
+                        parametreService::updateLogo,
+                        () -> supprimerLogoSiDemande(deleteLogo));
+    }
+
+    private void supprimerLogoSiDemande(String deleteLogo) {
+        if ("true".equals(deleteLogo)) {
+            parametreService.deleteLogo();
+        }
+    }
+
+    private ResponseEntity<Resource> construireReponseLogo(ParametreService.LogoData logo) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, logo.contentType())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + logo.fileName() + "\"")
@@ -117,8 +130,9 @@ public class ParametreController {
                 .body(new ByteArrayResource(logo.bytes()));
     }
 
-    private Utilisateur getUtilisateurConnecte(Principal principal) {
-        if (principal == null) return null;
-        return utilisateurRepository.findByIdentifiant(principal.getName()).orElse(null);
+    private Optional<Utilisateur> getUtilisateurConnecte(Principal principal) {
+        return Optional.ofNullable(principal)
+                .map(Principal::getName)
+                .flatMap(utilisateurRepository::findByIdentifiant);
     }
 }
