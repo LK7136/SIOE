@@ -148,7 +148,9 @@ public class DashboardController {
         return null;
     }
 
-    /** Gridstack n'envoie pas les valeurs par défaut (par exemple w=1) : un champ absent est accepté. */
+    /**
+     * Gridstack n'envoie pas les valeurs par défaut (par exemple w=1) : un champ absent est accepté.
+     */
     private static boolean entierValide(JsonNode noeud, String champ, int min, int max) {
         JsonNode valeur = noeud.get(champ);
         if (valeur == null) {
@@ -157,10 +159,18 @@ public class DashboardController {
         return valeur.isInt() && valeur.intValue() >= min && valeur.intValue() <= max;
     }
 
-    @PostMapping("/dashboard/parametres")
-    public String enregistrer(@RequestParam(name = "widgets", required = false) List<String> widgets,
-                              Principal principal) {
-        preferenceService.enregistrer(principal.getName(), widgets == null ? List.of() : widgets);
-        return "redirect:/dashboard";
+    @GetMapping("/dashboard/parametres")
+    public String parametres(Model model, Principal principal) {
+        List<WidgetDashboard> visibles = preferenceService.widgetsVisibles(principal.getName());
+        List<WidgetDashboard> reste = preferenceService.parDefaut().stream()
+                .filter(w -> !visibles.contains(w)).toList();
+        List<WidgetDashboard> affichage = new ArrayList<>(visibles);
+        affichage.addAll(reste);
+
+        model.addAttribute("affichage", affichage);
+        model.addAttribute("visibles", visibles);
+        model.addAttribute("pageTitle", "Personnaliser le tableau de bord");
+        model.addAttribute("activeMenu", "dashboard");
+        return "dashboard/parametres";
     }
 }
