@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes; // Ticket #14 : pour les messages flash
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -90,7 +91,8 @@ public class ConcertController {
     public String save(@ModelAttribute Concert concert,
                        BindingResult binding,
                        @RequestParam(value = "groupeId", required = false) Long groupeId,
-                       Model model) {
+                       Model model,
+                       RedirectAttributes flash) { // Ticket #14 : pour le message flash
 
         // 1. Validation (avant toute écriture)
         Map<String, String> erreurs = new LinkedHashMap<>();
@@ -109,34 +111,22 @@ public class ConcertController {
             return "concert/edit";
         }
 
-        // 2. Enregistrement (logique existante inchangée)
-        boolean avaitUnGroupe = false;
-        if (concert.getId() != null) {
-            Concert existant = concertService.findById(concert.getId());
-            avaitUnGroupe = existant.getGroupe() != null;
-        }
-
+        // 2. Enregistrement
+        // Ticket #14 : le statut est maintenant calculé dans ConcertService
+        Groupe groupe = null;
         if (groupeId != null) {
-            Groupe groupe = groupeService.findById(groupeId);
-            concert.setGroupe(groupe);
-            concert.setStatut("Programmé");
-        } else {
-            concert.setGroupe(null);
-
-            if (avaitUnGroupe) {
-                concert.setStatut("Annulé");
-            } else {
-                concert.setStatut("Non programmé");
-            }
+            groupe = groupeService.findById(groupeId);
         }
+        concertService.enregistrer(concert, groupe);
 
-        concertService.save(concert);
+        flash.addFlashAttribute("message", "Concert enregistré."); // Ticket #14 : message flash
         return "redirect:/concerts/liste";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id, RedirectAttributes flash) {
         concertService.deleteById(id);
+        flash.addFlashAttribute("message", "Concert supprimé."); // Ticket #14 : message flash
         return "redirect:/concerts/liste";
     }
 
