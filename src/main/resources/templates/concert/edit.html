@@ -108,6 +108,18 @@
                    th:text="${erreurs['heureBalanceFin']}"></div>
             </div>
           </div>
+          <!-- Ticket #14 : durée du concert et créneau de balance en lecture seule,
+               calculés en JavaScript pendant la saisie (fonction majDurees) -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="dureeConcert" class="form-label fw-bold">Durée du concert</label>
+              <input type="text" id="dureeConcert" class="form-control" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="creneauBalance" class="form-label fw-bold">Créneau de balance</label>
+              <input type="text" id="creneauBalance" class="form-control" readonly>
+            </div>
+          </div>
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="decibelsMax" class="form-label fw-bold">Décibels max</label>
@@ -237,7 +249,7 @@
         });
       }
 
-//script pour chercher un groupe avec son nom
+      //script pour chercher un groupe avec son nom
       function filtrerLesGroupes() {
         const saisie = document.getElementById('rechercheGroupe').value.toLowerCase();
         const lignes = document.querySelectorAll('#panel-groupes .hm-table tbody tr');
@@ -286,6 +298,7 @@
           });
         }
         lierFinAuDebut();
+        majDurees(); // Ticket #14 : recalcul si les dates ont été corrigées par le changement d'édition
       }
 
       // Un champ « fin » ne peut pas proposer de date antérieure à son champ « début »,
@@ -294,6 +307,19 @@
         lier('dateHeureDebut', 'dateHeureFin');
         lier('heureBalanceDebut', 'heureBalanceFin');
         lierBalanceAuConcert();
+      }
+
+      // Ticket #14 : fonction manquante (appelée plus haut mais jamais définie,
+      // ce qui provoquait « lier is not defined » et bloquait le script au chargement).
+      // Le champ « fin » ne peut pas descendre sous la valeur du champ « début ».
+      function lier(idDebut, idFin) {
+        const debut = document.getElementById(idDebut);
+        const fin = document.getElementById(idFin);
+        if (debut.value) {
+          fin.min = debut.value;
+        } else if (debut.min) {
+          fin.min = debut.min;
+        }
       }
 
       function lierBalanceAuConcert() {
@@ -327,7 +353,45 @@
         }
       });
 
-      document.addEventListener('DOMContentLoaded', function () { majBornesDates(false); });
+      // Ticket #14 : durée entre deux champs datetime-local, au format « 1 h 30 »
+      function calculerDuree(idDebut, idFin) {
+        const debut = document.getElementById(idDebut).value;
+        const fin = document.getElementById(idFin).value;
+        if (!debut || !fin) {
+          return '';
+        }
+        const minutes = (new Date(fin) - new Date(debut)) / 60000;
+        if (minutes <= 0) {
+          return 'Fin avant le début';
+        }
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return h + ' h ' + String(m).padStart(2, '0');
+      }
+
+      // Ticket #14 : met à jour la durée du concert et le créneau de balance
+      function majDurees() {
+        document.getElementById('dureeConcert').value = calculerDuree('dateHeureDebut', 'dateHeureFin');
+
+        const debutBalance = document.getElementById('heureBalanceDebut').value;
+        const finBalance = document.getElementById('heureBalanceFin').value;
+        let creneau = '';
+        if (debutBalance && finBalance) {
+          creneau = debutBalance.substring(11) + ' → ' + finBalance.substring(11)
+                  + ' (' + calculerDuree('heureBalanceDebut', 'heureBalanceFin') + ')';
+        }
+        document.getElementById('creneauBalance').value = creneau;
+      }
+
+      // Ticket #14 : recalcul en direct à chaque saisie dans un champ date
+      CHAMPS_DATES.forEach(function (id) {
+        document.getElementById(id).addEventListener('input', majDurees);
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        majBornesDates(false);
+        majDurees(); // Ticket #14 : affichage dès l'ouverture (modification ou retour après erreur)
+      });
     </script>
 
   </div>

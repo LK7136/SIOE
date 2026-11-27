@@ -120,6 +120,38 @@ public class ConcertService {
         concertRepository.save(concert);
     }
 
+    // Ticket #14 : nouvelle méthode. La logique de statut était avant dans
+    // ConcertController.save(), elle est déplacée ici car c'est une règle métier.
+    /**
+     * Enregistre un concert depuis le formulaire et calcule son statut :
+     *  - un groupe est choisi -> « Programmé »
+     *  - plus de groupe alors qu'il en avait un -> « Annulé »
+     *  - jamais eu de groupe -> « Non programmé »
+     */
+    public void enregistrer(Concert concert, Groupe groupe) {
+        // Ticket #14 : on regarde si le concert avait déjà un groupe avant la modification
+        boolean avaitUnGroupe = false;
+        if (concert.getId() != null) {
+            Concert existant = findById(concert.getId());
+            avaitUnGroupe = existant.getGroupe() != null;
+        }
+
+        // Ticket #14 : on associe le groupe choisi (ou null si aucun groupe coché)
+        concert.setGroupe(groupe);
+
+        // Ticket #14 : calcul du statut selon le groupe
+        if (groupe != null) {
+            concert.setStatut("Programmé");
+        } else if (avaitUnGroupe) {
+            concert.setStatut("Annulé");
+        } else {
+            concert.setStatut("Non programmé");
+        }
+
+        // Ticket #14 : enregistrement en base
+        concertRepository.save(concert);
+    }
+
     public void deleteById(Long id) {
         concertRepository.deleteById(id);
     }

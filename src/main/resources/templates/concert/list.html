@@ -19,6 +19,8 @@
                 <span>Nouveau concert</span>
             </a>
         </div>
+        <!-- Ticket #14 : messages flash après enregistrement ou suppression -->
+        <div th:if="${message}" class="alert alert-success m-3" th:text="${message}"></div>
         <div style="display:flex; justify-content:flex-end; align-items:center; gap:.5rem; padding:.5rem 0;">
             <form th:action="@{/concerts/liste}" method="get"
                   style="display:flex; align-items:center; gap:.5rem; margin:0;">
